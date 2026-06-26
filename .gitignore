@@ -1,0 +1,17 @@
+# Amber trajectories, restarts, topologies — large binaries, store outside git
+*.nc
+*.rst7
+*.prmtop
+*.inpcrd
+*.parm7
+*.mdcrd
+*.dcd
+
+# Grid / marching-cubes outputs that can be regenerated from code
+*.ply
+*.npy
+*.npz
+
+# OS / editor noise
+.DS_Store
+*.swp
