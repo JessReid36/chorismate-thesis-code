@@ -184,3 +184,19 @@ visual ChimeraX observation. OPEN QUESTION: is this inherited from raw 2CHT
 placement (artifact, must fix)? Reproduce the old step-09 raw-TSA-vs-placed check
 in the streamlined tree before freezing the complex. Also worth tracking whether
 MD equilibration converges site C's Arg63 toward the other two.
+
+## Arg63 site-C rotamer - RESOLVED (crystallographic, proven)
+
+Chain of evidence (all measured, not asserted):
+  1. Active site is inter-subunit; step 04 recovered same/cross residue origins
+     with zero mismatches.
+  2. Step 05: in raw 2CHT, Arg63' is conformationally heterogeneous across the 12
+     TSA sites (guanidinium-analogue 2.9-7.3 A; 7/12 swung >4.5 A). The cha_c
+     source site (raw L211) was already swung at 7.28 A in the crystal.
+  3. Step 05b: each repaired A/B/C Arg63 side chain is identical to raw 2CHT
+     (side-chain RMSD 0.000 A, all three chains) - repair/cleanup did NOT move them.
+  => site-C swung Arg63' is INHERITED crystallographic flexibility of a solvent-
+     exposed inter-subunit arginine, NOT a workflow artifact. Safe to freeze.
+
+Residual (genuine MD-stage check): during MD analysis, note whether site-C Arg63'
+converges toward the A/B conformation or stays swung. Either outcome is reportable.
