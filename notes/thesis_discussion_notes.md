@@ -154,3 +154,33 @@ say what they're cited for.
   and does not list Arg63 as a binding residue.
 - **Still to check visually (ChimeraX, next step):** overall pose sanity and
   Arg116 second-shell position look reasonable.
+
+## Inter-subunit active site (CONFIRMED - important)
+
+The B. subtilis CM active site is INTER-SUBUNIT: each of the three sites sits at
+the interface of two adjacent monomers (Chook 1993 PNAS; Chook 1994 JMB). Residue
+origin relative to the substrate's own subunit:
+  - same-subunit: Arg7, Arg90, Arg116, Glu78, Tyr108, Leu115
+  - adjacent-subunit ('): Arg63', Lys60', Thr74', Cys75', Phe57', Ala59'
+Step 04 measured closest contacts across ALL chains and recovered this exactly
+(A's site completed by C, B's by A, C's by B - the C3 pattern), zero mismatches.
+
+CORRECTION LOGGED: an earlier same-chain-only measurement wrongly reported Arg63
+at ~21 A and dropped it as non-contact. Arg63 IS a key active-site residue,
+contributed in trans by the adjacent subunit. The drop was a measurement artifact,
+now corrected. This is why cross-chain measurement matters for every ' residue.
+
+Residue roles (BRENDA / FMO QM/MM): Arg63, Arg116, Arg7, Tyr108 orient the
+substrate; the Glu78-Arg90-substrate arrangement controls H-bond strength and TS
+stabilisation, with Arg90's positive charge polarising the substrate in the TS.
+-> directly supports the DDE-doubledagger charge-placement rationale.
+
+## Verify-later: cha_c Arg63' rotamer
+
+Site C's Arg63' points its guanidinium AWAY from the substrate (nearest approach
+6.4 A via CB, vs 2.9-3.1 A via NH1 in sites A/B) - a rotamer flip, matching the
+visual ChimeraX observation. OPEN QUESTION: is this inherited from raw 2CHT
+(crystallographic heterogeneity, fine to report) or introduced by our repair/
+placement (artifact, must fix)? Reproduce the old step-09 raw-TSA-vs-placed check
+in the streamlined tree before freezing the complex. Also worth tracking whether
+MD equilibration converges site C's Arg63 toward the other two.
