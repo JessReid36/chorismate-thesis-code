@@ -31,7 +31,7 @@ active-site presence, peptide continuity).
 Covers: step 04 (chorismate superposed onto A/B/C TSA pose; fit RMSD; contact
 audit). This is where the J/K/L->A/B/C superposition is described.
 
-#### X.1.5 Protonation and parameterisation  [reserved]
+#### X.1.5 Protonation and parameterisation  [drafted]
 Reserved: H++ protonation, Antechamber/GAFF ligand parameterisation
 (chorismate net charge = -2, -nc -2). ff14SB assignment.
 
