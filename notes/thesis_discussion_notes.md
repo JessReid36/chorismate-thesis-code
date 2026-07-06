@@ -200,3 +200,24 @@ Chain of evidence (all measured, not asserted):
 
 Residual (genuine MD-stage check): during MD analysis, note whether site-C Arg63'
 converges toward the A/B conformation or stays swung. Either outcome is reportable.
+
+## Protonation (step 07) - pH and dielectric decisions
+
+- **pH 7.0 chosen** (not H++ default 6.5). Justification: physiological pH, and the
+  closest-matching 2CHT/chorismate preparation in the literature (Steinmann/
+  Claeyssens lineage) protonated at pH 7; general enzyme-MD convention is pH 7.
+  Reproduces our own original attempt_3 run (0.15_80_10_pH7). NOTE for write-up:
+  this is a field-convention choice, NOT strictly Agbaglo's "default parameters"
+  (H++ literal default = 6.5). State honestly in limitations.
+- **Dielectrics: internal 10, external 80** (VERIFIED against H++ literature - the
+  protein interior is the LOW value ~10-20, solvent/water is 80). Filename order
+  0.15_80_10 lists salinity, external, internal. Do not invert these.
+- **H++ topology/coordinate files DISCARDED** - H++ uses its own internal force
+  field/water model (ff19SB/OPC-style); we use only the protonated geometry and
+  rebuild with ff14SB + TIP3P in tleap. This is the correct, paper-faithful choice.
+- **Active-site protonation confirmed at pH 7** (from pKa table): Arg7/63/90/116 all
+  protonated (+), Glu78 deprotonated (-), Tyr108 neutral. Catalytic electrostatics
+  correct. Total protein charge -3; with 3x chorismate (-6) => complex -9 => 9 Na+
+  neutralization (matches Agbaglo).
+- **Citations to verify:** Gordon 2005 (NAR 33:W368); Anandakrishnan 2012 H++ 3.0
+  (NAR 40:W537).
