@@ -3,25 +3,22 @@
 #
 # Method: each chorismate ligand is positioned by least-squares (Kabsch)
 # superposition onto the crystallographic transition-state-analogue (TSA) pose
-# of its target A/B/C active site. The CP2K ligand coordinates are registered to
-# the J/K/L copy of 2CHT (see step 01b); since all 12 chains are crystallo-
-# graphically equivalent copies, superposing from the J/K/L TSA onto the A/B/C
-# TSA introduces no bias and places chorismate in the A/B/C site by the observed
-# analogue geometry. Placement is validated by TSA-fit RMSD, ligand-centre offset
-# to the target site, a protein-ligand heavy-atom contact audit, and recorded
-# closest-approach distances to the defined active-site residues.
+# of its target A/B/C active site. CP2K ligand coordinates are registered to the
+# J/K/L copy of 2CHT (step 01b); all 12 chains are crystallographically equivalent
+# copies, so superposing from J/K/L onto A/B/C introduces no bias.
 #
-# NOTE: the combined PDB is written WITHOUT bond/charge records. The placed .mol2
-# files remain the authoritative source of ligand connectivity and formal charge
-# (chorismate net charge = -2), re-established at parameterisation (step ~12).
+# Active site is INTER-SUBUNIT (Chook et al. 1993/1994): each site sits at the
+# interface of two adjacent monomers. Same-subunit residues: Arg7, Arg90, Arg116,
+# Glu78, Tyr108, Leu115. Adjacent-subunit (') residues: Arg63', Lys60', Thr74',
+# Cys75', Phe57', Ala59'. Catalytic-contact distances are therefore measured
+# against ALL chains, reporting the closest copy and its chain, so the same-chain
+# vs cross-chain (') contribution is explicit and checkable against the literature.
 #
-# Catalytic-contact distances are CLOSEST HEAVY-ATOM approaches on unrelaxed
-# placeholder coordinates - they indicate whether each active-site residue is in
-# the expected neighbourhood, not precise interaction geometry. Reported, not gated.
+# Distances are CLOSEST HEAVY-ATOM approaches on unrelaxed placeholder coords -
+# they show neighbourhood/architecture, not precise interaction geometry. Not gated.
 #
-# Residue set: Arg90, Glu78, Arg7, Arg116, Tyr108. Arg63 was measured but EXCLUDED:
-# it lies ~21 A from chorismate in all three sites, i.e. it is not a substrate-
-# contact residue in this system (dropped on the basis of measurement, not omitted).
+# NOTE: combined PDB carries no bond/charge records; the placed .mol2 files remain
+# authoritative for connectivity and formal charge (chorismate net charge = -2).
 set -euo pipefail
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 
@@ -48,8 +45,15 @@ audit_rep     = admin  / "step04_placement_audit.txt"
 catalytic_rep = admin  / "step04_catalytic_contact_report.tsv"
 combined_pdb  = outdir / "abc_with_chorismate_unprotonated.pdb"
 
-# Substrate-contact residues (Arg63 excluded: measured ~21 A, not a contact).
-catalytic_residues = [90, 78, 7, 116, 108]  # Arg90, Glu78, Arg7, Arg116, Tyr108
+# Active-site residues with EXPECTED chain origin relative to the substrate's own
+# subunit. "same" = own chain; "cross" = adjacent chain ('). Code measures against
+# ALL chains and reports the observed closest chain, so these labels are tested.
+active_site = [
+    (7,   "ARG", "same"),  (90,  "ARG", "same"),  (116, "ARG", "same"),
+    (78,  "GLU", "same"),  (108, "TYR", "same"),  (115, "LEU", "same"),
+    (63,  "ARG", "cross"), (60,  "LYS", "cross"), (74,  "THR", "cross"),
+    (75,  "CYS", "cross"), (57,  "PHE", "cross"), (59,  "ALA", "cross"),
+]
 
 placements = [
     dict(lig="liga.mol2", out="cha_a_placed.mol2", src=("K",210), tgt=("A",203),
@@ -166,20 +170,25 @@ for pl in placements:
                 k = (pa["chain"], pa["resid"], pa["resname"])
                 if k not in close or dd < close[k]: close[k] = dd
 
-    for resid in catalytic_residues:
-        res_atoms = [pa for pa in prot
-                     if pa["chain"] == pl["lig_chain"] and pa["resid"] == resid
-                     and not is_h(pa["atom"], pa["element"])]
-        if not res_atoms:
-            catrows.append((pl["label"], pl["lig_chain"], resid, "NA", "absent")); continue
-        best, best_pair = None, None
+    # catalytic contacts: for each active-site residue, find the closest copy
+    # ACROSS ALL CHAINS and report which chain it came from + same/cross label.
+    for resid, exp_resname, exp_origin in active_site:
+        cands = [pa for pa in prot if pa["resid"] == resid
+                 and not is_h(pa["atom"], pa["element"])]
+        if not cands:
+            catrows.append((pl["label"], pl["lig_chain"], resid, exp_resname,
+                            exp_origin, "NA", "NA", "NA", "absent")); continue
+        best = None
         for L in heavy_xyz:
-            for pa in res_atoms:
+            for pa in cands:
                 dd = dist(L, pa["xyz"])
-                if best is None or dd < best:
-                    best = dd; best_pair = (pa["resname"], pa["atom"])
-        catrows.append((pl["label"], pl["lig_chain"], resid, f"{best:.3f}",
-                        f"{best_pair[0]}:{best_pair[1]}"))
+                if best is None or dd < best[0]:
+                    best = (dd, pa["chain"], pa["resname"], pa["atom"])
+        dd, pchain, prname, patom = best
+        observed = "same" if pchain == pl["lig_chain"] else "cross"
+        match = "ok" if observed == exp_origin else "MISMATCH"
+        catrows.append((pl["label"], pl["lig_chain"], resid, prname, exp_origin,
+                        pchain, observed, f"{dd:.3f}", f"{patom}:{match}"))
 
     trows.append((pl["label"], pl["lig"], f"{pl['src'][0]}{pl['src'][1]}",
                   f"{pl['tgt'][0]}{pl['tgt'][1]}", len(common), rmsd, offset))
@@ -208,10 +217,10 @@ contact_rep.write_text("\n".join(clines) + "\n")
 audit_rep.write_text("step04_placement_audit\n" + "\n".join(alines) + "\n")
 
 with catalytic_rep.open("w") as f:
-    f.write("# Arg63 excluded from set: measured ~21 A from chorismate (not a contact residue)\n")
-    f.write("ligand\tchain\tresid\tclosest_heavy_A\tligand_partner_atom\n")
-    for lab, ch, resid, d, partner in catrows:
-        f.write(f"{lab}\t{ch}\t{resid}\t{d}\t{partner}\n")
+    f.write("# Active site is inter-subunit; 'cross' residues are contributed by the adjacent chain (').\n")
+    f.write("ligand\tlig_chain\tresid\tresname\texpected_origin\tobserved_chain\tobserved_origin\tclosest_heavy_A\tpartner_atom_match\n")
+    for row in catrows:
+        f.write("\t".join(str(x) for x in row) + "\n")
 
 with combined_pdb.open("w") as f:
     for line in protein.read_text().splitlines():
@@ -232,14 +241,15 @@ print("placement report:")
 for lab, lig, s, t, n, r, o in trows:
     print(f"  {lab}: {lig} {s}->{t} | fit RMSD {r:.4f} A | centre offset {o:.3f} A")
 
-resname_of = {90:"ARG",78:"GLU",7:"ARG",116:"ARG",108:"TYR"}
-print("\ncatalytic-residue closest heavy-atom approach (A):")
-print(f"  {'site':6s} " + " ".join(f"{resname_of[r]}{r:<3d}" for r in catalytic_residues))
+print("\ncatalytic-residue closest heavy-atom approach across all chains:")
+print(f"  {'site':4s} {'res':7s} {'exp':5s} {'obs_chain':9s} {'obs':5s} {'dist_A':7s} {'check'}")
 for pl in placements:
-    row = {resid: d for lab, ch, resid, d, p in catrows if lab == pl["label"]}
-    cells = " ".join(f"{row.get(r,'NA'):>6s}" for r in catalytic_residues)
-    print(f"  {pl['lig_chain']:6s} {cells}")
-print("\n  (Arg63 excluded: ~21 A in all sites, not a substrate-contact residue)")
+    for row in catrows:
+        if row[0] != pl["label"]: continue
+        _, lch, resid, rname, exp, obch, obs, dd, match = row
+        flag = "" if match.endswith("ok") else "  <-- unexpected"
+        print(f"  {lch:4s} {rname}{resid:<4d} {exp:5s} {obch:9s} {obs:5s} {dd:>7s} {match}{flag}")
+
 print(f"\nWROTE {catalytic_rep}")
 print(f"WROTE {combined_pdb}")
 PY
