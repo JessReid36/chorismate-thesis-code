@@ -120,3 +120,18 @@ say what they're cited for.
 | Kienhöfer/Lipscomb 2014 | PNAS, 10.1073/pnas.1408512111 | TS-stabilization evidence; charge-placement motivation | Intro / Discussion | ☐ | ☐ |
 | Sokalski DTSS 2004 | PMID 15584751 | Optimal catalytic field; grid-idea precedent | Discussion / Phase 2 | ☐ | ☐ |
 | DFT QM/MM CM | JPCB, 10.1021/jp036236h | QM-region choice (substrate ± Glu78/Arg90) | Methods (QM/MM) | ☐ | ☐ |
+
+---
+
+## Verify-later checks (post-minimisation / post-MD)
+
+- **Step 02 terminal graft joins (A115-A116, B1-B2):** repair closed these to a
+  canonical C-N distance by rigid translation of the graft block (moved 0.79 A
+  and 1.32 A respectively). This fixes the C-N DISTANCE only, not the bond
+  angles/dihedrals. After energy minimisation, confirm these joins relaxed to
+  physical backbone geometry. If minimisation cannot relax them, the terminal
+  repair needs revisiting.
+- **Active-site side-chain conformation:** Step 02 confirmed active-site residues
+  are PRESENT (7,57,59,60,63,73,74,75,78,90,108,115). Their conformational
+  integrity - especially catalytic Arg90 and Glu78 - is validated only later by
+  visual inspection and MD stability, not by the presence check.
