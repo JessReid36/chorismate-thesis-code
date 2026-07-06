@@ -143,3 +143,14 @@ say what they're cited for.
   explicitly verified rather than assumed. Note for provenance: the input to
   step 03 is the REPAIRED structure (2CHT+1DBF), not raw 2CHT - raw 2CHT (1.9 A,
   1994) carries no deposited hydrogens.
+
+- **Step 04 catalytic contacts - RESOLVED by measurement:** the earlier
+  verify-later item (confirm Arg90/Glu78 contact) is now answered directly.
+  Closest heavy-atom approaches, consistent across all three sites:
+  Arg90 2.8-3.0 A, Glu78 2.9-3.4 A, Arg7 2.7-2.8 A, Tyr108 2.6-3.0 A (all direct
+  contact); Arg116 5.5-6.8 A (second shell). Arg63 measured ~21 A -> excluded as
+  non-contact (documented in step04_catalytic_contact_report.tsv header, not
+  silently dropped). TODO: confirm reference paper's active-site set matches this
+  and does not list Arg63 as a binding residue.
+- **Still to check visually (ChimeraX, next step):** overall pose sanity and
+  Arg116 second-shell position look reasonable.
