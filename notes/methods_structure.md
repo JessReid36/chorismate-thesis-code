@@ -23,7 +23,7 @@ Covers: step 02 (A/B/C terminal repair using 1DBF; global superposition +
 terminal graft; join closure). J/K/L route NOT included (cut).
 Supporting: alignment RMSD, peptide-continuity table.
 
-#### X.1.3 Structure cleanup and validation  [reserved]
+#### X.1.3 Structure cleanup and validation  [drafted]
 Covers: step 03 (altloc resolution, hydrogen removal, heavy-atom validation,
 active-site presence, peptide continuity).
 

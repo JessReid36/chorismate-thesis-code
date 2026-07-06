@@ -135,3 +135,11 @@ say what they're cited for.
   are PRESENT (7,57,59,60,63,73,74,75,78,90,108,115). Their conformational
   integrity - especially catalytic Arg90 and Glu78 - is validated only later by
   visual inspection and MD stability, not by the presence check.
+
+- **Origin of removed hydrogens (step 03):** the 601 hydrogens removed were
+  genuine, identified by the authoritative PDB element column (not name-guessing).
+  They entered via the 1DBF-derived terminal residues (1DBF is 1.30 A and
+  hydrogen-bearing). Removal was correct ahead of controlled protonation, and was
+  explicitly verified rather than assumed. Note for provenance: the input to
+  step 03 is the REPAIRED structure (2CHT+1DBF), not raw 2CHT - raw 2CHT (1.9 A,
+  1994) carries no deposited hydrogens.
