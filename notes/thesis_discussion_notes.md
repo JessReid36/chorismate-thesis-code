@@ -1,0 +1,122 @@
+# Thesis discussion notes and reference tracker
+
+Running file for talking points, open decisions, and papers to read/cite.
+Populate as the project develops. Not part of the runnable workflow — this is
+a thinking/writing aid for the Discussion and Introduction chapters.
+
+---
+
+## Open decisions to revisit
+
+| Item | Current state | Decision point | Notes |
+|---|---|---|---|
+| Chorismate reactant coordinates | Using CP2K tutorial mol2 (LigA–C, 24 atoms) as placeholder | End of system-development phase | Provenance is pedagogical, not primary. Options if replaced: (A) anchor geometry to crystallographic TSA pose in 2CHT; (B) build from PubChem/ChEBI chorismate + align to TSA pose; (C) validate + re-provenance CP2K coords. Reactant charge confirmed = **2−** (dianion). |
+| Grid reference ligand | Built around placeholder chorismate | After QM/MM-optimized reactant + NEB-TS available | Grid must be regenerated on the real optimized reactant and TS geometries before any charge-placement claims. |
+| Charge-optimization method | Undecided | Phase 2, later | Candidates: ORCA single-points, point-charge embedding, QM/MM point-charge perturbation. Do not write as finalized. |
+
+---
+
+## Discussion talking points
+
+### 1. The reactant-destabilization vs TS-stabilization debate (CENTRAL)
+
+The literature on chorismate mutase contains a genuine, named controversy about
+*where* the catalytic effect comes from, and this project's ΔΔE‡ framework sits
+directly on top of it.
+
+- The Pauling paradigm holds that enzymes accelerate reactions by binding the
+  transition state (TS) more tightly than the substrate, lowering the activation
+  barrier relative to the uncatalyzed reaction.
+- This paradigm was **challenged** for chorismate mutase: some computational work
+  predicted that the decisive factor is **ground-state (reactant) destabilization**
+  — i.e. the enzyme strains/compresses the bound substrate — rather than TS
+  stabilization.
+- Later crystallographic and QM/MM work argues the opposite: catalysis is driven
+  mainly by **electrostatic transition-state stabilization**. The strongest
+  experimental support is the Arg90→citrulline variant (see refs): removing one
+  cationic active-site charge cripples catalysis (kcat and kcat/Km down by >4
+  orders of magnitude) while barely affecting substrate binding — showing the
+  positive charge stabilizes the TS, not the ground state.
+- Several QM/MM studies land on a **combination**: a *minor* substrate
+  destabilization by compression plus a *major* electrostatic TS stabilization.
+
+**Why this matters for the thesis:** the whole point of the ΔΔE‡ approach is to be
+specific about whether an added charge lowers the TS energy, raises the reactant
+energy, or changes the barrier — and by how much. The project therefore addresses
+a real open question rather than a settled one. In the write-up, position the work
+against BOTH sides of this debate; do not present TS stabilization as uncontested.
+
+Reminder for the whole write-up: never say "the charge lowers the energy" without
+stating whether it lowers the TS, raises/lowers the reactant, or changes the
+activation barrier.
+
+### 2. Enzyme scaffold vs reactant come from different sources
+
+2CHT provides the protein and the active-site location (via the bound TSA
+transition-state analogue). The chorismate reactant geometry comes from a separate
+source (currently the CP2K tutorial files). State this explicitly wherever 2CHT is
+introduced, so it is never read as "modelled the inhibitor as the substrate."
+
+### 3. Relationship to "optimal catalytic field" prior work
+
+At least one prior study (Sokalski/DTSS group) computes the *optimal catalytic
+field* — where charge/field placement best stabilizes the TS. This is the closest
+published analogue to the grid-based charge-placement idea in this project. MUST
+read carefully and articulate clearly how this project differs (e.g. explicit
+grid-sampled candidate positions around the real optimized reactant/TS geometries
+vs their analysis). This is both a precedent and the work to differentiate from.
+
+---
+
+## Papers to read / potential citations
+
+Verify each yourself before citing — pulled from literature search, confirm they
+say what they're cited for.
+
+### Structural (primary sources for 2CHT)
+- **Chook, Ke, Lipscomb (1993)** *Crystal structures of the monofunctional
+  chorismate mutase from B. subtilis and its complex with a transition state
+  analog.* PNAS 90(18): 8600–8603. DOI 10.1073/pnas.90.18.8600. PMID 8378335.
+  → PRIMARY citation for 2CHT. Structure at 1.9 Å, R ≈ 0.201, 12 monomers/asym unit.
+- **Chook, Gray, Ke, Lipscomb (1994)** *The monofunctional chorismate mutase from
+  B. subtilis...* J. Mol. Biol. 240(5): 476–500. DOI 10.1006/jmbi.1994.1462.
+  PMID 8046752. → Fuller structure determination (TSA + prephenate complexes),
+  spells out the pericyclic mechanism and active-site detail. Better for the
+  "why it works" mechanism discussion than the terse PNAS communication.
+
+### Computational / mechanistic (core to Phase 2 rationale)
+- **Ranaghan, Ridder, Szefczyk, Sokalski, Hermann, Mulholland (2004)**
+  *Transition state stabilization and substrate strain in enzyme catalysis:
+  ab initio QM/MM modelling of the chorismate mutase reaction.* Org. Biomol.
+  Chem. 2(7): 968–980. DOI 10.1039/b313759g. → KEY methodological precedent for
+  QM/MM of this exact system. Barrier estimates 7.4–11.0 (MP2) and 12.7–16.1
+  (B3LYP) kcal/mol vs experimental ΔH‡ = 12.7 ± 0.4 kcal/mol. Benchmark to
+  compare own barrier against.
+- **Kienhöfer / Lipscomb group (2014)** *Electrostatic transition state
+  stabilization rather than reactant destabilization provides the chemical basis
+  for efficient chorismate mutase catalysis.* PNAS. DOI 10.1073/pnas.1408512111.
+  → Arg90→citrulline experiment. KEY motivation for charge-placement rationale:
+  direct experimental evidence that an active-site positive charge stabilizes the
+  TS more than the reactant.
+- **Sokalski group (2004)** *Differential Transition-State Stabilization in Enzyme
+  Catalysis: Quantum Chemical Analysis... and Prediction of the Optimal Catalytic
+  Field.* PMID 15584751. → DTSS analysis, ~−23 kcal/mol TS stabilization
+  (MP2/6-31G(d)) relative to bound substrate. Closest analogue to the grid/
+  charge-field idea — read carefully, differentiate from.
+- **DFT-based QM/MM applied to chorismate mutase.** J. Phys. Chem. B.
+  DOI 10.1021/jp036236h. → Tested QM-region choices: substrate only vs substrate
+  + Glu78/Arg90 charged side chains. Informs QM-region selection decision.
+  Concludes minor substrate destabilization + major electrostatic TS stabilization.
+
+---
+
+## Reference tracking table (populate as write-up proceeds)
+
+| Ref (short) | Full citation / DOI | What it supports in the write-up | Chapter/section | Read? | Verified? |
+|---|---|---|---|---|---|
+| Chook 1993 | PNAS 90:8600, 10.1073/pnas.90.18.8600 | 2CHT source structure; enzyme is homotrimer, analogue-bound | Methods (inputs) | ☐ | ✅ |
+| Chook 1994 | JMB 240:476, 10.1006/jmbi.1994.1462 | Mechanism, active site, TSA + prephenate complexes | Intro / Discussion | ☐ | ☐ |
+| Ranaghan 2004 | OBC 2:968, 10.1039/b313759g | QM/MM precedent; barrier benchmark | Methods / Discussion | ☐ | ☐ |
+| Kienhöfer/Lipscomb 2014 | PNAS, 10.1073/pnas.1408512111 | TS-stabilization evidence; charge-placement motivation | Intro / Discussion | ☐ | ☐ |
+| Sokalski DTSS 2004 | PMID 15584751 | Optimal catalytic field; grid-idea precedent | Discussion / Phase 2 | ☐ | ☐ |
+| DFT QM/MM CM | JPCB, 10.1021/jp036236h | QM-region choice (substrate ± Glu78/Arg90) | Methods (QM/MM) | ☐ | ☐ |
