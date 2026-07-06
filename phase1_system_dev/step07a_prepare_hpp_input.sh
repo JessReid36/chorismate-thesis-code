@@ -8,7 +8,7 @@
 # be re-chained if H++ strips chain IDs (a known H++ behaviour).
 #
 # Server settings to use manually (matching physiological choice + original run):
-#   pH 7.0, salinity 0.15 M, internal dielectric 80, external dielectric 10.
+#   pH 7.0, salinity 0.15 M, internal dielectric 10, external dielectric 80.
 set -euo pipefail
 
 root="$HOME/system_development"
