@@ -45,7 +45,7 @@ Active-site residues marked. State column = protonation at pH 7 (chain A represe
 | TYR-108 | 8.7 | 9.9 | 10.1 | neutral | **yes** |
 | GLU-110 | 2.8 | 1.9 | 2.2 | deprotonated (-) |  |
 | LYS-111 | 10.8 | 10.9 | 11.0 | protonated (+) |  |
-| ARG-116 | >12.0 | >12.0 | >12.0 | protonated (+) | **yes** |
+| ARG-116 | >12.0 | >12.0 | >12.0 | protonated (+) |  |
 | ASP-118 | 3.2 | 2.2 | 3.4 | deprotonated (-) |  |
 | LYS-123 | 10.7 | 10.4 | 10.8 | protonated (+) |  |
 | GLU-126 | 4.4 | 4.2 | 4.2 | deprotonated (-) |  |
@@ -58,11 +58,12 @@ Active-site residues marked. State column = protonation at pH 7 (chain A represe
 | Arg7  | >12/>12/>12 | protonated (+) | substrate orientation |
 | Arg63'| >12/>12/>12 | protonated (+) | cross-subunit, orientation |
 | Arg90 | >12/>12/>12 | protonated (+) | TS electrostatic stabilization |
-| Arg116| >12/>12/>12 | protonated (+) | orientation |
 | Glu78 | <0/<0/<0 | deprotonated (-) | Glu78-Arg90-substrate H-bond network |
 | Tyr108| 8.7/9.9/10.1 | neutral | orientation |
 | Lys60'| 11.3/11.9/11.2 | protonated (+) | cross-subunit |
 | Cys75'| >12/>12/>12 | neutral (SH) | cross-subunit |
+
+*Active-site set = published Agbaglo QM-cluster residues (SI, S3). Arg116 is second shell (~5.5-6.8 A, step 04) and is NOT an active-site/QM residue. Val73 is in the set but non-titratable, so it does not appear in this pKa table.*
 
 ## Histidine tautomers (non-active-site) - CONFIRMED from H++ placed hydrogens (step 07b)
 

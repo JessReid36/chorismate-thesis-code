@@ -27,9 +27,13 @@ Supporting: alignment RMSD, peptide-continuity table.
 Covers: step 03 (altloc resolution, hydrogen removal, heavy-atom validation,
 active-site presence, peptide continuity).
 
-#### X.1.4 Ligand placement  [reserved]
-Covers: step 04 (chorismate superposed onto A/B/C TSA pose; fit RMSD; contact
-audit). This is where the J/K/L->A/B/C superposition is described.
+#### X.1.4 Ligand placement  [drafted]
+Covers: step 04 (chorismate superposed onto A/B/C TSA pose by Kabsch; fit RMSD
+0.08-0.15 A; inter-subunit catalytic-contact audit vs the published Agbaglo
+QM-cluster set {7,57,59,60,63,73,74,75,78,90,108,115}). The J/K/L->A/B/C
+superposition is described here. Active site is inter-subunit (C3 pattern: A
+completed by C, B by A, C by B); Arg116 is reported as second shell (~5.5-6.8 A),
+not an active-site/QM residue. Draft paragraph: written (see thesis draft).
 
 #### X.1.5 Protonation and parameterisation  [protonation drafted; parameterisation reserved]
 Protonation (steps 07a/07b): protein-only structure submitted to H++ (pH 7.0,

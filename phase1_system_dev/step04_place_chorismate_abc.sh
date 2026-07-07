@@ -8,11 +8,14 @@
 # copies, so superposing from J/K/L onto A/B/C introduces no bias.
 #
 # Active site is INTER-SUBUNIT (Chook et al. 1993/1994): each site sits at the
-# interface of two adjacent monomers. Same-subunit residues: Arg7, Arg90, Arg116,
-# Glu78, Tyr108, Leu115. Adjacent-subunit (') residues: Arg63', Lys60', Thr74',
-# Cys75', Phe57', Ala59'. Catalytic-contact distances are therefore measured
-# against ALL chains, reporting the closest copy and its chain, so the same-chain
-# vs cross-chain (') contribution is explicit and checkable against the literature.
+# interface of two adjacent monomers. The active-site residue set is the published
+# Agbaglo/DeYonker QM-cluster set (their SI, scheme S3): same-subunit Arg7, Arg90,
+# Glu78, Tyr108, Leu115; adjacent-subunit (') Arg63', Lys60', Val73', Thr74',
+# Cys75', Phe57', Ala59'. Arg116 is NOT in that set - it is second shell (measured
+# here at ~5.5-6.8 A vs 2.6-3.4 A for true contacts) and is reported separately for
+# provenance only. Catalytic-contact distances are measured against ALL chains,
+# reporting the closest copy and its chain, so the same-chain vs cross-chain (')
+# contribution is explicit and checkable against the literature.
 #
 # Distances are CLOSEST HEAVY-ATOM approaches on unrelaxed placeholder coords -
 # they show neighbourhood/architecture, not precise interaction geometry. Not gated.
@@ -45,14 +48,23 @@ audit_rep     = admin  / "step04_placement_audit.txt"
 catalytic_rep = admin  / "step04_catalytic_contact_report.tsv"
 combined_pdb  = outdir / "abc_with_chorismate_unprotonated.pdb"
 
-# Active-site residues with EXPECTED chain origin relative to the substrate's own
-# subunit. "same" = own chain; "cross" = adjacent chain ('). Code measures against
-# ALL chains and reports the observed closest chain, so these labels are tested.
+# Active-site residues = the published Agbaglo/DeYonker QM-cluster set (SI, S3),
+# with EXPECTED chain origin relative to the substrate's own subunit. "same" = own
+# chain; "cross" = adjacent chain ('). Code measures against ALL chains and reports
+# the observed closest chain, so these labels are tested.
 active_site = [
-    (7,   "ARG", "same"),  (90,  "ARG", "same"),  (116, "ARG", "same"),
-    (78,  "GLU", "same"),  (108, "TYR", "same"),  (115, "LEU", "same"),
-    (63,  "ARG", "cross"), (60,  "LYS", "cross"), (74,  "THR", "cross"),
-    (75,  "CYS", "cross"), (57,  "PHE", "cross"), (59,  "ALA", "cross"),
+    (7,   "ARG", "same"),  (90,  "ARG", "same"),  (78,  "GLU", "same"),
+    (108, "TYR", "same"),  (115, "LEU", "same"),
+    (63,  "ARG", "cross"), (60,  "LYS", "cross"), (73,  "VAL", "cross"),
+    (74,  "THR", "cross"), (75,  "CYS", "cross"), (57,  "PHE", "cross"),
+    (59,  "ALA", "cross"),
+]
+
+# Second-shell residues: measured and reported for provenance, but NOT part of the
+# active-site/QM-cluster set. Arg116 sits ~5.5-6.8 A from the substrate here and is
+# absent from the Agbaglo set, so it is classified second shell rather than a contact.
+second_shell = [
+    (116, "ARG", "same"),
 ]
 
 placements = [
@@ -170,25 +182,28 @@ for pl in placements:
                 k = (pa["chain"], pa["resid"], pa["resname"])
                 if k not in close or dd < close[k]: close[k] = dd
 
-    # catalytic contacts: for each active-site residue, find the closest copy
-    # ACROSS ALL CHAINS and report which chain it came from + same/cross label.
-    for resid, exp_resname, exp_origin in active_site:
-        cands = [pa for pa in prot if pa["resid"] == resid
-                 and not is_h(pa["atom"], pa["element"])]
-        if not cands:
-            catrows.append((pl["label"], pl["lig_chain"], resid, exp_resname,
-                            exp_origin, "NA", "NA", "NA", "absent")); continue
-        best = None
-        for L in heavy_xyz:
-            for pa in cands:
-                dd = dist(L, pa["xyz"])
-                if best is None or dd < best[0]:
-                    best = (dd, pa["chain"], pa["resname"], pa["atom"])
-        dd, pchain, prname, patom = best
-        observed = "same" if pchain == pl["lig_chain"] else "cross"
-        match = "ok" if observed == exp_origin else "MISMATCH"
-        catrows.append((pl["label"], pl["lig_chain"], resid, prname, exp_origin,
-                        pchain, observed, f"{dd:.3f}", f"{patom}:{match}"))
+    # catalytic contacts: for each active-site (and second-shell) residue, find the
+    # closest copy ACROSS ALL CHAINS and report which chain + same/cross label. The
+    # shell tag keeps second-shell Arg116 in the record without treating it as a
+    # defining active-site contact.
+    for shell, residue_set in (("active_site", active_site), ("second_shell", second_shell)):
+        for resid, exp_resname, exp_origin in residue_set:
+            cands = [pa for pa in prot if pa["resid"] == resid
+                     and not is_h(pa["atom"], pa["element"])]
+            if not cands:
+                catrows.append((pl["label"], pl["lig_chain"], shell, resid, exp_resname,
+                                exp_origin, "NA", "NA", "NA", "absent")); continue
+            best = None
+            for L in heavy_xyz:
+                for pa in cands:
+                    dd = dist(L, pa["xyz"])
+                    if best is None or dd < best[0]:
+                        best = (dd, pa["chain"], pa["resname"], pa["atom"])
+            dd, pchain, prname, patom = best
+            observed = "same" if pchain == pl["lig_chain"] else "cross"
+            match = "ok" if observed == exp_origin else "MISMATCH"
+            catrows.append((pl["label"], pl["lig_chain"], shell, resid, prname, exp_origin,
+                            pchain, observed, f"{dd:.3f}", f"{patom}:{match}"))
 
     trows.append((pl["label"], pl["lig"], f"{pl['src'][0]}{pl['src'][1]}",
                   f"{pl['tgt'][0]}{pl['tgt'][1]}", len(common), rmsd, offset))
@@ -217,8 +232,9 @@ contact_rep.write_text("\n".join(clines) + "\n")
 audit_rep.write_text("step04_placement_audit\n" + "\n".join(alines) + "\n")
 
 with catalytic_rep.open("w") as f:
-    f.write("# Active site is inter-subunit; 'cross' residues are contributed by the adjacent chain (').\n")
-    f.write("ligand\tlig_chain\tresid\tresname\texpected_origin\tobserved_chain\tobserved_origin\tclosest_heavy_A\tpartner_atom_match\n")
+    f.write("# Active-site set = published Agbaglo QM-cluster residues (S3); 'cross' residues are contributed by the adjacent chain (').\n")
+    f.write("# shell=active_site are the QM-cluster residues; shell=second_shell (Arg116) is measured for provenance, not a defining contact.\n")
+    f.write("ligand\tlig_chain\tshell\tresid\tresname\texpected_origin\tobserved_chain\tobserved_origin\tclosest_heavy_A\tpartner_atom_match\n")
     for row in catrows:
         f.write("\t".join(str(x) for x in row) + "\n")
 
@@ -242,13 +258,13 @@ for lab, lig, s, t, n, r, o in trows:
     print(f"  {lab}: {lig} {s}->{t} | fit RMSD {r:.4f} A | centre offset {o:.3f} A")
 
 print("\ncatalytic-residue closest heavy-atom approach across all chains:")
-print(f"  {'site':4s} {'res':7s} {'exp':5s} {'obs_chain':9s} {'obs':5s} {'dist_A':7s} {'check'}")
+print(f"  {'site':4s} {'shell':12s} {'res':7s} {'exp':5s} {'obs_chain':9s} {'obs':5s} {'dist_A':7s} {'check'}")
 for pl in placements:
     for row in catrows:
         if row[0] != pl["label"]: continue
-        _, lch, resid, rname, exp, obch, obs, dd, match = row
+        _, lch, shell, resid, rname, exp, obch, obs, dd, match = row
         flag = "" if match.endswith("ok") else "  <-- unexpected"
-        print(f"  {lch:4s} {rname}{resid:<4d} {exp:5s} {obch:9s} {obs:5s} {dd:>7s} {match}{flag}")
+        print(f"  {lch:4s} {shell:12s} {rname}{resid:<4d} {exp:5s} {obch:9s} {obs:5s} {dd:>7s} {match}{flag}")
 
 print(f"\nWROTE {catalytic_rep}")
 print(f"WROTE {combined_pdb}")

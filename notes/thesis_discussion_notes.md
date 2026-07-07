@@ -147,11 +147,15 @@ say what they're cited for.
 - **Step 04 catalytic contacts - RESOLVED by measurement:** the earlier
   verify-later item (confirm Arg90/Glu78 contact) is now answered directly.
   Closest heavy-atom approaches, consistent across all three sites:
-  Arg90 2.8-3.0 A, Glu78 2.9-3.4 A, Arg7 2.7-2.8 A, Tyr108 2.6-3.0 A (all direct
-  contact); Arg116 5.5-6.8 A (second shell). Arg63 measured ~21 A -> excluded as
-  non-contact (documented in step04_catalytic_contact_report.tsv header, not
-  silently dropped). TODO: confirm reference paper's active-site set matches this
-  and does not list Arg63 as a binding residue.
+  Arg90 2.8-3.0 A, Glu78 2.9-3.4 A, Arg7 2.7-2.8 A, Tyr108 2.6-3.0 A, Val73' 3.5 A,
+  Thr74' 3.3-3.6 A, Cys75' 3.2-3.4 A (all direct contact). Arg63' is a genuine
+  cross-chain contact at 2.9-3.1 A in sites A/B and a swung rotamer at 6.4 A in
+  site C (see step 05/05b). Arg116 sits at 5.5-6.8 A - SECOND SHELL, reported for
+  provenance but not an active-site/QM residue.
+  RESOLVED (active-site set): matched to the published Agbaglo QM-cluster set
+  {7,57,59,60,63,73,74,75,78,90,108,115}. Val73 IS in the set (now measured);
+  Arg116 is NOT (reclassified second shell); Arg63 IS in the set (the earlier
+  ~21 A same-chain reading was an artifact of same-chain-only measurement).
 - **Still to check visually (ChimeraX, next step):** overall pose sanity and
   Arg116 second-shell position look reasonable.
 
@@ -160,8 +164,9 @@ say what they're cited for.
 The B. subtilis CM active site is INTER-SUBUNIT: each of the three sites sits at
 the interface of two adjacent monomers (Chook 1993 PNAS; Chook 1994 JMB). Residue
 origin relative to the substrate's own subunit:
-  - same-subunit: Arg7, Arg90, Arg116, Glu78, Tyr108, Leu115
-  - adjacent-subunit ('): Arg63', Lys60', Thr74', Cys75', Phe57', Ala59'
+  - same-subunit: Arg7, Arg90, Glu78, Tyr108, Leu115
+  - adjacent-subunit ('): Arg63', Lys60', Val73', Thr74', Cys75', Phe57', Ala59'
+  - second shell (measured, NOT in the active-site/QM set): Arg116 (~5.5-6.8 A)
 Step 04 measured closest contacts across ALL chains and recovered this exactly
 (A's site completed by C, B's by A, C's by B - the C3 pattern), zero mismatches.
 
@@ -170,9 +175,12 @@ at ~21 A and dropped it as non-contact. Arg63 IS a key active-site residue,
 contributed in trans by the adjacent subunit. The drop was a measurement artifact,
 now corrected. This is why cross-chain measurement matters for every ' residue.
 
-Residue roles (BRENDA / FMO QM/MM): Arg63, Arg116, Arg7, Tyr108 orient the
-substrate; the Glu78-Arg90-substrate arrangement controls H-bond strength and TS
+Residue roles (BRENDA / FMO QM/MM): Arg63, Arg7, Tyr108 orient the substrate;
+the Glu78-Arg90-substrate arrangement controls H-bond strength and TS
 stabilisation, with Arg90's positive charge polarising the substrate in the TS.
+Arg116 is cited elsewhere as substrate-orienting but sits in the second shell
+here (~5.5-6.8 A) and is outside the Agbaglo QM-cluster set, so it is not treated
+as an active-site/QM residue.
 -> directly supports the DDE-doubledagger charge-placement rationale.
 
 ## Verify-later: cha_c Arg63' rotamer
