@@ -41,10 +41,16 @@ Protonation (steps 07a/07b): protein-only structure submitted to H++ (pH 7.0,
 generic HIS names were restored/assigned downstream: chains + 1-127 numbering
 recovered by residue-order mapping onto the 07a input; histidines named
 HID/HIE/HIP from the placed ring protons (His36/His54 = HIP, His106 = HIE; none
-active-site). Audit: backbone drift ~0 (fold preserved); the 2.245 A side-chain
-drift is Gln amide flips (Gln44 all chains, Gln101 C) - benign, no active-site
-residue; 378 peptide links intact incl. step-02 graft joins; 6 CYS reduced
-(no disulfide). Protein trimer net charge -3 at pH 7. Accepted structure:
+active-site). Drift is classified on three axes by exact set membership
+(backbone/side-chain, flippable/non-flippable, active-site/not): backbone,
+active-site, active-site-backbone and non-flippable heavy-atom drift are all
+0.000 A - the fold and every catalytic residue are provably untouched - and the
+only shifts >1 A (max 2.245 A) are Gln44/Gln101 amide flips (flippable,
+non-active-site, benign). 378 peptide links intact incl. step-02 graft joins;
+6 CYS reduced (no disulfide). An explicit acceptance rule (no missing/extra
+heavy atoms; backbone <=0.05, non-flippable <=0.2, active-site-backbone <=0.05 A;
+zero active-site atoms >1 A; no non-flippable or active-site large shift) returns
+ACCEPT. Protein trimer net charge -3 at pH 7. Accepted structure:
 abc_protonated_hpp_accepted.pdb. Draft paragraph: written (see thesis draft).
 Reserved (step 08): Antechamber/GAFF chorismate parameterisation (net charge
 -2, -nc -2); ff14SB assignment; full-system charge accounting
