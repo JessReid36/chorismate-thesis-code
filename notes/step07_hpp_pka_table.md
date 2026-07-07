@@ -64,10 +64,15 @@ Active-site residues marked. State column = protonation at pH 7 (chain A represe
 | Lys60'| 11.3/11.9/11.2 | protonated (+) | cross-subunit |
 | Cys75'| >12/>12/>12 | neutral (SH) | cross-subunit |
 
-## Histidine tautomers (non-active-site; need HID/HIE/HIP naming for tleap)
+## Histidine tautomers (non-active-site) - CONFIRMED from H++ placed hydrogens (step 07b)
 
-| Residue | pKa (A/B/C) | Assignment at pH7 |
-|---|---|---|
-| His36 | 7.1/7.1/7.0 | borderline - H++ assigns tautomer (HID/HIE) |
-| His54 | 9.1/8.4/9.3 | protonated (HIP) |
-| His106| <0/0.5/1.0 | deprotonated neutral (HID/HIE) |
+| Residue | pKa (A/B/C) | Assignment @pH7 (all 3 chains) | Evidence |
+|---|---|---|---|
+| His36 | 7.1/7.1/7.0 | HIP (doubly protonated, +) | HD1 + HE2 placed |
+| His54 | 9.1/8.4/9.3 | HIP (doubly protonated, +) | HD1 + HE2 placed |
+| His106| <0/0.5/1.0 | HIE (neutral, epsilon)     | HE2 only |
+
+His36 note: pKa ~7.1 is borderline, but it resolves to HIP at both pH 7.0 (our
+run) and pH 6.5 (H++ default) - fraction protonated ~0.56 and ~0.80 respectively
+- so the pH choice does not change any histidine assignment. Recorded in
+00_admin/step07b_his_assignment.tsv.

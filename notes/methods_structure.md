@@ -31,9 +31,20 @@ active-site presence, peptide continuity).
 Covers: step 04 (chorismate superposed onto A/B/C TSA pose; fit RMSD; contact
 audit). This is where the J/K/L->A/B/C superposition is described.
 
-#### X.1.5 Protonation and parameterisation  [drafted]
-Reserved: H++ protonation, Antechamber/GAFF ligand parameterisation
-(chorismate net charge = -2, -nc -2). ff14SB assignment.
+#### X.1.5 Protonation and parameterisation  [protonation drafted; parameterisation reserved]
+Protonation (steps 07a/07b): protein-only structure submitted to H++ (pH 7.0,
+0.15 M, internal diel 10, external diel 80). Server-stripped chain IDs and the
+generic HIS names were restored/assigned downstream: chains + 1-127 numbering
+recovered by residue-order mapping onto the 07a input; histidines named
+HID/HIE/HIP from the placed ring protons (His36/His54 = HIP, His106 = HIE; none
+active-site). Audit: backbone drift ~0 (fold preserved); the 2.245 A side-chain
+drift is Gln amide flips (Gln44 all chains, Gln101 C) - benign, no active-site
+residue; 378 peptide links intact incl. step-02 graft joins; 6 CYS reduced
+(no disulfide). Protein trimer net charge -3 at pH 7. Accepted structure:
+abc_protonated_hpp_accepted.pdb. Draft paragraph: written (see thesis draft).
+Reserved (step 08): Antechamber/GAFF chorismate parameterisation (net charge
+-2, -nc -2); ff14SB assignment; full-system charge accounting
+(protein -3 + 3 x chorismate -2 = -9 -> 9 Na+ neutralisation at step 09).
 
 ### X.2 Molecular dynamics
 
