@@ -6,6 +6,7 @@
 #   Terminal-repair template : PDB 1DBF.
 #   Chorismate substrate coords : LigA-C from the CP2K QM/MM example set.
 set -euo pipefail
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 
 root="$HOME/system_development"
 structdir="$root/01_inputs/structures"

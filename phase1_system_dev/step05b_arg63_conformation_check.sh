@@ -17,16 +17,16 @@ export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 
 root="$HOME/system_development"
 raw2cht="$root/01_inputs/structures/2cht_raw.pdb"
-placed="$root/02_preparation/protein_only/abc_repaired_clean.pdb"
+protein="$root/02_preparation/protein_only/abc_repaired_clean.pdb"
 admin="$root/00_admin"
 
-python3 - "$raw2cht" "$placed" "$admin" <<'PY'
+python3 - "$raw2cht" "$protein" "$admin" <<'PY'
 import sys, math
 from pathlib import Path
 from collections import defaultdict
 import numpy as np
 
-raw2cht, placed, admin = Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[3])
+raw2cht, protein, admin = Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[3])
 out = admin / "step05b_arg63_conformation_report.tsv"
 
 backbone = ["N", "CA", "C"]
@@ -45,7 +45,7 @@ def read_arg63(path):
     return d
 
 raw = read_arg63(raw2cht)
-plc = read_arg63(placed)
+plc = read_arg63(protein)
 
 def kabsch_fit(P, Q):
     # returns rotation+translation that best fits P onto Q, and applies to P

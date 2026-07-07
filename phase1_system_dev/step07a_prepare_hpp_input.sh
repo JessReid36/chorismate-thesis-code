@@ -10,6 +10,7 @@
 # Server settings to use manually (matching physiological choice + original run):
 #   pH 7.0, salinity 0.15 M, internal dielectric 10, external dielectric 80.
 set -euo pipefail
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 
 root="$HOME/system_development"
 protein="$root/02_preparation/protein_only/abc_repaired_clean.pdb"

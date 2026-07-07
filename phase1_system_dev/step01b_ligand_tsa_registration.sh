@@ -4,6 +4,7 @@
 # active sites; this mapping is the provenance for the source sites used later
 # when superposing chorismate onto the A/B/C TSA pose. Nearest-centre match only.
 set -euo pipefail
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 
 root="$HOME/system_development"
 pdb="$root/01_inputs/structures/2cht_raw.pdb"

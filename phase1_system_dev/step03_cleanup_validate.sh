@@ -5,6 +5,7 @@
 # confirm only true H are dropped), and validates heavy-atom structure:
 # no altlocs/H remain, backbone continuity intact, active-site residues present.
 set -euo pipefail
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 
 root="$HOME/system_development"
 prot_in="$root/02_preparation/protein_only/abc_repaired.pdb"
