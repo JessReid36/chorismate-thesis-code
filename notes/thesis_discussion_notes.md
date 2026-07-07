@@ -10,7 +10,7 @@ a thinking/writing aid for the Discussion and Introduction chapters.
 
 | Item | Current state | Decision point | Notes |
 |---|---|---|---|
-| Chorismate reactant coordinates | Using CP2K tutorial mol2 (LigA–C, 24 atoms) as placeholder | End of system-development phase | Provenance is pedagogical, not primary. Options if replaced: (A) anchor geometry to crystallographic TSA pose in 2CHT; (B) build from PubChem/ChEBI chorismate + align to TSA pose; (C) validate + re-provenance CP2K coords. Reactant charge confirmed = **2−** (dianion). |
+| Chorismate reactant coordinates | Using CP2K tutorial mol2 (LigA–C, 24 atoms) as placeholder | End of system-development phase | Provenance is pedagogical, not primary. Options if replaced: (A) anchor geometry to crystallographic TSA pose in 2CHT; (B) build from PubChem/ChEBI chorismate + align to TSA pose; (C) validate + re-provenance CP2K coords. Reactant charge confirmed = **2−** (dianion). Charges parameterised **AM1-BCC** in step 08 (MOE template charges from the CP2K mol2 replaced; derived off-HPC, see step08a_provenance.txt); **geometry still placeholder**. |
 | Grid reference ligand | Built around placeholder chorismate | After QM/MM-optimized reactant + NEB-TS available | Grid must be regenerated on the real optimized reactant and TS geometries before any charge-placement claims. |
 | Charge-optimization method | Undecided | Phase 2, later | Candidates: ORCA single-points, point-charge embedding, QM/MM point-charge perturbation. Do not write as finalized. |
 

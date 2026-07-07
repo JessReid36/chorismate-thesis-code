@@ -35,7 +35,7 @@ superposition is described here. Active site is inter-subunit (C3 pattern: A
 completed by C, B by A, C by B); Arg116 is reported as second shell (~5.5-6.8 A),
 not an active-site/QM residue. Draft paragraph: written (see thesis draft).
 
-#### X.1.5 Protonation and parameterisation  [protonation drafted; parameterisation reserved]
+#### X.1.5 Protonation and parameterisation  [drafted]
 Protonation (steps 07a/07b): protein-only structure submitted to H++ (pH 7.0,
 0.15 M, internal diel 10, external diel 80). Server-stripped chain IDs and the
 generic HIS names were restored/assigned downstream: chains + 1-127 numbering
@@ -52,9 +52,18 @@ heavy atoms; backbone <=0.05, non-flippable <=0.2, active-site-backbone <=0.05 A
 zero active-site atoms >1 A; no non-flippable or active-site large shift) returns
 ACCEPT. Protein trimer net charge -3 at pH 7. Accepted structure:
 abc_protonated_hpp_accepted.pdb. Draft paragraph: written (see thesis draft).
-Reserved (step 08): Antechamber/GAFF chorismate parameterisation (net charge
--2, -nc -2); ff14SB assignment; full-system charge accounting
-(protein -3 + 3 x chorismate -2 = -9 -> 9 Na+ neutralisation at step 09).
+Parameterisation (steps 08a/08b): chorismate (residue CHA, 24 atoms, net -2)
+GAFF-typed with Antechamber + parmchk2 (0 ATTN, 0 MISSING; types
+c,c2,c3,ce,h1,ha,ho,o,oh,os). Charges are AM1-BCC - the standard Antechamber/GAFF
+scheme and the charge model implied by the protocol ("Antechamber/GAFF"). AM1-BCC
+needs sqm, unavailable on the HPC (missing libopenblas.so.0), so charges were
+derived off-HPC on a local Ubuntu AmberTools (08a) and read into the HPC
+GAFF-typing run via -c rc (08b); this split is a recorded deviation. The MOE
+template charges carried in the CP2K mol2 were replaced. Outputs: cha_gaff.mol2 +
+cha.frcmod. Draft paragraph: written (see thesis draft).
+Reserved (step 09): ff14SB protein assignment; combine protonated protein + CHA
+into one pre-tleap complex; tleap solvation (TIP3P) + neutralisation
+(protein -3 + 3 x chorismate -2 = -9 -> 9 Na+).
 
 ### X.2 Molecular dynamics
 
