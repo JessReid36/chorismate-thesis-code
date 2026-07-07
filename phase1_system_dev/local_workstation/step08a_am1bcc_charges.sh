@@ -9,6 +9,11 @@
 #
 # Charge model: AM1-BCC - the standard Antechamber/GAFF scheme and the method
 # implied by the reference protocol ("Antechamber + GAFF").
+# ==============================================================================
+# RUN LOCATION: LOCAL Ubuntu workstation - NOT the HPC.
+# AM1-BCC needs sqm, which is broken on the HPC; this half is done on your PC with
+# conda AmberTools. The HPC half of step 08 is step08b_ligand_gaff.sh.
+# ==============================================================================
 set -euo pipefail
 
 # --- set these to match your one-time install ----------------------------------
@@ -17,13 +22,23 @@ export MAMBA_ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-$HOME/micromamba}"
 ENV="${ENV:-ambertools}"
 # -------------------------------------------------------------------------------
 
+# fail-safe: needs the local conda AmberTools; refuse with guidance if absent
+# (e.g. if this was launched on the HPC by mistake).
+if ! command -v "$MAMBA" >/dev/null 2>&1; then
+  echo "STOP: step 08a runs on your LOCAL Ubuntu workstation, not the HPC."
+  echo "  It needs conda AmberTools (working sqm) at: $MAMBA"
+  echo "  On the HPC?  Wrong machine - run 08a on your PC, scp charges_am1bcc.dat"
+  echo "              up, then run step08b_ligand_gaff.sh on the HPC."
+  echo "  On your PC?  Run the one-time micromamba/ambertools setup first."
+  exit 1
+fi
+
 workdir="$HOME/system_dev_offline/step08a_am1bcc"
 input="$workdir/cha_a.mol2"          # scp this canonical CHA template from the HPC first
 mkdir -p "$workdir"; cd "$workdir"
 
 [[ -s "$input" ]] || { echo "FAIL missing $input"; echo "  scp it first, e.g.:"; \
   echo "  scp 18660916@hpc1.sun.ac.za:~/system_development/02_preparation/accepted_preprotonation/cha_a.mol2 $workdir/"; exit 1; }
-command -v "$MAMBA" >/dev/null || { echo "FAIL micromamba not found at $MAMBA (run the one-time setup)"; exit 1; }
 
 echo "=== step 08a: verify canonical CHA input (24 atoms, 24 bonds, unique names, net -2) ==="
 python3 - "$input" <<'PY'
