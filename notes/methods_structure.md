@@ -61,15 +61,27 @@ derived off-HPC on a local Ubuntu AmberTools (08a) and read into the HPC
 GAFF-typing run via -c rc (08b); this split is a recorded deviation. The MOE
 template charges carried in the CP2K mol2 were replaced. Outputs: cha_gaff.mol2 +
 cha.frcmod. Draft paragraph: written (see thesis draft).
-Reserved (step 09): ff14SB protein assignment; combine protonated protein + CHA
-into one pre-tleap complex; tleap solvation (TIP3P) + neutralisation
-(protein -3 + 3 x chorismate -2 = -9 -> 9 Na+).
 
 ### X.2 Molecular dynamics
 
-#### X.2.1 System solvation and topology  [reserved]
-Reserved: tleap build, ff14SB + GAFF + TIP3P, ion placement (record RNG seed),
-box definition.
+#### X.2.1 System solvation and topology  [drafted]
+Covers: step 09 (09a combine + 09b tleap build/audit; collapses attempt_3's
+16/17/18/18b/18c). ff14SB (protein) + GAFF (CHA, AM1-BCC charges from step 08)
++ TIP3P assigned in tleap. 09a combines the accepted protonated trimer (07b)
+with the 3 placed chorismates (06) into one pre-tleap complex (6255 atoms =
+6183 protein + 72 CHA); atom/charge counts derived from inputs, not hard-coded.
+09b writes a dry topology (NATOM 6255, net -9) then solvates: TIP3P box with a
+10 A solute buffer (solvatebox -> rectangular, actual 92.9 x 76.7 x 95.4 A),
+16,472 waters, neutralised with 9 Na+ (addions Na+ 0; no background electrolyte,
+matching the protocol). Final solvated system 55,680 atoms, net 0. addions is
+deterministic - there is NO ion-placement RNG seed (the Langevin seed belongs to
+X.2.2). Counts and charge are read from the prmtop/inpcrd (the solvated PDB
+saturates at 9999 residues), not the PDB. AMBER22 substituted for the protocol's
+AMBER18 (identical ff/water/charge choices). tleap warnings classified and
+benign: 12 terminal-name conversions (cosmetic), 2 pre-neutralisation dry-charge
+notices (expected), 7 solute-internal H-atom close contacts from H++ placement
+(relaxed by the first restrained minimisation); 0 missing-parameter/unknown-type,
+0 errors. Draft paragraph: written (X.2.1 prose).
 
 #### X.2.2 Minimisation and equilibration  [reserved]
 Reserved: restrained minimisation series, NVT heating, NPT equilibration
