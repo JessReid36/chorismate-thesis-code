@@ -83,13 +83,30 @@ notices (expected), 7 solute-internal H-atom close contacts from H++ placement
 (relaxed by the first restrained minimisation); 0 missing-parameter/unknown-type,
 0 errors. Draft paragraph: written (X.2.1 prose).
 
-#### X.2.2 Minimisation and equilibration  [reserved]
-Reserved: restrained minimisation series, NVT heating, NPT equilibration
-(restraint ladder).
+#### X.2.2 Minimisation and equilibration  [drafted]
+Covers: step 10a (minimisation) + 10b (equilibration); collapses attempt_3's
+sprawling 19-27 single-core sander restart series into two clean jobs. 10a:
+restrained minimisation, solute heavy atoms held at 200 kcal/mol/A^2 (paper)
+while solvent + H relax; pmemd.MPI (16 CPU ranks); energy -150300 -> -219980
+kcal/mol, no residual overlap. 10b: five 20 ps NPT Langevin stages (pmemd.cuda),
+restraint relaxed 200 -> 100 -> 50 -> 10 -> 0 kcal/mol/A^2; heating 0->300 K
+folded into stage 1 (no separate NVT stage - the GPU benchmark confirmed NPT-
+from-0 K is stable), so 'NVT heating' from the old plan is dropped. MC barostat,
+SHAKE, dt=0.002, fixed Langevin seed ig=531984. Density climbs monotonically
+0.849 -> 1.009 g/cm^3, final T 299.8 K. GPU note: the amber22 module ships no
+CUDA-11 runtime, supplied via LD_LIBRARY_PATH (cudatoolkit-11.8 + openblas).
+Draft paragraph: written (X.2.2 prose).
 
-#### X.2.3 Production simulation  [reserved]
-Reserved: accepted 1 ns unrestrained NPT production segment (canonical MD
-reference; record seed; note 17-20 ns branches were audited and not accepted).
+#### X.2.3 Production simulation  [drafted]
+Covers: step 10c. SUPERSEDES attempt_3's 1 ns reference + abandoned 17-20 ns
+branches with a single clean 20 ns unrestrained NPT run (paper), pmemd.cuda,
+restarted from the equilibrated npt5.rst7; dt=0.002 + SHAKE, MC barostat,
+Langevin ig=531984. ntwx=500 -> 1 ps/frame -> 20,000 frames (prod.nc, 13.4 GB),
+matching the paper's sampling. Audited directly from the NetCDF header
+(stdlib struct + numpy, cpptraj-free): 20,000 frames, 55,680 atoms, coordinates
+finite; final avg T 299.99 K, density 1.022 g/cm^3; NSTEP reached nstlim.
+Shared-GPU contention required a 168 h (week) walltime to guarantee single-job
+completion (no continuation). Draft paragraph: written (X.2.3 prose).
 
 ### X.3 QM/MM calculations  [reserved]
 Reserved: QM-region definition (substrate +/- Glu78/Arg90 - see JPCB precedent),
