@@ -108,6 +108,20 @@ finite; final avg T 299.99 K, density 1.022 g/cm^3; NSTEP reached nstlim.
 Shared-GPU contention required a 168 h (week) walltime to guarantee single-job
 completion (no continuation). Draft paragraph: written (X.2.3 prose).
 
+#### X.2.4 Trajectory analysis  [drafted]
+Covers: step 11 (11a-d) - fork-independent QC of the 20 ns production before QM/MM
+frame selection. cpptraj-free (stdlib NetCDF reader + numpy); molecule-wise imaging +
+Kabsch (RMSD/RMSF), min-image distances (contacts). 11a backbone RMSD mean 3.16 A
+(cf Agbaglo 2.66), REVIEW flag from 1.6 A drift -> 11b resolves: rigid core 0.69 A,
+all flexibility in C-terminal tails (chain B 249-254 up to 13.9 A); active site stable.
+11c reaction coord (Claeyssens r; C4-O3 break / C6-C1 form): all 3 CHA near-attack
+(form min 2.84-2.97). 11d catalytic contacts: all 3 inter-subunit sites assembled
+correctly (Arg90->O13, Arg7/Arg63->carboxylate, Glu78->OH); CHA#2 a textbook Michaelis
+complex (Arg90-O13 2.92A/100%, Glu78-OH 2.81A/100%), CHA#1/#3 looser. Substrate pose
+VALIDATED; asymmetry = finite-sampling symmetry-breaking + anchoring strength, not error.
+Full findings + scientific conclusions: notes/step11_trajectory_analysis.md.
+Draft paragraph: pending (analysis chapter).
+
 ### X.3 QM/MM calculations  [reserved]
 Reserved: QM-region definition (substrate +/- Glu78/Arg90 - see JPCB precedent),
 method/basis, ORCA setup, single-point and optimisation.
