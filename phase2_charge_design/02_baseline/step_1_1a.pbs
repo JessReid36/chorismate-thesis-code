@@ -1,0 +1,65 @@
+#!/bin/bash
+#PBS -N cm_p2_11a
+#PBS -l select=1:ncpus=8:mem=32gb
+#PBS -l walltime=02:00:00
+#PBS -m ae
+#PBS -M 18660916@sun.ac.za
+#PBS -j oe
+#PBS -o /home/18660916/system_development/phase2_charge_design/02_baseline/step_1_1a.pbs.out
+cd /home/18660916/system_development/phase2_charge_design/02_baseline
+
+ORCA=/home/apps2/ORCA/6.0.1
+export PATH="/apps/openmpi/4.1.1/bin:$PATH"
+export LD_LIBRARY_PATH="$ORCA/lib:/apps/openmpi/4.1.1/lib:/apps/mambaforge/envs/medaka/lib:$LD_LIBRARY_PATH"
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
+echo "host=$(hostname) start=$(date)"
+
+for base in react_vac react_cpcm; do
+  echo "=== running $base ==="
+  "$ORCA/orca" "${base}.inp" > "${base}.out" 2>&1 </dev/null
+done
+
+echo "=== HOMO/LUMO + convergence summary ==="
+python3 - <<'PY'
+import re
+from pathlib import Path
+
+def summarize(out):
+    p = Path(out)
+    if not p.is_file():
+        print(f"{out}: MISSING"); return
+    txt = p.read_text(errors="ignore")
+    converged = "SCF CONVERGED AFTER" in txt or "SCF NOT CONVERGED" not in txt and "TOTAL SCF ENERGY" in txt
+    scf_conv = "SCF CONVERGED AFTER" in txt
+    # final single point energy
+    m_e = re.findall(r"FINAL SINGLE POINT ENERGY\s+(-?\d+\.\d+)", txt)
+    energy = m_e[-1] if m_e else "NA"
+    # last ORBITAL ENERGIES block -> HOMO (last occ=2.0000) and LUMO (first occ=0.0000)
+    homo = lumo = None
+    blocks = txt.split("ORBITAL ENERGIES")
+    if len(blocks) > 1:
+        rows = []
+        for ln in blocks[-1].splitlines():
+            f = ln.split()
+            # NO OCC E(Eh) E(eV)
+            if len(f) == 4:
+                try:
+                    no = int(f[0]); occ = float(f[1]); eh = float(f[2]); ev = float(f[3])
+                    rows.append((occ, eh, ev))
+                except ValueError:
+                    pass
+        occ_rows = [r for r in rows if r[0] > 0.5]
+        vir_rows = [r for r in rows if r[0] <= 0.5]
+        if occ_rows: homo = occ_rows[-1]
+        if vir_rows: lumo = vir_rows[0]
+    print(f"{out}")
+    print(f"  SCF converged: {scf_conv}")
+    print(f"  final energy (Eh): {energy}")
+    if homo: print(f"  HOMO: {homo[1]:.6f} Eh  ({homo[2]:.3f} eV)  <-- POSITIVE => unbound/metastable" if homo[1] > 0 else f"  HOMO: {homo[1]:.6f} Eh  ({homo[2]:.3f} eV)  (bound)")
+    if lumo: print(f"  LUMO: {lumo[1]:.6f} Eh  ({lumo[2]:.3f} eV)")
+    print()
+
+for out in ("react_vac.out", "react_cpcm.out"):
+    summarize(out)
+PY
+echo "end=$(date)"
