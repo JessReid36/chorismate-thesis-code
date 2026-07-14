@@ -1,0 +1,9 @@
+# Reacting-atom mapping for the chorismate Claisen rearrangement.
+# Breaking: C4-O3 (ring sp3 C to ether O). Forming: C6-C1 (ring C to terminal =CH2).
+# xyz_index0 is 0-based (ORCA constraint convention); mol2_id is 1-based.
+# Reaction coordinate r = d(C4-O3) - d(C6-C1), Angstrom.
+bond_role	atom_name	xyz_index0	mol2_id	element
+break	O3	7	8	O
+break	C4	8	9	C
+form	C1	0	1	C
+form	C6	12	13	C
