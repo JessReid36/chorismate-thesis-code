@@ -7,23 +7,22 @@
 #PBS -j oe
 #PBS -o /home/18660916/system_development/phase2_charge_design/06_polarize/step_4_1.pbs.out
 cd /home/18660916/system_development/phase2_charge_design/06_polarize
-
 ORCA=/home/apps2/ORCA/6.0.1
 export PATH="/apps/openmpi/4.1.1/bin:${PATH:-}"
 export LD_LIBRARY_PATH="$ORCA/lib:/apps/openmpi/4.1.1/lib:/apps/mambaforge/envs/medaka/lib:${LD_LIBRARY_PATH:-}"
 export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
 echo "host=$(hostname) start=$(date)"
-
 for base in pol_R_bare pol_TS_bare pol_R_pc pol_TS_pc; do
   echo "=== running $base ==="
   "$ORCA/orca" "${base}.inp" > "${base}.out" 2>&1 </dev/null
 done
-
 echo "=== polarized barrier change vs frozen-density prediction ==="
-python3 - <<'PY'
-import re
+DESIGN=K2_neutral python3 - <<'PY'
+import re, os
+import numpy as np
 from pathlib import Path
 HART2KCAL = 627.509
+design = os.environ.get("DESIGN", "K2_neutral")
 def energy(out):
     m = re.findall(r"FINAL SINGLE POINT ENERGY\s+(-?\d+\.\d+)", Path(out).read_text(errors="ignore"))
     return float(m[-1]) if m else None
@@ -36,15 +35,16 @@ for b in labels:
     print(f"  {b}: E = {E[b]}  converged={conv[b]}")
 if any(E[b] is None for b in labels) or not all(conv.values()):
     print("FAIL: missing energy or SCF not converged."); raise SystemExit(1)
-
+# frozen prediction read DIRECTLY from the design npz actually being tested (no hardcoded staleness)
+z = np.load("sol_discrete.npz", allow_pickle=True)
+ddE_frozen = float(z[f"{design}_ddE"])   # Eh
 barrier_bare = E["pol_TS_bare"] - E["pol_R_bare"]
 barrier_pc   = E["pol_TS_pc"]   - E["pol_R_pc"]
 ddE_pol      = barrier_pc - barrier_bare
-ddE_frozen   = -0.014778   # K2_neutral q.Dv (Eh), REAL value from Stage 3.4 (-9.273 kcal/mol)
 pol_corr     = ddE_pol - ddE_frozen
 rel = 100*pol_corr/ddE_frozen if ddE_frozen else float('nan')
-
-print(f"\nbare barrier        = {barrier_bare:+.6f} Eh ({barrier_bare*HART2KCAL:+.3f} kcal/mol)")
+print(f"\ndesign tested: {design}  (frozen prediction read from sol_discrete.npz)")
+print(f"bare barrier        = {barrier_bare:+.6f} Eh ({barrier_bare*HART2KCAL:+.3f} kcal/mol)")
 print(f"with-charge barrier = {barrier_pc:+.6f} Eh ({barrier_pc*HART2KCAL:+.3f} kcal/mol)")
 print(f"ddE_polarized (true)      = {ddE_pol:+.6f} Eh ({ddE_pol*HART2KCAL:+.3f} kcal/mol)")
 print(f"ddE_frozen (q.Dv predict) = {ddE_frozen:+.6f} Eh ({ddE_frozen*HART2KCAL:+.3f} kcal/mol)")
@@ -54,6 +54,6 @@ if barrier_pc < barrier_bare:
     print("charges LOWER the barrier (stabilizing), consistent with the frozen-density sign.")
 else:
     print("WARNING: charges RAISE the barrier - check CPCM-charge handling / .pc signs.")
-print("FROZEN-DENSITY VALIDATED (<20%)" if abs(rel)<20 else "POLARIZATION SIGNIFICANT (>20%) - see 4.3")
+print("FROZEN-DENSITY VALIDATED (<20%)" if abs(rel)<20 else "POLARIZATION SIGNIFICANT (>20%) - strong field polarizes substrate; linear model rougher here")
 PY
 echo "end=$(date)"
