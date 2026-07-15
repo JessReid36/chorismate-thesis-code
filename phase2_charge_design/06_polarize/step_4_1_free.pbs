@@ -7,23 +7,29 @@
 #PBS -j oe
 #PBS -o /home/18660916/system_development/phase2_charge_design/06_polarize/step_4_1_free.pbs.out
 cd /home/18660916/system_development/phase2_charge_design/06_polarize
-
 ORCA=/home/apps2/ORCA/6.0.1
 export PATH="/apps/openmpi/4.1.1/bin:${PATH:-}"
 export LD_LIBRARY_PATH="$ORCA/lib:/apps/openmpi/4.1.1/lib:/apps/mambaforge/envs/medaka/lib:${LD_LIBRARY_PATH:-}"
 export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
 echo "host=$(hostname) start=$(date)"
-
 for base in polf_R_bare polf_TS_bare polf_R_pc polf_TS_pc; do
   echo "=== running $base ==="
   "$ORCA/orca" "${base}.inp" > "${base}.out" 2>&1 </dev/null
 done
-
 echo "=== polarized barrier change vs frozen-density prediction (NET-FREE) ==="
-python3 - <<'PY'
-import re
+DESIGN=K2_free python3 - <<'PY'
+import re, os, zipfile, struct
 from pathlib import Path
 HART2KCAL = 627.509
+design = os.environ.get("DESIGN", "K2_free")
+def npz_scalar(npz, key):
+    # read a float64 scalar from an .npz using stdlib only (compute nodes may lack numpy)
+    z = zipfile.ZipFile(npz)
+    name = [n for n in z.namelist() if n[:-4] == key][0]   # strip .npy
+    b = z.read(name)
+    assert b[:6] == b'\x93NUMPY', "not an npy member"
+    hlen = struct.unpack('<H', b[8:10])[0]
+    return struct.unpack('<d', b[10+hlen:10+hlen+8])[0]
 def energy(out):
     m = re.findall(r"FINAL SINGLE POINT ENERGY\s+(-?\d+\.\d+)", Path(out).read_text(errors="ignore"))
     return float(m[-1]) if m else None
@@ -36,28 +42,23 @@ for b in labels:
     print(f"  {b}: E = {E[b]}  converged={conv[b]}")
 if any(E[b] is None for b in labels) or not all(conv.values()):
     print("FAIL: missing energy or SCF not converged."); raise SystemExit(1)
-
+ddE_frozen = npz_scalar("sol_discrete.npz", f"{design}_ddE")
 barrier_bare = E["polf_TS_bare"] - E["polf_R_bare"]
 barrier_pc   = E["polf_TS_pc"]   - E["polf_R_pc"]
 ddE_pol      = barrier_pc - barrier_bare
-ddE_frozen   = -0.017976   # K2_free q.Dv (Eh) - REPLACE with value from npz
 pol_corr     = ddE_pol - ddE_frozen
 rel = 100*pol_corr/ddE_frozen if ddE_frozen else float('nan')
-
-print(f"\nbare barrier        = {barrier_bare:+.6f} Eh ({barrier_bare*HART2KCAL:+.3f} kcal/mol)")
+print(f"\ndesign tested: {design}  (frozen read from sol_discrete.npz, stdlib)")
+print(f"bare barrier        = {barrier_bare:+.6f} Eh ({barrier_bare*HART2KCAL:+.3f} kcal/mol)")
 print(f"with-charge barrier = {barrier_pc:+.6f} Eh ({barrier_pc*HART2KCAL:+.3f} kcal/mol)")
 print(f"ddE_polarized (true)      = {ddE_pol:+.6f} Eh ({ddE_pol*HART2KCAL:+.3f} kcal/mol)")
 print(f"ddE_frozen (q.Dv predict) = {ddE_frozen:+.6f} Eh ({ddE_frozen*HART2KCAL:+.3f} kcal/mol)")
 print(f"polarization correction   = {pol_corr:+.6f} Eh ({pol_corr*HART2KCAL:+.3f} kcal/mol)  [{rel:+.1f}% of frozen]")
 print()
-print(f"COMPARISON: net-neutral true was -8.350 kcal/mol; net-free frozen was {ddE_frozen*HART2KCAL:+.3f}.")
-print(f"  net-free true ddE = {ddE_pol*HART2KCAL:+.3f} kcal/mol")
-if ddE_pol*HART2KCAL > -8.350:
-    print("  -> net-free's edge EVAPORATED under polarization (true now WORSE than net-neutral).")
-    print("     Confirms the frozen-density net-free advantage was an artifact. Net-neutral is the headline.")
+if barrier_pc < barrier_bare:
+    print("charges LOWER the barrier (stabilizing), consistent with the frozen-density sign.")
 else:
-    print("  -> net-free retains an advantage even after polarization; worth reporting as a real effect.")
-print(f"  net-free polarization correction {rel:+.1f}% vs net-neutral's -10.0% "
-      f"(larger correction => leaned harder on the unreliable regime).")
+    print("WARNING: charges RAISE the barrier - check CPCM-charge handling / .pc signs.")
+print("FROZEN-DENSITY VALIDATED (<20%)" if abs(rel)<20 else "POLARIZATION SIGNIFICANT (>20%) - strong net-charged field polarizes substrate; linear model rougher here")
 PY
 echo "end=$(date)"

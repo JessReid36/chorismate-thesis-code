@@ -18,11 +18,16 @@ for base in pol_R_bare pol_TS_bare pol_R_pc pol_TS_pc; do
 done
 echo "=== polarized barrier change vs frozen-density prediction ==="
 DESIGN=K2_neutral python3 - <<'PY'
-import re, os
-import numpy as np
+import re, os, zipfile, struct
 from pathlib import Path
 HART2KCAL = 627.509
 design = os.environ.get("DESIGN", "K2_neutral")
+def npz_scalar(npz, key):
+    z = zipfile.ZipFile(npz)
+    name = [n for n in z.namelist() if n[:-4] == key][0]
+    b = z.read(name)
+    hlen = struct.unpack("<H", b[8:10])[0]
+    return struct.unpack("<d", b[10+hlen:10+hlen+8])[0]
 def energy(out):
     m = re.findall(r"FINAL SINGLE POINT ENERGY\s+(-?\d+\.\d+)", Path(out).read_text(errors="ignore"))
     return float(m[-1]) if m else None
@@ -35,15 +40,13 @@ for b in labels:
     print(f"  {b}: E = {E[b]}  converged={conv[b]}")
 if any(E[b] is None for b in labels) or not all(conv.values()):
     print("FAIL: missing energy or SCF not converged."); raise SystemExit(1)
-# frozen prediction read DIRECTLY from the design npz actually being tested (no hardcoded staleness)
-z = np.load("sol_discrete.npz", allow_pickle=True)
-ddE_frozen = float(z[f"{design}_ddE"])   # Eh
+ddE_frozen = npz_scalar("sol_discrete.npz", f"{design}_ddE")
 barrier_bare = E["pol_TS_bare"] - E["pol_R_bare"]
 barrier_pc   = E["pol_TS_pc"]   - E["pol_R_pc"]
 ddE_pol      = barrier_pc - barrier_bare
 pol_corr     = ddE_pol - ddE_frozen
 rel = 100*pol_corr/ddE_frozen if ddE_frozen else float('nan')
-print(f"\ndesign tested: {design}  (frozen prediction read from sol_discrete.npz)")
+print(f"\ndesign tested: {design}  (frozen read from sol_discrete.npz, stdlib)")
 print(f"bare barrier        = {barrier_bare:+.6f} Eh ({barrier_bare*HART2KCAL:+.3f} kcal/mol)")
 print(f"with-charge barrier = {barrier_pc:+.6f} Eh ({barrier_pc*HART2KCAL:+.3f} kcal/mol)")
 print(f"ddE_polarized (true)      = {ddE_pol:+.6f} Eh ({ddE_pol*HART2KCAL:+.3f} kcal/mol)")
