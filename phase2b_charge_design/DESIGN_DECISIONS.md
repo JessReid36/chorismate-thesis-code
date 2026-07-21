@@ -73,3 +73,55 @@ Calibration go/no-go (run on first real system, all ~5 shortlisted through r2SCA
   abandon cheap level    if relaxed geometry/connectivity disagree (spurious collapse/TS) -> full DFT
 The SPREAD (candidate-dependence), not the mean offset, is the decision metric.
 Source: phase2b research report "Cheap-Geometry, DFT-Energy Funnel for Tier 2".
+
+## Certified optimality is optimality of the PROXY, not of catalysis (critical framing)
+The Tier-1 certificate (branch-and-bound gap 0.000) proves optimality w.r.t. the OBJECTIVE we
+write down -- currently "minimise Sum q*Dv", i.e. lower the frozen-single-point barrier.
+"Provably best at minimising the Dv-barrier" is NOT "provably best at catalysing the reaction".
+Conflating the two would be the most attackable claim in the thesis. The certificate guarantees
+a PROXY optimum, not a catalytic optimum.
+
+Three gaps between the proxy and real catalysis:
+1. Frozen-density gap: Dv uses a fixed electron density. Real charges repolarise the substrate;
+   past ~1-3 charges the frozen estimate diverges (max-lowering barrier -> physically impossible
+   negatives -- the giveaway).
+2. Frozen-path gap (the big one): catalysis = lowering the whole R->TS->P barrier with a still-
+   connected path, and charges can MOVE the TS (GOCAT). Minimising Dv at the fixed TS point can
+   "win" by crushing that point while another path point becomes the real bottleneck -> a
+   Dv-optimal design can be catalytically WORSE than a Dv-suboptimal one. The certificate cannot
+   see this by construction.
+3. Over-optimisation gap: because more charges trivially lower the proxy, "optimal" under
+   max-lowering actively selects the unphysical, spill-out-prone, path-distorting arrangements --
+   it optimises hardest in the direction that departs from catalysis.
+
+Consequence: the "more charges -> lower barrier" trend under max-lowering is monotone BY
+CONSTRUCTION (a non-helping charge is placed as ~zero contribution), so it is NOT a chemical
+finding. The max-lowering column is a DIAGNOSTIC only: (a) the certified ceiling at each K,
+(b) the K where it goes unphysical (~K=4 on the real field) = the frozen-objective validity limit
+and the concrete argument for Tier-2.
+
+## Two-level optimality claim (how the thesis must carry it)
+- Tier 1 = certified optimality of the SCREEN: not "this is the best catalyst" but "this is
+  provably the best candidate under our physically-motivated proxy objective, with a certificate".
+  Novel precisely because no prior method certifies its screen (GOCAT's GA cannot even claim its
+  proxy-optimum is a proxy-optimum).
+- Catalysis is decided at Tier 2 and is NOT claimed certified. Dv-optimal + near-optimal candidates
+  are carried into relaxed-path validation (path relaxed, TS free); the real barrier there judges
+  catalysis. The certificate's job is to choose WHICH candidates get the expensive validation --
+  provably rather than heuristically.
+Why we downweight max-lowering: it is the proxy that departs MOST from catalysis (gap 3). The
+distributed and whole-path objectives write a proxy that CORRELATES BETTER with catalysis (spread
+load -> less spill-out/path distortion; whole-path min-max -> cannot cheat by crushing one point).
+Still proxies, but better ones; a certificate over a better proxy is worth more.
+
+## Ranking preservation is THE load-bearing experiment (not a footnote)
+The certificate is valuable only if the certified Tier-1 ORDERING predicts the Tier-2 catalytic
+ordering. Ranking preservation tests exactly that. Holds -> the certificate provably finds the
+candidates that turn out to catalyse. Fails -> we have certified a proxy that does not track the
+goal, and the objective must be improved. This is where "optimal at lowering the barrier" is
+converted into (or fails to convert into) "optimal at promoting catalysis".
+
+## Contribution framing (one line)
+Not "we found the optimal catalyst" but "we built the first CERTIFIED screen for electrostatic
+catalyst design, and we test honestly whether certified-optimal-on-the-proxy tracks actually-
+catalytic". Keeping these two claims rigorously separate is what makes the thesis defensible.
