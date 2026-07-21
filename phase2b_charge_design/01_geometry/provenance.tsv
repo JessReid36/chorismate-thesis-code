@@ -1,0 +1,4 @@
+label	source_trajectory_hpc	break_expect	form_expect
+reactant	05_qmmm/18e_reactant_reduced/reactant_reduced.QMRegion_trj.xyz	1.472	3.124
+ts	05_qmmm/18c_reduced_region/ts_reduced.QMRegion_trj.xyz	2.111	2.526
+product	05_qmmm/18f_product_reduced/product_reduced.QMRegion_trj.xyz	2.902	1.583
