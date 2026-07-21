@@ -1,0 +1,36 @@
+grid=331 pts, ether-O=[57.93, 33.43, 57.35], menu=[-1.0, 1.0], bare barrier=+17.47 (solver: HiGHS)
+distributed band (total ddE): [-12.47, -5.27] kcal/mol
+
+K | MAX-LOWERING            | DISTRIBUTED (min max|contrib|)
+  | ddE      barrier   gap  | max|contrib|  total    barrier   gap
+ 1|   -5.77   +11.70  0.000 |       5.27    -5.27   +12.20  0.000
+ 2|  -11.04    +6.43  0.000 |       2.65    -5.29   +12.18  0.000
+ 3|  -16.07    +1.40  0.000 |       1.83    -5.30   +12.17  0.000
+ 4|  -20.88    -3.41  0.000 |       1.34    -5.28   +12.19  0.000
+ 5|  -25.54    -8.07  0.000 |       1.08    -5.27   +12.20  0.000
+ 6|  -29.94   -12.47  0.000 |       0.90    -5.30   +12.17  0.000
+ 7|  -34.15   -16.68  0.000 |       0.77    -5.27   +12.20  0.000
+ 8|  -38.05   -20.58  0.000 |       0.69    -5.28   +12.19  0.000
+ 9|  -41.89   -24.42  0.000 |       0.60    -5.27   +12.20  0.000
+10|  -45.00   -27.53  0.000 |       0.55    -5.28   +12.19  0.000
+
+--- K=1 max-lowering ---
+      q=-1 shell 2.0 dv=+0.00919  8.40 A from ether-O 
+--- K=1 distributed ---
+      q=+1 shell 2.0 dv=-0.00840  3.84 A from ether-O <- +1 @ ether-O valley (Arg90)
+
+--- K=2 max-lowering ---
+      q=+1 shell 2.0 dv=-0.00840  3.84 A from ether-O <- +1 @ ether-O valley (Arg90)
+      q=-1 shell 2.0 dv=+0.00919  8.40 A from ether-O 
+--- K=2 distributed ---
+      q=+1 shell 2.0 dv=-0.00422  4.82 A from ether-O 
+      q=-1 shell 4.0 dv=+0.00421  10.18 A from ether-O 
+
+--- K=3 max-lowering ---
+      q=+1 shell 2.0 dv=-0.00840  3.84 A from ether-O <- +1 @ ether-O valley (Arg90)
+      q=-1 shell 2.0 dv=+0.00801  8.90 A from ether-O 
+      q=-1 shell 2.0 dv=+0.00919  8.40 A from ether-O 
+--- K=3 distributed ---
+      q=+1 shell 4.0 dv=-0.00292  6.21 A from ether-O 
+      q=-1 shell 2.0 dv=+0.00274  6.67 A from ether-O 
+      q=-1 shell 4.0 dv=+0.00278  9.79 A from ether-O 
