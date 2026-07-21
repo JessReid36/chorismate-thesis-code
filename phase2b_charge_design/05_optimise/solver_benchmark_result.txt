@@ -1,0 +1,16 @@
+Coin0505I Presolved problem not optimal, resolve after postsolve
+Coin0505I Presolved problem not optimal, resolve after postsolve
+Coin0505I Presolved problem not optimal, resolve after postsolve
+Coin0505I Presolved problem not optimal, resolve after postsolve
+Coin0505I Presolved problem not optimal, resolve after postsolve
+Coin0505I Presolved problem not optimal, resolve after postsolve
+Coin0505I Presolved problem not optimal, resolve after postsolve
+Coin0505I Presolved problem not optimal, resolve after postsolve
+Coin0505I Presolved problem not optimal, resolve after postsolve
+Coin0505I Presolved problem not optimal, resolve after postsolve
+distributed min-max MILP: grid=330 pts, close-pairs=4983, K=7, time budget=120s/solver
+
+CBC   (python-mip): obj=0.7827  gap=0.0000  time=103.4s  -> CERTIFIED
+HiGHS (highspy)  : obj=0.7827  gap=0.0000  time=0.6s  -> CERTIFIED
+
+same optimum: True | HiGHS speedup to certification: >167x
