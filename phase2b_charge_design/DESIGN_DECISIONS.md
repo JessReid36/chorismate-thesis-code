@@ -53,3 +53,23 @@ Because Tier 1 is a frozen-path proxy and GOCAT warns frozen-path underestimates
 the certificate only MATTERS if the screen's RANKING survives Tier-2 relaxation. Demonstrating
 that the frozen-path optimum faithfully predicts which candidates recreate the reaction is the
 headline validation of the whole approach, not an optional extra.
+
+## Tier-2 method: three-level funnel (cheap geometry, DFT energy)
+Tier 2 stays validation-grade but is made cheaper WITHOUT a fully semiempirical step, which
+would corrupt ranking preservation for this dianionic/pericyclic/field-sensitive system.
+  Tier 1   certified MILP on the B3LYP-D3BJ/def2-SVP Dv grid (unchanged, DFT-quality)
+  Tier 2a  r2SCAN-3c relaxed-path optimisation under the designed field (cheap GEOMETRY;
+           collapse mitigations on). Geometry + connectivity + TS-shift are the deliverables;
+           r2SCAN-3c energies only coarsely shortlist.
+  Tier 2b  B3LYP-D3BJ single point (diffuse-augmented basis, e.g. def2-SVPD/ma-def2-SVP) on the
+           top 2-3 relaxed paths -> FINAL barrier + ranking. This is the word on ranking.
+Rationale: r2SCAN-3c geometry is DFT-quality (on par with M06-2X-D3/TZP); all cheap methods
+degrade on barriers, worst for GFN2-xTB on pericyclic (BHPERI) + anions + field response, so
+GFN2-xTB is at most a geometry pre-filter, never in the ranking. def2-SVP lacks diffuse
+functions for a -2 species -> confirmation uses a diffuse-augmented basis.
+Calibration go/no-go (run on first real system, all ~5 shortlisted through r2SCAN-3c AND DFT):
+  keep cheap triage      if Spearman rho >= 0.9 AND barrier-change error spread <= 1 kcal/mol
+  demote to geometry-only if energies reorder (rho < 0.9) but geometries/TS agree -> DFT SP on all
+  abandon cheap level    if relaxed geometry/connectivity disagree (spurious collapse/TS) -> full DFT
+The SPREAD (candidate-dependence), not the mean offset, is the decision metric.
+Source: phase2b research report "Cheap-Geometry, DFT-Energy Funnel for Tier 2".
