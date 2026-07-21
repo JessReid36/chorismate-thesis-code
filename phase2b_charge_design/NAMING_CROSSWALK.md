@@ -22,3 +22,10 @@ Use this table to trace any phase2b stage back to its phase2 origin.
 - frozen-geometry field set (-10.888 / -11.354), polarised (-12.201 / -14.009), K-sweep, design_K2-8.pc
 - shell_restricted_sweep.py (retracted)
 - +15.771 (frozen) and +15.08 (mixed-region) barriers -> superseded by the 18e-consistent barrier (pending)
+
+## Two-tier update (see DESIGN_DECISIONS.md)
+| phase2b            | role   | notes |
+|--------------------|--------|-------|
+| 05_optimise        | Tier 1 | certified screen (THE novelty): MILP + linear whole-path min-max |
+| 08_relaxed_validation | Tier 2 | relaxed-path validation on top candidates; not claimed novel |
+07_validate remains the frozen-geometry Route-1 headline + D1-D5 + native-BsCM check.

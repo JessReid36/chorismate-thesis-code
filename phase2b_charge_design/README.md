@@ -30,3 +30,7 @@ sandbox         optimiser-formulation prototyping (geometry-independent; runs no
 
 ## Status
 Scaffold. 01_geometry waits on Phase 1 18e/18f convergence; sandbox proceeds now.
+
+## Design decisions
+See DESIGN_DECISIONS.md for the two-tier structure (certified screen + relaxed validation),
+the GOCAT-grounded novelty positioning, and the ranking-preservation check.
