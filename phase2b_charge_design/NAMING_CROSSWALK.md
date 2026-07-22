@@ -21,7 +21,7 @@ Use this table to trace any phase2b stage back to its phase2 origin.
 - all *_realgeom result dirs (built on the stale geometry)
 - frozen-geometry field set (-10.888 / -11.354), polarised (-12.201 / -14.009), K-sweep, design_K2-8.pc
 - shell_restricted_sweep.py (retracted)
-- +15.771 (frozen) and +15.08 (mixed-region) barriers -> superseded by the 18e-consistent barrier (pending)
+- +15.771 (frozen) and +15.08 (mixed-region) barriers -> superseded by the 18e-consistent barrier +16.00 (freq-verified, retained-final)
 
 ## Two-tier update (see DESIGN_DECISIONS.md)
 | phase2b            | role   | notes |
