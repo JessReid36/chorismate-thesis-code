@@ -14,6 +14,7 @@ no action now but monitor per-design.
 ## A. External-charge / field issues (the heart of Tier-2)
 
 ### A1. Geometric collapse / "implosion" under relaxation  [OPEN — critical]
+**Stage 0 CONFIRMED (2026-07): implosion observed for K3 and K4 at both endpoints — trajMin 0.02–0.93 A vs the >=2 A premise; K4_product diverges (MAX grad 1.07->7.39), K3/K4_reactant settle into collapsed minima. K1/K2 plateau without imploding at snapshot. Guard now mandatory. See 07_stage0/STAGE0_FINDINGS.md.**
 Distinct from spill-out. Spill-out is a *static, diffuse-basis* effect (density detaching to a far
 charge). Implosion is *dynamic*: during opt/NEB the NUCLEI move, and the atom carrying developing
 negative charge (ether O3) is pulled toward the +1 site. The >=2 A safety margin is asserted only
