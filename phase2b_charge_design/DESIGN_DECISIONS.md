@@ -125,3 +125,38 @@ converted into (or fails to convert into) "optimal at promoting catalysis".
 Not "we found the optimal catalyst" but "we built the first CERTIFIED screen for electrostatic
 catalyst design, and we test honestly whether certified-optimal-on-the-proxy tracks actually-
 catalytic". Keeping these two claims rigorously separate is what makes the thesis defensible.
+
+---
+
+## Decision (2026-07): Tier-2 endpoint relaxation moves to ASH; native bare %pointcharges is closed
+
+Empirical basis — Stage 0 + Stage 1 on the four max-lowering designs (K1-K4, both endpoints),
+committed in results repo phase2b_charge_design/07_stage0/ (raw job.out + STAGE0/STAGE1 tables):
+
+- **Stage 0** (bare `%pointcharges` + CPCM eps=4 + Opt, coordsys cartesian, no guard): 0/8
+  converged (72-cycle cap); 6/8 imploded — every design carrying the +1 at 3.84 A from ether O3
+  (K2/K3/K4, both endpoints) collapsed, a nucleus reaching 0.01-1.06 A of a charge from a >=3.5 A
+  start, tearing O3 off C4 at the products; K4_product diverged (MAX grad ~4767). K1 (lone -1,
+  far) stayed intact but did not converge.
+- **Stage 1** (added `Calc_Hess true` + `Recalc_Hess 5` to break the plateau): 0/8 converged at
+  ~4.5 h/job. A full analytic Hessian recomputed every 5 cycles did NOT fix K1 — MAX gradient
+  oscillates 6-30x over tolerance with no downward trend. The non-convergence is a frustrated,
+  shallow field-distorted surface, not a curvature deficit; more Hessian is a dead end.
+
+Conclusion: both failure modes are unfixable within native `%geom Opt` + bare point charges.
+Implosion requires a one-sided distance floor (a repulsive wall on the substrate atoms), which
+`%geom` cannot express (rigid constraints only; one-sided harmonic walls live only in the `%md`
+module and are not confirmed to be honoured by its L-BFGS Minimize). The frustrated surface
+requires a restraint-capable optimiser. Loosening the convergence criterion is rejected: K1 sits
+above even a 1e-3 reaction-relevant threshold, so it would report a non-stationary point.
+
+Decision: Tier-2 endpoint re-optimisation and NEB move to the ASH wrapper (Bjornsson), using its
+geomeTRIC/OpenMM layer for (a) a uniform one-sided minimum atom-charge distance floor + LJ wall
+applied identically to all designs, and (b) restraint-aware optimisation, with ORCA as the QM
+engine at the unchanged level (B3LYP-D3BJ/def2-SVP/CPCM eps=4). Implosion that persists under the
+guard is retained as a ranking FAILURE (register G1), not rescued. This makes the ASH dependency
+non-negotiable rather than a convenience — justified by the Stage 0/1 evidence above, not assumed.
+
+Guardrail confirmed harmless: K1 shows no implosion, so the uniform floor will be inert for
+non-imploding designs (zero energy/gradient at their converged separations) and only bind the
+collapsing ones — preserving barrier fairness across the batch.
