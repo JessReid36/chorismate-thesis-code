@@ -1,0 +1,13 @@
+#!/bin/bash
+#PBS -N k2_wall
+#PBS -l select=1:ncpus=8:mem=16gb
+#PBS -l walltime=06:00:00
+#PBS -j oe
+#PBS -o /home/18660916/k2_wall.log
+source /apps/mambaforge/etc/profile.d/conda.sh
+conda activate /home/18660916/envs/ash
+export PYTHONNOUSERSITE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1
+export PATH="/apps/openmpi/4.1.1/bin:$PATH"
+export LD_LIBRARY_PATH="/home/apps2/ORCA/6.0.1/lib:/apps/openmpi/4.1.1/lib:/apps/mambaforge/envs/medaka/lib:$LD_LIBRARY_PATH"
+cd /home/18660916/system_development/phase2b_charge_design/07_stage0/stage1/wall
+python k2_spike_wall.py run
