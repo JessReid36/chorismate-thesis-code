@@ -92,3 +92,85 @@ The ASH QM/MM pipeline ITSELF is validated (constructs, embeds, runs, wall injec
 - Emerging hypothesis to test, not assume: K2's certified-optimal-on-proxy field may be physically
   too aggressive to admit a relaxed substrate — which would itself be a Tier-2 result
   (proxy-optimal =/= physically realisable), consistent with the frozen-field proxy's known limits.
+
+## Attempt 5 — ASH, MOLECULAR SURROGATES (guanidinium=+1, formate=-1), full QM, frozen.  WORKS (concept proven).
+Motivated by the literature (Behrens & Hartke Top Catal 2022 "back to the real world"; Sokalski OCF is
+analytic-not-point-charges): the collapse is a POINT-CHARGE ARTIFACT (a bare charge is a singular,
+Pauli-free Coulomb sink), not a real physical result. Fix: replace each abstract +/-1 with a REAL
+molecular group that has finite size + Pauli repulsion.
+Build (sandbox-validated): 24 substrate atoms + guanidinium C(NH2)3+ (10 atoms, central C at the
+certified +1 site, 3.84 A from O3) + formate HCOO- (4 atoms, C at the -1 site). Net charge -2, singlet,
+38 QM atoms. Surrogates FROZEN (indices 24-37); only the substrate relaxes. Level unchanged
+(B3LYP-D3BJ/def2-SVP/CPCM eps=4). Script: ash_guarded/k2_surrogate_spike.py (note: autostart=False is
+REQUIRED - ASH otherwise hands ORCA a stale orca.gbw across geometry steps -> "Input geometry does not
+match current geometry" GUESS crash; also Guess PModel).
+RESULT (job 395224, ended at walltime after 1 geom step - see cost note): first SCF converges cleanly,
+E = -1229.569 Eh, NO instability/oscillation/collapse. Step-1 geometry: an electron-rich substrate atom
+(carboxylate O6) forms a HELD SALT BRIDGE to a guanidinium N-H (O6...H = 1.508 A - a real H-bond
+distance), and O3 migrates toward a guanidinium H (3.14 -> 2.87 A) with the substrate intact
+(O3-C4 1.449). Contrast: bare/point-charge attempts pulled an O to 0.02-0.955 A (singular sink).
+KEY RESULT: real molecular groups convert the implosion into a physical hydrogen bond / salt bridge -
+Pauli repulsion supplies the minimum the point charge lacked. The surrogate route is the correct
+representation. This is the resolution of the whole relaxation problem.
+
+## OPEN ISSUE from Attempt 5 - COST (blocks scaling; decide before batch)
+The full-QM 38-atom optimization is far too slow (first SCF ~12 h with ORCA LEAN-SCF; did not converge in
+6 h walltime, only 1 geom step). Not scalable to (all designs) x (2 endpoints) x (NEB). Options for the
+PRODUCTION guard, giving the same Pauli protection at ~24-atom cost:
+ (a) QM substrate + MM guanidinium/formate (OpenMM layer, LJ sigma/eps = Pauli wall) via QMMMTheory -
+     surrogate electrostatics as MM charges WITH LJ; validated OpenMM path already exists.
+ (b) LJ-walled point charges (bare +/-1 as MM particles carrying sigma/eps) - lighter, less chemically
+     explicit, but the LJ wall is the physically-motivated floor (r0 ~ vdW contact 3.0-3.4 A) the earlier
+     wall-run lacked.
+ (c) cheaper QM geometry (r2SCAN-3c) + B3LYP single point on top.
+Full-QM surrogate = gold-standard validation (keep for the headline design); production guard should be
+(a) or (b). NEXT: build the cheap guarded variant and re-run K2 to a CONVERGED endpoint, confirm the
+salt bridge holds, then scale.
+
+## Attempt 5 result + net-charge finding + literature verdicts (2026-07, updates the above)
+
+### Attempt 5 (full-QM surrogates) — WORKED for K2, but only K2 is valid full-QM.
+K2 full-QM surrogate run (guanidinium+1 / formate-1, frozen, 38 QM atoms, net -2): first SCF clean
+(E=-1229.569 Eh), substrate carboxylate O forms a HELD salt bridge to a guanidinium N-H at 1.508 A -
+a real H-bond, NOT a collapse. Confirms the point-charge implosion is a REPRESENTATION ARTIFACT and
+real molecular groups fix it. Cost: ~12 h/SCF; did not converge in 6 h; relaunched clean as
+'k2_fullqm_surr' (168 h walltime, email flags). This is the gold-standard anchor.
+
+### NET-CHARGE PROBLEM (caught in sandbox before running K1/K3/K4 full-QM).
+Full-QM surrogate systems inherit the design's net charge: K1=-3, K2=-2, K3=-3, K4=-4 (substrate -2
++ surrogate net). Only K2 is net -2. Building K1/K3/K4 as full-QM would create -3/-4 molecular
+polyanions (substrate dianion + separated formate -1s, charge centres 3-9 A apart).
+
+### LITERATURE VERDICT 1 (multiply-charged-anion research). CONFIRMED: -3/-4 full-QM polyanions
+are LIKELY ELECTRONICALLY UNBOUND. Separated -1 carboxylates add Coulomb repulsion, not binding;
+real analogues (pyrene tetrasulfonate, CuPc-tetrasulfonate) have NEGATIVE electron binding energies.
+CPCM eps=4 is too weak to bind them (needs high dielectric / explicit counter-ions/waters:
+~3 waters per -2 centre, ~16 per -3). CRITICAL ARTIFACT: def2-SVP (non-diffuse) MASKS the
+instability - the SCF converges and looks bound while the true HOMO is positive/autodetaching; a
+diffuse basis (def2-SVPD) would reveal density spilling out. => DO NOT relax isolated -3/-4 full-QM
+systems in def2-SVP/CPCM(eps=4) and trust them. My earlier "-3/-4 likely unbound" hunch is
+literature-confirmed, not speculation.
+
+### LITERATURE VERDICT 2 (external-charge representation research). Recommended method =
+electrostatic embedding: keep chorismate as the ONLY QM subsystem (charge stays -2 for ALL designs
+- MM charges add field, not electrons, so the polyanion problem DISAPPEARS), with the external
++/-1 groups as MM with LENNARD-JONES / Pauli walls. Bare point charges collapse (spill-out); the
+LJ/ECP/Gaussian-blur wall is the standard cure. Floor must be at vdW CONTACT (3.0-3.4 A) not 2.2 A,
+and steep (LJ r^-12 / k>=500), which is EXACTLY why our Attempt-4 wall (2.2 A, k=100, harmonic) was
+penetrated - mis-calibrated, not wrong in concept.
+
+### CORRECTED PLAN (supersedes the "Next" list above).
+- Full-QM surrogate: VALID only for K2 (net -2). Keep k2_fullqm_surr running as the gold standard.
+- PRIMARY production method = QM substrate (-2) + MM MOLECULAR surrogates (guanidinium/formate) with
+  FORCE-FIELD LJ (OPLS/AMBER vdW radii => real Pauli wall at vdW contact, no arbitrary tuning). QM
+  charge stays -2 for K1-K4 => no net-charge/unbound problem AND no collapse. This is the one
+  combination not yet run (bare-charge+custom-wall failed on calibration; full-QM hit net charge;
+  MM-molecular-surrogate-with-FF-LJ has each missing piece).
+- CALIBRATION: full-QM K2 vs MM-LJ K2. If they agree (salt-bridge distances, relaxed substrate
+  geometry, barrier), MM-LJ is validated -> run K1-K4 on MM-LJ with confidence.
+- MANDATORY sandbox gate before any HPC run: verify ASH's OpenMM layer actually APPLIES sigma/eps to
+  the MM surrogate atoms (source shows addParticle(0,1,0) default = ZERO LJ). If LJ is not applied,
+  it is bare charges again and will re-collapse; add LJ explicitly via CustomNonbondedForce. Do NOT
+  run until LJ-on-MM-particles is confirmed.
+- VERIFICATION on every run: HOMO<0; diffuse-basis (def2-SVPD) test for spill-out; no density on the
+  outermost charge; for embedding, watch frontier-atom charges near the +1 for over-polarisation.
