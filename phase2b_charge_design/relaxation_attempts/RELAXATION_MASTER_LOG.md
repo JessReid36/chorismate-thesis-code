@@ -174,3 +174,20 @@ penetrated - mis-calibrated, not wrong in concept.
   run until LJ-on-MM-particles is confirmed.
 - VERIFICATION on every run: HOMO<0; diffuse-basis (def2-SVPD) test for spill-out; no density on the
   outermost charge; for embedding, watch frontier-atom charges near the +1 for over-polarisation.
+
+## Attempt 6 — MM MOLECULAR SURROGATES (guanidinium/formate as MM fragments + explicit QM-MM LJ).  PRODUCTION METHOD.
+Synthesis of all findings. QM = 24 substrate only (charge -2, so NO polyanion problem for any design);
+guanidinium(+1)/formate(-1) as MM fragments carrying distributed partial charges (sum +1/-1) AND explicit
+Lennard-Jones vs every QM atom (336 LB-combined pairs, E=4eps[(s/r)^12-(s/r)^6]) injected as CustomBondForce
+into mm.system. The small-sigma N-H lets an electron-rich substrate O approach to H-bond distance; N/O/C give
+the Pauli wall. Surrogates frozen at certified positions. Script: ash_guarded/k2_mmsurr_spike.py.
+RESULT (job k2_mmsurr, 200 steps, smooth monotonic descent -837.37, no oscillation, maxiter):
+  min substrate<->surrogate = 1.766 A  -> REAL SALT BRIDGE, reproduces the full-QM gold standard (1.54 A).
+  A substrate carboxylate O docks to a guanidinium N-H (same pose as full-QM, where O6 bridged); no collapse.
+KEY RESULT: MM molecular surrogates reproduce the full-QM salt-bridge geometry at 24-atom QM cost, keep QM at
+-2 (net-charge-safe for K1-K4), and optimize smoothly. THIS IS THE PRODUCTION GUARD for all designs.
+Contrast: bare-charge + smooth LJ wall (Attempt 5b/wall3) only REPELS (substrate went to O3->+1 5.89 A) because
+a bare +1 has no H-bond donor. The molecular surrogate supplies the donor -> attractive salt bridge, matching
+gold. Calibration confirmed: cheap MM-surrogate ~ expensive full-QM on the salt-bridge geometry.
+NEXT: clone to K1/K3/K4 (same LJ machinery, each design's own charge set + surrogate placement); run all four
+in parallel. Then relaxed-path/NEB on the surviving designs.
