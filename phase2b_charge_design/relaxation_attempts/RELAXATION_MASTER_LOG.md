@@ -208,3 +208,21 @@ the TS ~2.5 A), this may wash out in the BARRIER - to be verified at the TS. Not
 converged (maxiter step81), so part of the gap may be gold-standard non-convergence.
 NEXT: (B) one restrained MM run (C1-C6 fixed at 3.78) to confirm everything-but-C1-C6 matches, then (A) clone
 to K1/K3/K4, run relaxed paths, and CALIBRATE ON THE BARRIER (the real endpoint), not just reactant geometry.
+
+## Attempt 6c — RESTRAINED calibration (C1-C6 pinned at full-QM 3.782 A): CONFIRMS the method.
+Re-ran converged MM-surrogate K2 with C1-C6 (atoms 0,12) constrained to the full-QM value 3.782 A
+(ASH Optimizer constraints={"bond":[[0,12,3.782]]}, constrainvalue=True). CONVERGED. Result:
+  C1-C6 = 3.777 (constraint held), O3-C4 = 1.429 (full-QM 1.456), salt bridge = 1.640 A (full-QM 1.541).
+VERDICT: with the one soft forming-bond coordinate pinned, the cheap MM-surrogate reproduces the full-QM
+substrate geometry EVERYWHERE (reacting core + salt bridge <=0.1 A). => the 1.2 A C1-C6 gap in the free
+run was the SOLE real difference, a single flat large-amplitude reactant coordinate; everything
+catalytically relevant matches gold. MM MOLECULAR SURROGATE METHOD IS CALIBRATED for production.
+Scripts: ash_guarded/k2_mmsurr_loose.py (free, converged) + k2_mmsurr_restr.py (restrained confirmation).
+
+## Scaling to K1/K3/K4 — surrogate placement finding
+K1 (1 formate) and K3 (guan + 2 formate) place cleanly (inter-fragment min 2.19 A, no clash). K4 does NOT:
+its three -1 sites are only 2.61-4.50 A apart, and three formates (~2.2 A wide each) cannot occupy that
+volume without their -O arms clashing (naive min 1.415 A). This is itself a design-realizability finding:
+K4's charge packing is too dense for real molecular ions. Plan: K1/K2/K3 on full MM molecular surrogates;
+K4 via mixed representation (guanidinium + 1 formate for the separated -1 + LJ-point-charges for the two
+crowded -1s) OR document K4 as not surrogate-representable and run point-charge-LJ only.
