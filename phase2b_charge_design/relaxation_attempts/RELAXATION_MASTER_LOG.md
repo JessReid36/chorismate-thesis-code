@@ -191,3 +191,20 @@ a bare +1 has no H-bond donor. The molecular surrogate supplies the donor -> att
 gold. Calibration confirmed: cheap MM-surrogate ~ expensive full-QM on the salt-bridge geometry.
 NEXT: clone to K1/K3/K4 (same LJ machinery, each design's own charge set + surrogate placement); run all four
 in parallel. Then relaxed-path/NEB on the surviving designs.
+
+## Attempt 6b — MM surrogate with LOOSE convergence (gmax 6e-3): CONVERGED. Calibration verdict.
+Re-ran K2 MM-surrogate with reaction-relevant conv_criteria (gmax 6e-3, grms 3e-3) via ASH Optimizer
+conv_criteria= kwarg. Result: CONVERGED ("Converged! =D") at step 241, gmax 3.4e-3, E=-837.376. First fully
+converged relaxation of the project. Script: ash_guarded/k2_mmsurr_loose.py.
+CALIBRATION (converged MM-surr vs full-QM step81 gold):
+  reacting core AGREES: O3-C4 1.456 vs 1.434, C4-C6 2.504 vs 2.480 (both <=0.02 A).
+  salt bridge AGREES: 1.541 vs 1.460 A (both form carboxylate<->guanidinium bridge).
+  C1-C6 DIFFERS: 3.782 vs 5.004 A (1.2 A) - PERSISTS after convergence (was 1.3 A before) -> a REAL
+  conformer difference in the soft forming-bond distance, NOT a convergence artefact. Likely cause: QM
+  guanidinium polarises/charge-transfers to the substrate in ways an MM point-charge guanidinium cannot.
+VERDICT: cheap MM-surrogate reproduces the catalytically-relevant reacting core + salt bridge (<0.02 A) but
+gives a more OPEN reactant C1-C6. Since C1-C6 is a flat non-bonded coordinate at the reactant (stiff only at
+the TS ~2.5 A), this may wash out in the BARRIER - to be verified at the TS. Note: full-QM gold itself is NOT
+converged (maxiter step81), so part of the gap may be gold-standard non-convergence.
+NEXT: (B) one restrained MM run (C1-C6 fixed at 3.78) to confirm everything-but-C1-C6 matches, then (A) clone
+to K1/K3/K4, run relaxed paths, and CALIBRATE ON THE BARRIER (the real endpoint), not just reactant geometry.
