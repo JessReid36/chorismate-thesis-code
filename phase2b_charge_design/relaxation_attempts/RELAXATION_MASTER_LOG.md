@@ -236,3 +236,19 @@ crowded -1s) OR document K4 as not surrogate-representable and run point-charge-
 | K4 | 314 | 1.447 | 2.482 | 5.042 | 1.853 | mixed rep, floppiest (dense charge) |
 Reacting core consistent across all four (O3-C4 1.43-1.45, C4-C6 2.48-2.49). Step count tracks design
 frustration (K1 136 -> K4 314) = more competing charges -> flatter surface. Product endpoints running next.
+
+## LJ-wall gate check (research-flagged silent-failure risk): PASSED.
+Research flagged that an OpenMM CustomBondForce added to mm.system can be silently ignored if the Context
+isn't reinitialized. Checked directly: MM energy 0.000 -> 0.029666 Eh the instant the LJ CustomBondForce is
+added (BEFORE any reinit) => ASH rebuilds the OpenMM context on every run(), the LJ wall IS evaluated at every
+gradient. All relaxation results stand. (Also evidenced by wall3 bare-charge repelling to 5.89A vs
+MM-surrogate salt-bridging at 1.46A - opposite geometries prove the MM+LJ layer is active.)
+
+## Barrier method DECIDED (from research):
+Route through ASH (NOT ORCA-native NEB - it can't see the OpenMM LJ walls). Primary = ASH NEBTS() with
+ActiveRegion=True, actatoms=qmatoms, runmode='serial' (QM/MM NEB can't image-parallelize in ASH; parallelize
+ORCA), geodesic interpolation or Phase-1 TS as guess, partial Hessian on reacting atoms (C1=0,O3=7,C4=8,C6=12
++neighbours). Fallback for floppy designs = relaxed scan of O3-C4 via calc_surface then TSOpt=True on the peak.
+Verify each TS: partial NumFreq(hessatoms=qmatoms) -> 1 imaginary mode along O3-C4/C1-C6 -> connect to
+endpoints by +/-mode displacement + relax. Barrier(K)=E(TS,K)-E(reactant,K). Each design=different fixed
+field -> separate TS per design (OEEF: dBarrier ~ field.dmu). Pilot K2 first, then K1/K3, then K4.
