@@ -252,3 +252,14 @@ ORCA), geodesic interpolation or Phase-1 TS as guess, partial Hessian on reactin
 Verify each TS: partial NumFreq(hessatoms=qmatoms) -> 1 imaginary mode along O3-C4/C1-C6 -> connect to
 endpoints by +/-mode displacement + relax. Barrier(K)=E(TS,K)-E(reactant,K). Each design=different fixed
 field -> separate TS per design (OEEF: dBarrier ~ field.dmu). Pilot K2 first, then K1/K3, then K4.
+
+## ALL FOUR ENDPOINTS COMPLETE (reactant + product, converged, per design).
+| design | reactant O3-C4/C1-C6 | product O3-C4/C1-C6 |
+|---|---|---|
+| K1 | 1.43 / 4.26 | 3.65 / 1.56 |
+| K2 | 1.43 / 5.00 | 5.13 / 1.57 |
+| K3 | 1.44 / 4.00 | 5.17 / 1.57 |
+| K4 | 1.45 / 5.04 | 4.26 / 1.51 |
+All relaxed under each design's fixed field (MM-surrogate method, QM -2). Break O3-C4, form C1-C6
+cleanly in every case. Endpoints committed: results production_batch/. Barrier phase underway:
+K2 pilot running NEB-TS (nebts_k2) + relaxed scan (scan_k2) in parallel for cost-vs-outcome comparison.
