@@ -226,3 +226,13 @@ volume without their -O arms clashing (naive min 1.415 A). This is itself a desi
 K4's charge packing is too dense for real molecular ions. Plan: K1/K2/K3 on full MM molecular surrogates;
 K4 via mixed representation (guanidinium + 1 formate for the separated -1 + LJ-point-charges for the two
 crowded -1s) OR document K4 as not surrogate-representable and run point-charge-LJ only.
+
+## ALL FOUR REACTANT ENDPOINTS CONVERGED (calibrated MM-surrogate method).
+| design | steps | O3-C4 | C4-C6 | C1-C6 | salt bridge | note |
+|---|---|---|---|---|---|---|
+| K1 | 136 | 1.434 | 2.485 | 4.263 | none (17.5) | benign, lone -1, no guanidinium |
+| K2 | 241 | 1.434 | 2.480 | 5.004 | 1.460 | calibrated vs full-QM |
+| K3 | 182 | 1.441 | 2.489 | 4.002 | 1.886 | 2 formate + guan |
+| K4 | 314 | 1.447 | 2.482 | 5.042 | 1.853 | mixed rep, floppiest (dense charge) |
+Reacting core consistent across all four (O3-C4 1.43-1.45, C4-C6 2.48-2.49). Step count tracks design
+frustration (K1 136 -> K4 314) = more competing charges -> flatter surface. Product endpoints running next.
