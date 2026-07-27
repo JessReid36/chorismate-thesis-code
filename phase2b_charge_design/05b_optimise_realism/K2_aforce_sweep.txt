@@ -1,0 +1,11 @@
+grid=331 pts  menu=[-1.0, 1.0]  K=2  bare=+17.47  (net-free, HiGHS certified)
+preorg penalty sweep: distorting drive D = sum q*a_COEFF (a_pot or a_force per --coeff)
+  (D>0 = design drives C1-C6 apart = distorting; goal: mu pushes certified optimum toward D<=0)
+
+ mu    | ddE(Dv)  barrier |    D(distort)  gap  | placed sites (idx:q@shell, apot)
+-------+------------------+---------------------+-------------------------------------
+     0 |  -11.04    +6.43 |  +1.4101e-02 0.000 | 150:-1@2.0(a=-0.009) 249:+1@2.0(a=+0.005)
+    50 |  -10.95    +6.52 |  +6.2328e-03 0.000 | 185:-1@2.0(a=-0.001) 249:+1@2.0(a=+0.005)
+   100 |  -10.95    +6.52 |  +6.2328e-03 0.000 | 185:-1@2.0(a=-0.001) 249:+1@2.0(a=+0.005)
+   200 |  -10.95    +6.52 |  +6.2328e-03 0.000 | 185:-1@2.0(a=-0.001) 249:+1@2.0(a=+0.005)
+   500 |   -9.73    +7.74 |  +1.5886e-03 0.000 | 117:+1@2.0(a=-0.007) 150:-1@2.0(a=-0.009)
