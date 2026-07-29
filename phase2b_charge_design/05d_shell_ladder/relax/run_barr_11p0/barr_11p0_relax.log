@@ -1,0 +1,2958 @@
+geometric-optimize called with the following command line:
+relax_barrier.py shell11p0ts run
+
+                                        [91m())))))))))))))))/[0m                     
+                                    [91m())))))))))))))))))))))))),[0m                
+                                [91m*)))))))))))))))))))))))))))))))))[0m             
+                        [94m#,[0m    [91m()))))))))/[0m                [91m.)))))))))),[0m          
+                      [94m#%%%%,[0m  [91m())))))[0m                        [91m.))))))))*[0m        
+                      [94m*%%%%%%,[0m  [91m))[0m              [93m..[0m              [91m,))))))).[0m      
+                        [94m*%%%%%%,[0m         [93m***************/.[0m        [91m.)))))))[0m     
+                [94m#%%/[0m      [94m(%%%%%%,[0m    [93m/*********************.[0m       [91m)))))))[0m    
+              [94m.%%%%%%#[0m      [94m*%%%%%%,[0m  [93m*******/,[0m     [93m**********,[0m      [91m.))))))[0m   
+                [94m.%%%%%%/[0m      [94m*%%%%%%,[0m  [93m**[0m              [93m********[0m      [91m.))))))[0m  
+          [94m##[0m      [94m.%%%%%%/[0m      [94m(%%%%%%,[0m                  [93m,******[0m      [91m/)))))[0m  
+        [94m%%%%%%[0m      [94m.%%%%%%#[0m      [94m*%%%%%%,[0m    [92m,/////.[0m       [93m******[0m      [91m))))))[0m 
+      [94m#%[0m      [94m%%[0m      [94m.%%%%%%/[0m      [94m*%%%%%%,[0m  [92m////////,[0m      [93m*****/[0m     [91m,)))))[0m 
+    [94m#%%[0m  [94m%%%[0m  [94m%%%#[0m      [94m.%%%%%%/[0m      [94m(%%%%%%,[0m  [92m///////.[0m     [93m/*****[0m      [91m))))).[0m
+  [94m#%%%%.[0m      [94m%%%%%#[0m      [94m/%%%%%%*[0m      [94m#%%%%%%[0m   [92m/////)[0m     [93m******[0m      [91m))))),[0m
+    [94m#%%%%##%[0m  [94m%%%#[0m      [94m.%%%%%%/[0m      [94m(%%%%%%,[0m  [92m///////.[0m     [93m/*****[0m      [91m))))).[0m
+      [94m##[0m     [94m%%%[0m      [94m.%%%%%%/[0m      [94m*%%%%%%,[0m  [92m////////.[0m      [93m*****/[0m     [91m,)))))[0m 
+        [94m#%%%%#[0m      [94m/%%%%%%/[0m      [94m(%%%%%%[0m      [92m/)/)//[0m       [93m******[0m      [91m))))))[0m 
+          [94m##[0m      [94m.%%%%%%/[0m      [94m(%%%%%%,[0m                  [93m*******[0m      [91m))))))[0m  
+                [94m.%%%%%%/[0m      [94m*%%%%%%,[0m  [93m**.[0m             [93m/*******[0m      [91m.))))))[0m  
+              [94m*%%%%%%/[0m      [94m(%%%%%%[0m   [93m********/*..,*/*********[0m       [91m*))))))[0m   
+                [94m#%%/[0m      [94m(%%%%%%,[0m    [93m*********************/[0m        [91m)))))))[0m    
+                        [94m*%%%%%%,[0m         [93m,**************/[0m         [91m,))))))/[0m     
+                      [94m(%%%%%%[0m   [91m()[0m                              [91m))))))))[0m       
+                      [94m#%%%%,[0m  [91m())))))[0m                        [91m,)))))))),[0m        
+                        [94m#,[0m    [91m())))))))))[0m                [91m,)))))))))).[0m          
+                                 [91m()))))))))))))))))))))))))))))))/[0m             
+                                    [91m())))))))))))))))))))))))).[0m                
+                                         [91m())))))))))))))),[0m                     
+
+-=# [1;94m geomeTRIC started. Version: 1.1.1 [0m #=-
+Current date and time: 2026-07-29 17:07:18
+#========================================================#
+#| [92m    Arguments passed to driver run_optimizer():     [0m |#
+#========================================================#
+bothre                    0.0 
+constraints               constraints.txt 
+convergence_cmax          0.01 
+convergence_dmax          0.015 
+convergence_drms          0.01 
+convergence_energy        1e-05 
+convergence_gmax          0.006 
+convergence_grms          0.003 
+coordsys                  hdlc 
+customengine              <ash.interfaces.interface_geometric_new.ASHengineclass object at 0x1494e3630d90> 
+input                     dummyinputname 
+irc                       False 
+logIni                    /home/18660916/envs/ash/lib/python3.11/site-packages/ash/log.ini 
+maxiter                   400 
+prefix                    geometric_OPTtraj 
+rigid                     False 
+subfrctor                 1 
+transition                False 
+verbose                   0 
+----------------------------------------------------------
+Custom engine selected.
+$freeze
+xyz 25
+xyz 26
+xyz 27
+xyz 28
+xyz 29
+xyz 30
+xyz 31
+xyz 32
+xyz 33
+xyz 34
+xyz 35
+xyz 36
+xyz 37
+xyz 38
+xyz 39
+xyz 40
+xyz 41
+xyz 42
+xyz 43
+xyz 44
+xyz 45
+xyz 46
+xyz 47
+xyz 48
+xyz 49
+xyz 50
+xyz 51
+xyz 52
+xyz 53
+xyz 54
+xyz 55
+xyz 56
+xyz 57
+xyz 58
+xyz 59
+xyz 60
+xyz 61
+xyz 62
+xyz 63
+xyz 64
+xyz 65
+xyz 66
+xyz 67
+xyz 68
+xyz 69
+xyz 70
+xyz 71
+xyz 72
+xyz 73
+xyz 74
+xyz 75
+xyz 76
+xyz 77
+xyz 78
+xyz 79
+xyz 80
+xyz 81
+xyz 82
+Bonds will be generated from interatomic distances less than 1.20 times sum of covalent radii
+246 internal coordinates being used (instead of 246 Cartesians)
+<class 'geometric.internal.CartesianX'> : 82
+<class 'geometric.internal.CartesianY'> : 82
+<class 'geometric.internal.CartesianZ'> : 82
+<class 'geometric.internal.Distance'> : 98
+<class 'geometric.internal.Angle'> : 108
+<class 'geometric.internal.OutOfPlane'> : 295
+<class 'geometric.internal.Dihedral'> : 502
+Constraint                         Current      Target       Diff.
+Cartesian-X 25                    55.73300    55.73300     0.00000
+Cartesian-Y 25                    32.77150    32.77150     0.00000
+Cartesian-Z 25                    70.09050    70.09050     0.00000
+Cartesian-X 26                    55.88358    55.88358     0.00000
+Cartesian-Y 26                    33.15672    33.15672     0.00000
+Cartesian-Z 26                    68.82645    68.82645     0.00000
+Cartesian-X 27                    55.57306    55.57306     0.00000
+Cartesian-Y 27                    33.81922    33.81922     0.00000
+Cartesian-Z 27                    69.52270    69.52270     0.00000
+Cartesian-X 28                    56.07975    56.07975     0.00000
+Cartesian-Y 28                    32.20168    32.20168     0.00000
+Cartesian-Z 28                    69.09011    69.09011     0.00000
+Cartesian-X 29                    55.32410    55.32410     0.00000
+Cartesian-Y 29                    33.64390    33.64390     0.00000
+Cartesian-Z 29                    71.00735    71.00735     0.00000
+Cartesian-X 30                    55.52027    55.52027     0.00000
+Cartesian-Y 30                    32.68887    32.68887     0.00000
+Cartesian-Z 30                    71.27102    71.27102     0.00000
+Cartesian-X 31                    55.43845    55.43845     0.00000
+Cartesian-Y 31                    33.93644    33.93644     0.00000
+Cartesian-Z 31                    70.04743    70.04743     0.00000
+Cartesian-X 32                    55.99132    55.99132     0.00000
+Cartesian-Y 32                    31.51388    31.51388     0.00000
+Cartesian-Z 32                    70.43770    70.43770     0.00000
+Cartesian-X 33                    56.10567    56.10567     0.00000
+Cartesian-Y 33                    31.80641    31.80641     0.00000
+Cartesian-Z 33                    69.47778    69.47778     0.00000
+Cartesian-X 34                    55.68080    55.68080     0.00000
+Cartesian-Y 34                    32.17638    32.17638     0.00000
+Cartesian-Z 34                    71.13396    71.13396     0.00000
+Cartesian-X 35                    51.95560    51.95560     0.00000
+Cartesian-Y 35                    29.35290    29.35290     0.00000
+Cartesian-Z 35                    67.74710    67.74710     0.00000
+Cartesian-X 36                    52.10618    52.10618     0.00000
+Cartesian-Y 36                    29.73812    29.73812     0.00000
+Cartesian-Z 36                    66.48305    66.48305     0.00000
+Cartesian-X 37                    51.79566    51.79566     0.00000
+Cartesian-Y 37                    30.40062    30.40062     0.00000
+Cartesian-Z 37                    67.17930    67.17930     0.00000
+Cartesian-X 38                    52.30235    52.30235     0.00000
+Cartesian-Y 38                    28.78308    28.78308     0.00000
+Cartesian-Z 38                    66.74671    66.74671     0.00000
+Cartesian-X 39                    51.54670    51.54670     0.00000
+Cartesian-Y 39                    30.22530    30.22530     0.00000
+Cartesian-Z 39                    68.66395    68.66395     0.00000
+Cartesian-X 40                    51.74287    51.74287     0.00000
+Cartesian-Y 40                    29.27027    29.27027     0.00000
+Cartesian-Z 40                    68.92762    68.92762     0.00000
+Cartesian-X 41                    51.66105    51.66105     0.00000
+Cartesian-Y 41                    30.51784    30.51784     0.00000
+Cartesian-Z 41                    67.70403    67.70403     0.00000
+Cartesian-X 42                    52.21392    52.21392     0.00000
+Cartesian-Y 42                    28.09528    28.09528     0.00000
+Cartesian-Z 42                    68.09431    68.09431     0.00000
+Cartesian-X 43                    52.32827    52.32827     0.00000
+Cartesian-Y 43                    28.38781    28.38781     0.00000
+Cartesian-Z 43                    67.13438    67.13438     0.00000
+Cartesian-X 44                    51.90340    51.90340     0.00000
+Cartesian-Y 44                    28.75778    28.75778     0.00000
+Cartesian-Z 44                    68.79056    68.79056     0.00000
+Cartesian-X 45                    66.68130    66.68130     0.00000
+Cartesian-Y 45                    28.98960    28.98960     0.00000
+Cartesian-Z 45                    42.37150    42.37150     0.00000
+Cartesian-X 46                    67.86513    67.86513     0.00000
+Cartesian-Y 46                    29.05138    29.05138     0.00000
+Cartesian-Z 46                    41.97496    41.97496     0.00000
+Cartesian-X 47                    65.97002    65.97002     0.00000
+Cartesian-Y 47                    27.96222    27.96222     0.00000
+Cartesian-Z 47                    42.40406    42.40406     0.00000
+Cartesian-X 48                    66.22332    66.22332     0.00000
+Cartesian-Y 48                    29.92545    29.92545     0.00000
+Cartesian-Z 48                    42.72426    42.72426     0.00000
+Cartesian-X 49                    70.24600    70.24600     0.00000
+Cartesian-Y 49                    31.86160    31.86160     0.00000
+Cartesian-Z 49                    44.36020    44.36020     0.00000
+Cartesian-X 50                    71.42982    71.42982     0.00000
+Cartesian-Y 50                    31.92338    31.92338     0.00000
+Cartesian-Z 50                    43.96366    43.96366     0.00000
+Cartesian-X 51                    69.53472    69.53472     0.00000
+Cartesian-Y 51                    30.83422    30.83422     0.00000
+Cartesian-Z 51                    44.39276    44.39276     0.00000
+Cartesian-X 52                    69.78802    69.78802     0.00000
+Cartesian-Y 52                    32.79745    32.79745     0.00000
+Cartesian-Z 52                    44.71296    44.71296     0.00000
+Cartesian-X 53                    62.52960    62.52960     0.00000
+Cartesian-Y 53                    24.88590    24.88590     0.00000
+Cartesian-Z 53                    43.17370    43.17370     0.00000
+Cartesian-X 54                    63.71342    63.71342     0.00000
+Cartesian-Y 54                    24.94768    24.94768     0.00000
+Cartesian-Z 54                    42.77716    42.77716     0.00000
+Cartesian-X 55                    61.81832    61.81832     0.00000
+Cartesian-Y 55                    23.85852    23.85852     0.00000
+Cartesian-Z 55                    43.20626    43.20626     0.00000
+Cartesian-X 56                    62.07162    62.07162     0.00000
+Cartesian-Y 56                    25.82175    25.82175     0.00000
+Cartesian-Z 56                    43.52646    43.52646     0.00000
+Cartesian-X 57                    64.14630    64.14630     0.00000
+Cartesian-Y 57                    21.16730    21.16730     0.00000
+Cartesian-Z 57                    47.85290    47.85290     0.00000
+Cartesian-X 58                    65.33012    65.33012     0.00000
+Cartesian-Y 58                    21.22908    21.22908     0.00000
+Cartesian-Z 58                    47.45636    47.45636     0.00000
+Cartesian-X 59                    63.43502    63.43502     0.00000
+Cartesian-Y 59                    20.13992    20.13992     0.00000
+Cartesian-Z 59                    47.88546    47.88546     0.00000
+Cartesian-X 60                    63.68832    63.68832     0.00000
+Cartesian-Y 60                    22.10315    22.10315     0.00000
+Cartesian-Z 60                    48.20566    48.20566     0.00000
+Cartesian-X 61                    66.96520    66.96520     0.00000
+Cartesian-Y 61                    24.44620    24.44620     0.00000
+Cartesian-Z 61                    45.06990    45.06990     0.00000
+Cartesian-X 62                    68.14902    68.14902     0.00000
+Cartesian-Y 62                    24.50798    24.50798     0.00000
+Cartesian-Z 62                    44.67336    44.67336     0.00000
+Cartesian-X 63                    66.25392    66.25392     0.00000
+Cartesian-Y 63                    23.41882    23.41882     0.00000
+Cartesian-Z 63                    45.10246    45.10246     0.00000
+Cartesian-X 64                    66.50722    66.50722     0.00000
+Cartesian-Y 64                    25.38205    25.38205     0.00000
+Cartesian-Z 64                    45.42266    45.42266     0.00000
+Cartesian-X 65                    69.19040    69.19040     0.00000
+Cartesian-Y 65                    22.82840    22.82840     0.00000
+Cartesian-Z 65                    49.87250    49.87250     0.00000
+Cartesian-X 66                    70.37422    70.37422     0.00000
+Cartesian-Y 66                    22.89018    22.89018     0.00000
+Cartesian-Z 66                    49.47596    49.47596     0.00000
+Cartesian-X 67                    68.47912    68.47912     0.00000
+Cartesian-Y 67                    21.80102    21.80102     0.00000
+Cartesian-Z 67                    49.90506    49.90506     0.00000
+Cartesian-X 68                    68.73242    68.73242     0.00000
+Cartesian-Y 68                    23.76425    23.76425     0.00000
+Cartesian-Z 68                    50.22526    50.22526     0.00000
+Cartesian-X 69                    71.85490    71.85490     0.00000
+Cartesian-Y 69                    27.72720    27.72720     0.00000
+Cartesian-Z 69                    47.77060    47.77060     0.00000
+Cartesian-X 70                    73.03872    73.03872     0.00000
+Cartesian-Y 70                    27.78898    27.78898     0.00000
+Cartesian-Z 70                    47.37406    47.37406     0.00000
+Cartesian-X 71                    71.14362    71.14362     0.00000
+Cartesian-Y 71                    26.69982    26.69982     0.00000
+Cartesian-Z 71                    47.80316    47.80316     0.00000
+Cartesian-X 72                    71.39692    71.39692     0.00000
+Cartesian-Y 72                    28.66305    28.66305     0.00000
+Cartesian-Z 72                    48.12336    48.12336     0.00000
+Cartesian-X 73                    56.37030    56.37030     0.00000
+Cartesian-Y 73                    28.05720    28.05720     0.00000
+Cartesian-Z 73                    68.87920    68.87920     0.00000
+Cartesian-X 74                    56.52088    56.52088     0.00000
+Cartesian-Y 74                    28.44242    28.44242     0.00000
+Cartesian-Z 74                    67.61515    67.61515     0.00000
+Cartesian-X 75                    56.21036    56.21036     0.00000
+Cartesian-Y 75                    29.10492    29.10492     0.00000
+Cartesian-Z 75                    68.31140    68.31140     0.00000
+Cartesian-X 76                    56.71705    56.71705     0.00000
+Cartesian-Y 76                    27.48738    27.48738     0.00000
+Cartesian-Z 76                    67.87881    67.87881     0.00000
+Cartesian-X 77                    55.96140    55.96140     0.00000
+Cartesian-Y 77                    28.92960    28.92960     0.00000
+Cartesian-Z 77                    69.79605    69.79605     0.00000
+Cartesian-X 78                    56.15757    56.15757     0.00000
+Cartesian-Y 78                    27.97457    27.97457     0.00000
+Cartesian-Z 78                    70.05972    70.05972     0.00000
+Cartesian-X 79                    56.07575    56.07575     0.00000
+Cartesian-Y 79                    29.22214    29.22214     0.00000
+Cartesian-Z 79                    68.83613    68.83613     0.00000
+Cartesian-X 80                    56.62862    56.62862     0.00000
+Cartesian-Y 80                    26.79958    26.79958     0.00000
+Cartesian-Z 80                    69.22640    69.22640     0.00000
+Cartesian-X 81                    56.74297    56.74297     0.00000
+Cartesian-Y 81                    27.09211    27.09211     0.00000
+Cartesian-Z 81                    68.26648    68.26648     0.00000
+Cartesian-X 82                    56.31810    56.31810     0.00000
+Cartesian-Y 82                    27.46208    27.46208     0.00000
+Cartesian-Z 82                    69.92266    69.92266     0.00000
+> ===== Optimization Info: ====
+> Job type: Energy minimization
+> Maximum number of optimization cycles: 400
+> Initial / maximum trust radius (Angstrom): 0.100 / 0.300
+> Convergence Criteria:
+> Will converge when all 5 criteria are reached:
+>  |Delta-E| < 1.00e-05
+>  RMS-Ortho-Grad < 3.00e-03
+>  Max-Ortho-Grad < 6.00e-03
+>  RMS-Disp  < 1.00e-02
+>  Max-Disp  < 1.50e-02
+> 
+> Constraints are requested. The following criterion is added:
+>  Max Constraint Violation (in Angstroms/degrees) < 1.00e-02 
+> === End Optimization Info ===
+Step    0 : Gradient = 5.293e-03/2.753e-02 (rms/max) Energy = -837.3929201896
+Hessian Eigenvalues: 2.63687e-02 2.63687e-02 2.63687e-02 ... 5.78010e-01 5.78010e-01 5.78010e-01
+Step    1 : Displace = [0m1.528e-02[0m/[0m8.710e-02[0m (rms/max) Trust = 1.000e-01 (=) Grad_T = [92m2.662e-03[0m/[0m1.084e-02[0m (rms/max) E (change) = -837.3970540799 ([0m-4.134e-03[0m) Quality = [0m1.158[0m
+Hessian Eigenvalues: 2.44311e-02 2.63687e-02 2.63687e-02 ... 5.78010e-01 5.78010e-01 5.78011e-01
+Step    2 : Displace = [0m1.543e-02[0m/[0m7.200e-02[0m (rms/max) Trust = 1.414e-01 ([92m+[0m) Grad_T = [92m2.481e-03[0m/[0m1.126e-02[0m (rms/max) E (change) = -837.3995061918 ([0m-2.452e-03[0m) Quality = [0m1.561[0m
+Hessian Eigenvalues: 7.77730e-03 2.63687e-02 2.63687e-02 ... 5.78010e-01 5.78010e-01 6.04336e-01
+Step    3 : Displace = [0m4.265e-02[0m/[0m1.903e-01[0m (rms/max) Trust = 2.000e-01 ([92m+[0m) Grad_T = [0m4.616e-03[0m/[0m1.939e-02[0m (rms/max) E (change) = -837.4037886088 ([0m-4.282e-03[0m) Quality = [0m1.353[0m
+Hessian Eigenvalues: 3.93011e-03 2.63687e-02 2.63687e-02 ... 5.78010e-01 5.78292e-01 6.21991e-01
+Step    4 : Displace = [0m5.133e-02[0m/[0m2.141e-01[0m (rms/max) Trust = 2.828e-01 ([92m+[0m) Grad_T = [0m6.112e-03[0m/[0m2.303e-02[0m (rms/max) E (change) = -837.4088107171 ([0m-5.022e-03[0m) Quality = [0m1.579[0m
+Hessian Eigenvalues: 1.58469e-03 2.63687e-02 2.63687e-02 ... 5.78010e-01 5.84094e-01 5.89335e-01
+Step    5 : Displace = [0m1.609e-01[0m/[0m6.114e-01[0m (rms/max) Trust = 3.000e-01 ([92m+[0m) Grad_T = [0m1.397e-02[0m/[0m5.441e-02[0m (rms/max) E (change) = -837.4116045497 ([0m-2.794e-03[0m) Quality = [0m0.258[0m
+Hessian Eigenvalues: 3.53302e-03 2.63687e-02 2.63687e-02 ... 5.78010e-01 5.78351e-01 5.93836e-01
+Step    6 : Displace = [0m5.684e-02[0m/[0m2.766e-01[0m (rms/max) Trust = 3.000e-01 (=) Grad_T = [0m8.915e-03[0m/[0m3.864e-02[0m (rms/max) E (change) = -837.4340816602 ([0m-2.248e-02[0m) Quality = [0m1.200[0m
+Hessian Eigenvalues: 6.37195e-03 1.92991e-02 2.63687e-02 ... 5.78010e-01 5.78011e-01 5.89424e-01
+Step    7 : Displace = [0m1.059e-01[0m/[0m4.150e-01[0m (rms/max) Trust = 3.000e-01 (=) Grad_T = [0m1.188e-01[0m/[0m7.857e-01[0m (rms/max) E (change) = -837.2303297225 ([91m+2.038e-01[0m) Quality = [91m-5.998[0m
+[93mRejecting step - quality is lower than -1.0[0m
+Hessian Eigenvalues: 6.37195e-03 1.92991e-02 2.63687e-02 ... 5.78010e-01 5.78011e-01 5.89424e-01
+Step    8 : Displace = [0m4.929e-02[0m/[0m2.039e-01[0m (rms/max) Trust = 5.296e-02 ([1;91mx[0m) Grad_T = [0m8.410e-03[0m/[0m4.892e-02[0m (rms/max) E (change) = -837.4562036431 ([0m-2.212e-02[0m) Quality = [0m0.814[0m
+Hessian Eigenvalues: 8.41617e-03 2.52535e-02 2.63687e-02 ... 5.78010e-01 5.78010e-01 5.88161e-01
+Step    9 : Displace = [0m3.222e-02[0m/[0m1.369e-01[0m (rms/max) Trust = 7.489e-02 ([92m+[0m) Grad_T = [0m5.434e-03[0m/[0m3.118e-02[0m (rms/max) E (change) = -837.4585914148 ([0m-2.388e-03[0m) Quality = [0m0.203[0m
+Hessian Eigenvalues: 9.59315e-03 2.34563e-02 2.63687e-02 ... 5.78010e-01 5.78010e-01 5.89702e-01
+ashpath: /home/18660916/envs/ash/lib/python3.11/site-packages/ash
+Sys path: ['/home/18660916/envs/ash/lib/python3.11/site-packages/ash', '/home/18660916/system_development/phase2b_charge_design/05d_shell_ladder/relax/run_barr_11p0', '/home/18660916/envs/ash/lib/python311.zip', '/home/18660916/envs/ash/lib/python3.11', '/home/18660916/envs/ash/lib/python3.11/lib-dynload', '/home/18660916/envs/ash/lib/python3.11/site-packages']
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+                                           ASH                                            
+                              A MULTISCALE MODELLING PROGRAM                              
+                                        Version: 0.9dev                                        
+                               Git commit version: Unknown                                
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+ASH path: /home/18660916/envs/ash/lib/python3.11/site-packages/ash
+Python version: 3.11.15
+Python interpreter: /home/18660916/envs/ash/bin/python3
+
+ASH Settings after reading defaults and ~/ash_user_settings.ini : 
+See https://ash.readthedocs.io/en/latest/basics.html#ash-settings on how to change settings.
+	 debugflag :  False
+	 load_julia :  False
+	 julia_library :  pythoncall
+	 use_ANSI_color :  False
+	 print_logo :  False
+	 print_input :  True
+	 scale :  1.0
+	 tol :  0.1
+	 conndepth :  10
+	 connectivity_code :  julia
+	 nonbondedMM_code :  julia
+	 print_exit_footer :  True
+	 print_full_timings :  True
+
+Note: ASH can use ANSI escape sequences for displaying color. Use e.g. less -R to display
+To turn on/off escape sequences, set: 'use_ANSI_color = False' in
+~/ash_user_settings.ini
+
+Input script: /home/18660916/system_development/phase2b_charge_design/05d_shell_ladder/relax/run_barr_11p0/relax_barrier.py
+================================================================================
+   > import sys, openmm
+   > from ash import Fragment, ORCATheory, OpenMMTheory, QMMMTheory, Optimizer
+   > name=sys.argv[1]; RUN=(len(sys.argv)>2 and sys.argv[2]=="run")
+   > ORCADIR="/home/apps2/ORCA/6.0.1"
+   > coords="\n".join(open("%s_coords.xyz"%name).read().splitlines()[2:])
+   > mmcharges=[float(x) for x in open("%s_charges.txt"%name).read().split(",")]
+   > frag=Fragment(coordsstring=coords, charge=-2, mult=1)
+   > els=[a.split()[0] for a in coords.strip().split("\n")]
+   > print(">> %s: %d atoms (24 QM + %d MM), MM net %+.2f"%(name,frag.numatoms,frag.numatoms-24,sum(mmcharges)))
+   > assert len(mmcharges)==frag.numatoms
+   > LJ={"C":(3.40,0.086),"N":(3.25,0.170),"O":(2.96,0.210),"H":(1.06,0.016)}
+   > orca=ORCATheory(orcadir=ORCADIR,orcasimpleinput="! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF",
+   >     orcablocks="%cpcm epsilon 4.0 end\n%scf MaxIter 300 Guess PModel end",numcores=8,autostart=False)
+   > mm=OpenMMTheory(fragment=frag,dummysystem=True,platform="CPU",numcores=1,autoconstraints=None,rigidwater=False)
+   > lj=openmm.CustomBondForce("4*eps*((sig/r)^12 - (sig/r)^6)")
+   > lj.addPerBondParameter("sig");lj.addPerBondParameter("eps");lj.setUsesPeriodicBoundaryConditions(False)
+   > ang=openmm.unit.angstrom;kcal=openmm.unit.kilocalorie_per_mole;npair=0
+   > for i in range(24):
+   >     si,ei=LJ[els[i]]
+   >     for j in range(24,frag.numatoms):
+   >         sj,ej=LJ[els[j]]
+   >         sig=((si+sj)/2*ang).value_in_unit(openmm.unit.nanometer);eps=(((ei*ej)**0.5)*kcal).value_in_unit(openmm.unit.kilojoule_per_mole)
+   >         lj.addBond(i,j,[sig,eps]);npair+=1
+   > lj.setForceGroup(11);mm.system.addForce(lj)
+   > qmmm=QMMMTheory(qm_theory=orca,mm_theory=mm,fragment=frag,qmatoms=list(range(24)),charges=mmcharges,embedding="elstat",qm_charge=-2,qm_mult=1,numcores=8)
+   > FROZEN=list(range(24,frag.numatoms))
+   > CONV={"convergence_energy":1e-5,"convergence_grms":3.0e-3,"convergence_gmax":6.0e-3,"convergence_drms":1.0e-2,"convergence_dmax":1.5e-2}
+   > if not RUN:
+   >     print("\n=== DRY RUN OK %s: %d pairs, MM %+.0f, %d frozen ==="%(name,npair,sum(mmcharges),len(FROZEN))); sys.exit(0)
+   > result=Optimizer(theory=qmmm,fragment=frag,coordsystem="hdlc",frozenatoms=FROZEN,maxiter=400,conv_criteria=CONV,charge=-2,mult=1)
+   > frag.write_xyzfile("%s_relaxed.xyz"%name)
+   > # extract final energy
+   > E=frag.energy if hasattr(frag,"energy") else None
+   > print(">> DONE %s  FINAL ENERGY = %s Eh -> %s_relaxed.xyz"%(name,E,name))
+   > open("%s_energy.txt"%name,"w").write(str(E))
+================================================================================ 
+
+
+--------------------------------------------------------------------------------
+                                New ASH fragment                                
+--------------------------------------------------------------------------------
+
+ASH Fragment creation
+Getting coordinates from string: C     60.14190600    34.25017500    56.86750500
+H     60.65410400    33.35229400    57.20242100
+H     60.73860600    35.07435300    56.47491200
+C     58.80287300    34.45194900    57.16141800
+C     58.13069700    35.79868100    56.84307300
+O     58.86276300    36.77666300    56.53446600
+O     56.87734100    35.82963400    56.93983700
+O     58.04533200    33.51170800    57.60013500
+C     57.53567900    32.20862600    56.01945400
+H     56.92805500    31.57263500    56.66681400
+C     58.86068700    31.87524000    55.78984900
+H     59.36035100    31.12725100    56.40326400
+C     59.64119800    32.67145500    54.96010600
+C     58.97535300    33.57937300    54.02371700
+H     59.61208400    34.05213900    53.27111900
+C     57.64453400    33.77154800    54.05277400
+H     57.14874400    34.42947900    53.33266900
+C     56.77153500    33.13738000    55.09626400
+H     56.36648800    33.96180100    55.70835200
+O     55.70405500    32.44082700    54.44502300
+H     55.04194600    32.20048300    55.11214300
+C     61.07068900    32.21901900    54.67969600
+O     61.72429900    31.71851300    55.62834500
+O     61.44865900    32.31879300    53.48933100
+C     55.733000    32.771500    70.090500
+N     55.883577    33.156720    68.826446
+H     55.573060    33.819222    69.522700
+H     56.079746    32.201682    69.090113
+N     55.324101    33.643904    71.007349
+H     55.520270    32.688866    71.271016
+H     55.438449    33.936440    70.047428
+N     55.991321    31.513876    70.437705
+H     56.105670    31.806411    69.477784
+H     55.680804    32.176378    71.133959
+C     51.955600    29.352900    67.747100
+N     52.106177    29.738120    66.483046
+H     51.795660    30.400622    67.179300
+H     52.302346    28.783082    66.746713
+N     51.546701    30.225304    68.663949
+H     51.742870    29.270266    68.927616
+H     51.661049    30.517840    67.704028
+N     52.213921    28.095276    68.094305
+H     52.328270    28.387811    67.134384
+H     51.903404    28.757778    68.790559
+C     66.681300    28.989600    42.371500
+O     67.865125    29.051376    41.974963
+O     65.970016    27.962217    42.404059
+H     66.223321    29.925450    42.724261
+C     70.246000    31.861600    44.360200
+O     71.429825    31.923376    43.963663
+O     69.534716    30.834217    44.392759
+H     69.788021    32.797450    44.712961
+C     62.529600    24.885900    43.173700
+O     63.713425    24.947676    42.777163
+O     61.818316    23.858517    43.206259
+H     62.071621    25.821750    43.526461
+C     64.146300    21.167300    47.852900
+O     65.330125    21.229076    47.456363
+O     63.435016    20.139917    47.885459
+H     63.688321    22.103150    48.205661
+C     66.965200    24.446200    45.069900
+O     68.149025    24.507976    44.673363
+O     66.253916    23.418817    45.102459
+H     66.507221    25.382050    45.422661
+C     69.190400    22.828400    49.872500
+O     70.374225    22.890176    49.475963
+O     68.479116    21.801017    49.905059
+H     68.732421    23.764250    50.225261
+C     71.854900    27.727200    47.770600
+O     73.038725    27.788976    47.374063
+O     71.143616    26.699817    47.803159
+H     71.396921    28.663050    48.123361
+C     56.370300    28.057200    68.879200
+N     56.520877    28.442420    67.615146
+H     56.210360    29.104922    68.311400
+H     56.717046    27.487382    67.878813
+N     55.961401    28.929604    69.796049
+H     56.157570    27.974566    70.059716
+H     56.075749    29.222140    68.836128
+N     56.628621    26.799576    69.226405
+H     56.742970    27.092111    68.266484
+H     56.318104    27.462078    69.922659
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 82
+Formula: N9O20H33C20
+Label: CHHCCOOOCHCHCCHCHCHOHCOOCNHHNHHNHHCNHHNHHNHHCOOHCOOHCOOHCOOHCOOHCOOHCOOHCNHHNHHNHH
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+>> shell11p0ts: 82 atoms (24 QM + 58 MM), MM net -4.00
+
+
+                     #####################################                      
+                     #                                   #                      
+                     #     ORCATheory initialization     #                      
+                     #                                   #                      
+                     #####################################                      
+Checking for ORCA location
+ Using orcadir path provided: /home/apps2/ORCA/6.0.1 
+Checking if ORCA binary works... yes 
+ORCA parallel job requested with numcores: 8 . Make sure that the correct OpenMPI version (for the ORCA version) is available in your environment
+OpenMPI binary directory found: /apps/openmpi/4.1.1/bin
+Testing that mpirun is executable... yes 
+OpenMPI version (mpirun -V): mpirun (Open MPI) 4.1.1
+
+Report bugs to http://www.open-mpi.org/community/help/
+
+bind_to_core_option: True
+
+Creating ORCA object
+ORCA dir: /home/apps2/ORCA/6.0.1
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+
+ORCATheory object created!
+
+
+                           #########################                            
+                           #                       #                            
+                           #     OpenMM Theory     #                            
+                           #                       #                            
+                           #########################                            
+OpenMM CPU threads set to: 1
+Imported OpenMM library version: 8.5.2
+
+--------------------------------------------------------------------------------
+                             Defining OpenMM object                             
+--------------------------------------------------------------------------------
+
+Printlevel: 2
+No automatic constraints
+AutoConstraint setting: None
+Rigidwater constraints: False
+Hydrogenmass option: 1.5 Da
+Using platform: CPU
+
+--------------------------------------------------------------------------------
+                            Setting up force fields.                            
+--------------------------------------------------------------------------------
+
+Note: OpenMM will fail in this step if parameters are missing in topology and
+      parameter files (e.g. nonbonded entries).
+
+Defining new basic single-chain, multi-residue topology
+Inside write_xmlfile_nonbonded
+Wrote XML-file: dummy.xml
+residueTemplates: {}
+System is non-periodic.
+nonbonded noPBC Method is: NoCutoff
+Nonbonded cutoff : 20 Angstrom
+
+----------------------
+OpenMM system created.
+----------------------
+OpenMM Forces defined: [<openmm.openmm.NonbondedForce; proxy of <Swig Object of type 'OpenMM::NonbondedForce *' at 0x1494e5a53e30> >, <openmm.openmm.CMMotionRemover; proxy of <Swig Object of type 'OpenMM::CMMotionRemover *' at 0x1494e5a5c2f0> >]
+
+Setting charges
+Number of atoms in OpenMM system: 82
+
+System constraints defined upon system creation: 0
+Use printlevel =>3 to see list of all constraints
+
+----------------------------------------------------------------------------
+Time to calculate step (OpenMM object creation): 2.763 seconds, 0.0 minutes.
+----------------------------------------------------------------------------
+
+
+                            ########################                            
+                            #                      #                            
+                            #     QM/MM Theory     #                            
+                            #                      #                            
+                            ########################                            
+QM-theory: ORCATheory
+MM-theory: OpenMMTheory
+All atoms in fragment: 82
+QM region (24 atoms): [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+MM region (58 atoms)
+QM/MM object selected to use 8 cores
+Embedding: elstat
+Reading in charges
+Updating charges in OpenMM object.
+Updating simulation object for modified Nonbonded force.
+
+--------------------------------------------------------------------
+Time to calculate step (update_charges): 0.002 seconds, 0.0 minutes.
+--------------------------------------------------------------------
+QM-region coordinates (before linkatoms):
+   0    C  60.14190600   34.25017500   56.86750500
+   1    H  60.65410400   33.35229400   57.20242100
+   2    H  60.73860600   35.07435300   56.47491200
+   3    C  58.80287300   34.45194900   57.16141800
+   4    C  58.13069700   35.79868100   56.84307300
+   5    O  58.86276300   36.77666300   56.53446600
+   6    O  56.87734100   35.82963400   56.93983700
+   7    O  58.04533200   33.51170800   57.60013500
+   8    C  57.53567900   32.20862600   56.01945400
+   9    H  56.92805500   31.57263500   56.66681400
+  10    C  58.86068700   31.87524000   55.78984900
+  11    H  59.36035100   31.12725100   56.40326400
+  12    C  59.64119800   32.67145500   54.96010600
+  13    C  58.97535300   33.57937300   54.02371700
+  14    H  59.61208400   34.05213900   53.27111900
+  15    C  57.64453400   33.77154800   54.05277400
+  16    H  57.14874400   34.42947900   53.33266900
+  17    C  56.77153500   33.13738000   55.09626400
+  18    H  56.36648800   33.96180100   55.70835200
+  19    O  55.70405500   32.44082700   54.44502300
+  20    H  55.04194600   32.20048300   55.11214300
+  21    C  61.07068900   32.21901900   54.67969600
+  22    O  61.72429900   31.71851300   55.62834500
+  23    O  61.44865900   32.31879300   53.48933100
+
+Determining QM-MM/HL-LL boundary
+Parameters determing connectivity:
+Scaling factor: 1.0
+Tolerance: 0.30000000000000004
+QM atoms: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+QM atoms to be excluded from boundary creation (excludeboundaryatomlist):  []
+QM-MM boundary dictionary: {}
+
+------------------------------------------------------------------------
+Time to calculate step (get_boundary_atoms): 0.025 seconds, 0.0 minutes.
+------------------------------------------------------------------------
+No covalent QM-MM boundary. Linkatoms and dipole_correction options set to False
+Removing constraints in OpenMM object for atoms: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+Removing bonded terms for QM-region in MMtheory
+Modifying bonded forces.
+
+
+Number of bonded terms removed:
+Harmonic Bond terms: 0
+Harmonic Angle terms: 0
+Periodic Torsion terms: 0
+Custom Torsion terms: 0
+CMAP Torsion terms: 0
+CustomBond terms 0
+
+
+--------------------------------------------------------------------------
+Time to calculate step (modify_bonded_forces): 0.005 seconds, 0.0 minutes.
+--------------------------------------------------------------------------
+Removing nonbonded terms for QM-region in MMtheory (QM-QM interactions)
+Add exceptions/exclusions. Removing i-j interactions for list: 24 atoms
+Case Nonbondedforce. Adding Exception for ij pair.
+Number of exceptions (Nonbondedforce) added: 276
+Number of exclusions (CustomNonbondedforce) added: 0
+
+--------------------------------------------------------------------
+Time to calculate step (add exceptions): 0.002 seconds, 0.0 minutes.
+--------------------------------------------------------------------
+Charges of QM atoms set to 0 (since Electrostatic Embedding):
+Setting QM charges to Zero
+
+-------------------------------------------------------------------
+Time to calculate step (ZeroQMCharges): 0.000 seconds, 0.0 minutes.
+-------------------------------------------------------------------
+Updating charges in OpenMM object.
+Updating simulation object for modified Nonbonded force.
+
+--------------------------------------------------------------------
+Time to calculate step (update_charges): 0.001 seconds, 0.0 minutes.
+--------------------------------------------------------------------
+Deleting Coulombexceptions for atomlist: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+
+-----------------------------------------------------------------------
+Time to calculate step (delete_exceptions): 0.004 seconds, 0.0 minutes.
+-----------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------
+Time to calculate step (QM/MM object creation): 0.438 seconds, 0.0 minutes.
+---------------------------------------------------------------------------
+
+
+                 #############################################                  
+                 #                                           #                  
+                 #     geomeTRICOptimizer initialization     #                  
+                 #                                           #                  
+                 #############################################                  
+Creating optimizer object
+User-defined convergence criteria:
+Theory is not periodic
+Printlevel: 2
+Coordinate system:  hdlc
+Max iterations:  400
+Frozen atoms: [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81]
+Active Region: False
+TS Optimization: False
+Hessian Option: None
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+
+--------------------------------------------------------------------------------
+                            Running geomeTRIC object                            
+--------------------------------------------------------------------------------
+
+ 
+Doing geometry optimization on fragment. Formula: N9O20H33C20 Label: CHHCCOOOCHCHCCHCHCHOHCOOCNHHNHHNHHCNHHNHHNHHCOOHCOOHCOOHCOOHCOOHCOOHCOOHCNHHNHHNHH  
+No constraints provided to run method.
+Testing if constraints present in optimizer object
+No constraints in optimizer object.
+Now testing if constraints in fragment object 
+No constraints in fragment object.
+
+Constraints:  None
+constrainvalue:  False
+Inside define_constraints
+Constraints: None
+Inside write_constraintsfile
+Writing frozen atom constraints
+Wrote XYZ file:  initialxyzfiletric.xyz
+No Hessian option provided.
+self.constraintsfile: constraints.txt
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+Hessian option: None
+Coordinate system: hdlc
+Starting optimization
+
+--------------------------------------------------------------------------------------
+Time to calculate step (Time spent before run_optimizer): 29.160 seconds, 0.5 minutes.
+--------------------------------------------------------------------------------------
+geometric called detect_dft option option for ASHengineclass.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 82
+Formula: N9O20H33C20
+Label: CHHCCOOOCHCHCCHCHCHOHCOOCNHHNHHNHHCNHHNHHNHHCOOHCOOHCOOHCOOHCOOHCOOHCOOHCNHHNHHNHH
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 0 (print_atoms_list region)
+---------------------------------------------------
+        C  60.14190600   34.25017500   56.86750500
+        H  60.65410400   33.35229400   57.20242100
+        H  60.73860600   35.07435300   56.47491200
+        C  58.80287300   34.45194900   57.16141800
+        C  58.13069700   35.79868100   56.84307300
+        O  58.86276300   36.77666300   56.53446600
+        O  56.87734100   35.82963400   56.93983700
+        O  58.04533200   33.51170800   57.60013500
+        C  57.53567900   32.20862600   56.01945400
+        H  56.92805500   31.57263500   56.66681400
+        C  58.86068700   31.87524000   55.78984900
+        H  59.36035100   31.12725100   56.40326400
+        C  59.64119800   32.67145500   54.96010600
+        C  58.97535300   33.57937300   54.02371700
+        H  59.61208400   34.05213900   53.27111900
+        C  57.64453400   33.77154800   54.05277400
+        H  57.14874400   34.42947900   53.33266900
+        C  56.77153500   33.13738000   55.09626400
+        H  56.36648800   33.96180100   55.70835200
+        O  55.70405500   32.44082700   54.44502300
+        H  55.04194600   32.20048300   55.11214300
+        C  61.07068900   32.21901900   54.67969600
+        O  61.72429900   31.71851300   55.62834500
+        O  61.44865900   32.31879300   53.48933100
+        C  55.73300000   32.77150000   70.09050000
+        N  55.88357700   33.15672000   68.82644600
+        H  55.57306000   33.81922200   69.52270000
+        H  56.07974600   32.20168200   69.09011300
+        N  55.32410100   33.64390400   71.00734900
+        H  55.52027000   32.68886600   71.27101600
+        H  55.43844900   33.93644000   70.04742800
+        N  55.99132100   31.51387600   70.43770500
+        H  56.10567000   31.80641100   69.47778400
+        H  55.68080400   32.17637800   71.13395900
+        C  51.95560000   29.35290000   67.74710000
+        N  52.10617700   29.73812000   66.48304600
+        H  51.79566000   30.40062200   67.17930000
+        H  52.30234600   28.78308200   66.74671300
+        N  51.54670100   30.22530400   68.66394900
+        H  51.74287000   29.27026600   68.92761600
+        H  51.66104900   30.51784000   67.70402800
+        N  52.21392100   28.09527600   68.09430500
+        H  52.32827000   28.38781100   67.13438400
+        H  51.90340400   28.75777800   68.79055900
+        C  66.68130000   28.98960000   42.37150000
+        O  67.86512500   29.05137600   41.97496300
+        O  65.97001600   27.96221700   42.40405900
+        H  66.22332100   29.92545000   42.72426100
+        C  70.24600000   31.86160000   44.36020000
+        O  71.42982500   31.92337600   43.96366300
+        O  69.53471600   30.83421700   44.39275900
+        H  69.78802100   32.79745000   44.71296100
+        C  62.52960000   24.88590000   43.17370000
+        O  63.71342500   24.94767600   42.77716300
+        O  61.81831600   23.85851700   43.20625900
+        H  62.07162100   25.82175000   43.52646100
+        C  64.14630000   21.16730000   47.85290000
+        O  65.33012500   21.22907600   47.45636300
+        O  63.43501600   20.13991700   47.88545900
+        H  63.68832100   22.10315000   48.20566100
+        C  66.96520000   24.44620000   45.06990000
+        O  68.14902500   24.50797600   44.67336300
+        O  66.25391600   23.41881700   45.10245900
+        H  66.50722100   25.38205000   45.42266100
+        C  69.19040000   22.82840000   49.87250000
+        O  70.37422500   22.89017600   49.47596300
+        O  68.47911600   21.80101700   49.90505900
+        H  68.73242100   23.76425000   50.22526100
+        C  71.85490000   27.72720000   47.77060000
+        O  73.03872500   27.78897600   47.37406300
+        O  71.14361600   26.69981700   47.80315900
+        H  71.39692100   28.66305000   48.12336100
+        C  56.37030000   28.05720000   68.87920000
+        N  56.52087700   28.44242000   67.61514600
+        H  56.21036000   29.10492200   68.31140000
+        H  56.71704600   27.48738200   67.87881300
+        N  55.96140100   28.92960400   69.79604900
+        H  56.15757000   27.97456600   70.05971600
+        H  56.07574900   29.22214000   68.83612800
+        N  56.62862100   26.79957600   69.22640500
+        H  56.74297000   27.09211100   68.26648400
+        H  56.31810400   27.46207800   69.92265900
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING QM/MM MODULE------------- 
+QM Module: ORCATheory
+MM Module: OpenMMTheory
+Charge provided from QMMMTheory object:  -2
+Mult provided from QMMMTheory object:  1
+QM-region Charge: -2 Mult: 1
+Embedding: Electrostatic
+First QMMMTheory run. Running runprep
+Inside QMMMTheory runprep
+
+-------------------------------------------------------------
+Time to calculate step (runprep): 0.000 seconds, 0.0 minutes.
+-------------------------------------------------------------
+Number of pointcharges (to QM program): 58
+Number of charge coordinates: 58
+Running QM/MM object with 8 cores available
+
+-------------------------------------------------------------------
+Time to calculate step (before-QMstep): 0.000 seconds, 0.0 minutes.
+-------------------------------------------------------------------
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+No orca.gbw file is present in dir.
+Checking if a file orca.gbw exists in parentdir:
+Found no file. ORCA will guess new orbitals
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+Pointcharge embedding is on!
+ ORCA Calculation starting. 
+Found warning messages in ORCA outputfile:
+WARNING: The chosen methods will break translational/rotational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ Warning: op=0 Small HOMO/LUMO gap (   0.075) - skipping pre-diagonalization
+
+ ORCA Calculation done. 
+ORCA converged in 16 iterations
+ORCA energy: -836.111741202379
+  ------------ENDING ORCA-INTERFACE------------- 
+
+----------------------------------------------------------------
+Time to calculate step (ORCA run): 427.639 seconds, 7.1 minutes.
+----------------------------------------------------------------
+
+---------------------------------------------------------------
+Time to calculate step (QM step): 427.639 seconds, 7.1 minutes.
+---------------------------------------------------------------
+
+----------------------------------------------------------------------
+Time to calculate step (QMpcgrad prepare): 0.000 seconds, 0.0 minutes.
+----------------------------------------------------------------------
+
+--------------------------------------------------------------------------
+Time to calculate step (linkatomgrad prepare): 0.000 seconds, 0.0 minutes.
+--------------------------------------------------------------------------
+
+----------------------------------------------------------------------------
+Time to calculate step (QM/MM gradient prepare): 0.000 seconds, 0.0 minutes.
+----------------------------------------------------------------------------
+Using OpenMM theory as part of QM/MM.
+Using MM on full system. Charges for QM region [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23] have been set to zero 
+
+--------------------------------------------------------------------------------
+                   Creating/updating OpenMM simulation object                   
+--------------------------------------------------------------------------------
+
+Integrator name: VerletIntegrator
+Timestep: 0.001
+Temperature: 300
+Coupling frequency: 1
+Properties: {'Threads': '1'}
+Topology: <Topology; 1 chains, 1 residues, 82 atoms, 0 bonds>
+
+----------------------------------------------------------------------------------
+Time to calculate step (creating/updating simulation): 0.004 seconds, 0.0 minutes.
+----------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+                     Running Single-point OpenMM Interface                      
+--------------------------------------------------------------------------------
+
+Number of OpenMM system constraints defined: 0
+
+-----------------------------------------------------------------------------------
+Time to calculate step (OpenMMTheory.run: const-check): 0.004 seconds, 0.0 minutes.
+-----------------------------------------------------------------------------------
+Updating coordinates.
+
+------------------------------------------------------------------------
+Time to calculate step (Creating pos array): 0.000 seconds, 0.0 minutes.
+------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+Time to calculate step (Updating MM positions): 0.000 seconds, 0.0 minutes.
+---------------------------------------------------------------------------
+Calling OpenMM getState.
+
+---------------------------------------------------------------------
+Time to calculate step (OpenMM getState): 0.001 seconds, 0.0 minutes.
+---------------------------------------------------------------------
+OpenMM Energy: -1.2811789872614339 Eh
+OpenMM Energy: -803.9519524771175 kcal/mol
+
+-----------------------
+Ending OpenMM interface
+-----------------------
+
+----------------------------------------------------------------
+Time to calculate step (OpenMM run): 0.005 seconds, 0.0 minutes.
+----------------------------------------------------------------
+
+-------------------------------------------------------------
+Time to calculate step (MM step): 0.006 seconds, 0.0 minutes.
+-------------------------------------------------------------
+
+Note: You are using electrostatic embedding. This means that the QM-energy is actually the polarized QM-energy
+Note: MM energy also contains the QM-MM Lennard-Jones interaction
+
+QM energy:              -836.111741202379 
+MM energy:                -1.281178987261
+QM/MM energy:           -837.392920189640 
+
+  ------------ENDING QM/MM MODULE------------- 
+
+-----------------------------------------------------------------
+Time to calculate step (QM/MM run): 427.645 seconds, 7.1 minutes.
+-----------------------------------------------------------------
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 82
+Formula: N9O20H33C20
+Label: CHHCCOOOCHCHCCHCHCHOHCOOCNHHNHHNHHCNHHNHHNHHCOOHCOOHCOOHCOOHCOOHCOOHCOOHCNHHNHHNHH
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 0 (print_atoms_list region)
+---------------------------------------------------
+        C  60.12602881   34.25021443   56.87865418
+        H  60.65596656   33.35007028   57.18929775
+        H  60.72424919   35.06534454   56.46534237
+        C  58.78496161   34.45571083   57.18009735
+        C  58.10803594   35.80953921   56.83451623
+        O  58.87321913   36.76695971   56.55285076
+        O  56.85254049   35.86136878   56.96341248
+        O  58.03873335   33.53239698   57.68698896
+        C  57.53950316   32.19997994   56.00884023
+        H  56.92224008   31.57734385   56.66534224
+        C  58.85647949   31.86019315   55.77834760
+        H  59.36260763   31.11206873   56.39050791
+        C  59.64520862   32.66196074   54.95314577
+        C  58.97847118   33.57643653   54.02348465
+        H  59.61364230   34.05313474   53.27481218
+        C  57.64782242   33.76980741   54.05586325
+        H  57.14971845   34.42640910   53.33553306
+        C  56.77299092   33.13599991   55.09697916
+        H  56.36944706   33.95758379   55.72046502
+        O  55.69934826   32.44235680   54.44066359
+        H  55.05006269   32.20493322   55.11650614
+        C  61.08727541   32.22019420   54.68390223
+        O  61.69241529   31.73600650   55.67362014
+        O  61.44269882   32.35460241   53.49655933
+        C  55.73300000   32.77150000   70.09050000
+        N  55.88357700   33.15672000   68.82644600
+        H  55.57306000   33.81922200   69.52270000
+        H  56.07974600   32.20168200   69.09011300
+        N  55.32410100   33.64390400   71.00734900
+        H  55.52027000   32.68886600   71.27101600
+        H  55.43844900   33.93644000   70.04742800
+        N  55.99132100   31.51387600   70.43770500
+        H  56.10567000   31.80641100   69.47778400
+        H  55.68080400   32.17637800   71.13395900
+        C  51.95560000   29.35290000   67.74710000
+        N  52.10617700   29.73812000   66.48304600
+        H  51.79566000   30.40062200   67.17930000
+        H  52.30234600   28.78308200   66.74671300
+        N  51.54670100   30.22530400   68.66394900
+        H  51.74287000   29.27026600   68.92761600
+        H  51.66104900   30.51784000   67.70402800
+        N  52.21392100   28.09527600   68.09430500
+        H  52.32827000   28.38781100   67.13438400
+        H  51.90340400   28.75777800   68.79055900
+        C  66.68130000   28.98960000   42.37150000
+        O  67.86512500   29.05137600   41.97496300
+        O  65.97001600   27.96221700   42.40405900
+        H  66.22332100   29.92545000   42.72426100
+        C  70.24600000   31.86160000   44.36020000
+        O  71.42982500   31.92337600   43.96366300
+        O  69.53471600   30.83421700   44.39275900
+        H  69.78802100   32.79745000   44.71296100
+        C  62.52960000   24.88590000   43.17370000
+        O  63.71342500   24.94767600   42.77716300
+        O  61.81831600   23.85851700   43.20625900
+        H  62.07162100   25.82175000   43.52646100
+        C  64.14630000   21.16730000   47.85290000
+        O  65.33012500   21.22907600   47.45636300
+        O  63.43501600   20.13991700   47.88545900
+        H  63.68832100   22.10315000   48.20566100
+        C  66.96520000   24.44620000   45.06990000
+        O  68.14902500   24.50797600   44.67336300
+        O  66.25391600   23.41881700   45.10245900
+        H  66.50722100   25.38205000   45.42266100
+        C  69.19040000   22.82840000   49.87250000
+        O  70.37422500   22.89017600   49.47596300
+        O  68.47911600   21.80101700   49.90505900
+        H  68.73242100   23.76425000   50.22526100
+        C  71.85490000   27.72720000   47.77060000
+        O  73.03872500   27.78897600   47.37406300
+        O  71.14361600   26.69981700   47.80315900
+        H  71.39692100   28.66305000   48.12336100
+        C  56.37030000   28.05720000   68.87920000
+        N  56.52087700   28.44242000   67.61514600
+        H  56.21036000   29.10492200   68.31140000
+        H  56.71704600   27.48738200   67.87881300
+        N  55.96140100   28.92960400   69.79604900
+        H  56.15757000   27.97456600   70.05971600
+        H  56.07574900   29.22214000   68.83612800
+        N  56.62862100   26.79957600   69.22640500
+        H  56.74297000   27.09211100   68.26648400
+        H  56.31810400   27.46207800   69.92265900
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING QM/MM MODULE------------- 
+QM Module: ORCATheory
+MM Module: OpenMMTheory
+Charge provided from QMMMTheory object:  -2
+Mult provided from QMMMTheory object:  1
+QM-region Charge: -2 Mult: 1
+Embedding: Electrostatic
+Number of pointcharges (to QM program): 58
+Number of charge coordinates: 58
+Running QM/MM object with 8 cores available
+
+-------------------------------------------------------------------
+Time to calculate step (before-QMstep): 0.000 seconds, 0.0 minutes.
+-------------------------------------------------------------------
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+Pointcharge embedding is on!
+ ORCA Calculation starting. 
+Found warning messages in ORCA outputfile:
+WARNING: The chosen methods will break translational/rotational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ Warning: op=0 Small HOMO/LUMO gap (   0.080) - skipping pre-diagonalization
+
+ ORCA Calculation done. 
+ORCA converged in 16 iterations
+ORCA energy: -836.115875022273
+  ------------ENDING ORCA-INTERFACE------------- 
+
+----------------------------------------------------------------
+Time to calculate step (ORCA run): 404.402 seconds, 6.7 minutes.
+----------------------------------------------------------------
+
+---------------------------------------------------------------
+Time to calculate step (QM step): 404.402 seconds, 6.7 minutes.
+---------------------------------------------------------------
+
+----------------------------------------------------------------------
+Time to calculate step (QMpcgrad prepare): 0.000 seconds, 0.0 minutes.
+----------------------------------------------------------------------
+
+--------------------------------------------------------------------------
+Time to calculate step (linkatomgrad prepare): 0.000 seconds, 0.0 minutes.
+--------------------------------------------------------------------------
+
+----------------------------------------------------------------------------
+Time to calculate step (QM/MM gradient prepare): 0.000 seconds, 0.0 minutes.
+----------------------------------------------------------------------------
+Using OpenMM theory as part of QM/MM.
+Using MM on full system. Charges for QM region [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23] have been set to zero 
+
+--------------------------------------------------------------------------------
+                   Creating/updating OpenMM simulation object                   
+--------------------------------------------------------------------------------
+
+Integrator name: VerletIntegrator
+Timestep: 0.001
+Temperature: 300
+Coupling frequency: 1
+Properties: {'Threads': '1'}
+Topology: <Topology; 1 chains, 1 residues, 82 atoms, 0 bonds>
+
+----------------------------------------------------------------------------------
+Time to calculate step (creating/updating simulation): 0.002 seconds, 0.0 minutes.
+----------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+                     Running Single-point OpenMM Interface                      
+--------------------------------------------------------------------------------
+
+Number of OpenMM system constraints defined: 0
+
+-----------------------------------------------------------------------------------
+Time to calculate step (OpenMMTheory.run: const-check): 0.002 seconds, 0.0 minutes.
+-----------------------------------------------------------------------------------
+Updating coordinates.
+
+------------------------------------------------------------------------
+Time to calculate step (Creating pos array): 0.000 seconds, 0.0 minutes.
+------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+Time to calculate step (Updating MM positions): 0.000 seconds, 0.0 minutes.
+---------------------------------------------------------------------------
+Calling OpenMM getState.
+
+---------------------------------------------------------------------
+Time to calculate step (OpenMM getState): 0.000 seconds, 0.0 minutes.
+---------------------------------------------------------------------
+OpenMM Energy: -1.2811790576477564 Eh
+OpenMM Energy: -803.9519966452017 kcal/mol
+
+-----------------------
+Ending OpenMM interface
+-----------------------
+
+----------------------------------------------------------------
+Time to calculate step (OpenMM run): 0.003 seconds, 0.0 minutes.
+----------------------------------------------------------------
+
+-------------------------------------------------------------
+Time to calculate step (MM step): 0.004 seconds, 0.0 minutes.
+-------------------------------------------------------------
+
+Note: You are using electrostatic embedding. This means that the QM-energy is actually the polarized QM-energy
+Note: MM energy also contains the QM-MM Lennard-Jones interaction
+
+QM energy:              -836.115875022273 
+MM energy:                -1.281179057648
+QM/MM energy:           -837.397054079921 
+
+  ------------ENDING QM/MM MODULE------------- 
+
+-----------------------------------------------------------------
+Time to calculate step (QM/MM run): 404.406 seconds, 6.7 minutes.
+-----------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 82
+Formula: N9O20H33C20
+Label: CHHCCOOOCHCHCCHCHCHOHCOOCNHHNHHNHHCNHHNHHNHHCOOHCOOHCOOHCOOHCOOHCOOHCOOHCNHHNHHNHH
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 0 (print_atoms_list region)
+---------------------------------------------------
+        C  60.10603679   34.24801933   56.88776728
+        H  60.64600122   33.34298971   57.17200767
+        H  60.69633554   35.05630444   56.44874950
+        C  58.76982695   34.46079861   57.21939150
+        C  58.09956589   35.83072914   56.87141508
+        O  58.86428428   36.77448533   56.56343205
+        O  56.83912152   35.88956069   56.97683880
+        O  58.03331448   33.55051219   57.76043258
+        C  57.52981247   32.17613504   55.99613917
+        H  56.90455011   31.57187964   56.66221198
+        C  58.84186852   31.84881474   55.77827463
+        H  59.36053729   31.09685544   56.37794314
+        C  59.63533041   32.66346789   54.95568190
+        C  58.97762225   33.57808358   54.02519523
+        H  59.61340771   34.05664400   53.27938748
+        C  57.64763123   33.77040525   54.06050947
+        H  57.14913652   34.42522084   53.33899597
+        C  56.77350917   33.13300284   55.10008681
+        H  56.37170398   33.94884605   55.73667822
+        O  55.69183764   32.44994451   54.43733075
+        H  55.05573331   32.20906874   55.12214114
+        C  61.09637078   32.23559520   54.71476849
+        O  61.69521996   31.75034652   55.70503923
+        O  61.44556380   32.39158222   53.53459265
+        C  55.73300000   32.77150000   70.09050000
+        N  55.88357700   33.15672000   68.82644600
+        H  55.57306000   33.81922200   69.52270000
+        H  56.07974600   32.20168200   69.09011300
+        N  55.32410100   33.64390400   71.00734900
+        H  55.52027000   32.68886600   71.27101600
+        H  55.43844900   33.93644000   70.04742800
+        N  55.99132100   31.51387600   70.43770500
+        H  56.10567000   31.80641100   69.47778400
+        H  55.68080400   32.17637800   71.13395900
+        C  51.95560000   29.35290000   67.74710000
+        N  52.10617700   29.73812000   66.48304600
+        H  51.79566000   30.40062200   67.17930000
+        H  52.30234600   28.78308200   66.74671300
+        N  51.54670100   30.22530400   68.66394900
+        H  51.74287000   29.27026600   68.92761600
+        H  51.66104900   30.51784000   67.70402800
+        N  52.21392100   28.09527600   68.09430500
+        H  52.32827000   28.38781100   67.13438400
+        H  51.90340400   28.75777800   68.79055900
+        C  66.68130000   28.98960000   42.37150000
+        O  67.86512500   29.05137600   41.97496300
+        O  65.97001600   27.96221700   42.40405900
+        H  66.22332100   29.92545000   42.72426100
+        C  70.24600000   31.86160000   44.36020000
+        O  71.42982500   31.92337600   43.96366300
+        O  69.53471600   30.83421700   44.39275900
+        H  69.78802100   32.79745000   44.71296100
+        C  62.52960000   24.88590000   43.17370000
+        O  63.71342500   24.94767600   42.77716300
+        O  61.81831600   23.85851700   43.20625900
+        H  62.07162100   25.82175000   43.52646100
+        C  64.14630000   21.16730000   47.85290000
+        O  65.33012500   21.22907600   47.45636300
+        O  63.43501600   20.13991700   47.88545900
+        H  63.68832100   22.10315000   48.20566100
+        C  66.96520000   24.44620000   45.06990000
+        O  68.14902500   24.50797600   44.67336300
+        O  66.25391600   23.41881700   45.10245900
+        H  66.50722100   25.38205000   45.42266100
+        C  69.19040000   22.82840000   49.87250000
+        O  70.37422500   22.89017600   49.47596300
+        O  68.47911600   21.80101700   49.90505900
+        H  68.73242100   23.76425000   50.22526100
+        C  71.85490000   27.72720000   47.77060000
+        O  73.03872500   27.78897600   47.37406300
+        O  71.14361600   26.69981700   47.80315900
+        H  71.39692100   28.66305000   48.12336100
+        C  56.37030000   28.05720000   68.87920000
+        N  56.52087700   28.44242000   67.61514600
+        H  56.21036000   29.10492200   68.31140000
+        H  56.71704600   27.48738200   67.87881300
+        N  55.96140100   28.92960400   69.79604900
+        H  56.15757000   27.97456600   70.05971600
+        H  56.07574900   29.22214000   68.83612800
+        N  56.62862100   26.79957600   69.22640500
+        H  56.74297000   27.09211100   68.26648400
+        H  56.31810400   27.46207800   69.92265900
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING QM/MM MODULE------------- 
+QM Module: ORCATheory
+MM Module: OpenMMTheory
+Charge provided from QMMMTheory object:  -2
+Mult provided from QMMMTheory object:  1
+QM-region Charge: -2 Mult: 1
+Embedding: Electrostatic
+Number of pointcharges (to QM program): 58
+Number of charge coordinates: 58
+Running QM/MM object with 8 cores available
+
+-------------------------------------------------------------------
+Time to calculate step (before-QMstep): 0.000 seconds, 0.0 minutes.
+-------------------------------------------------------------------
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+Pointcharge embedding is on!
+ ORCA Calculation starting. 
+Found warning messages in ORCA outputfile:
+WARNING: The chosen methods will break translational/rotational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ Warning: op=0 Small HOMO/LUMO gap (   0.074) - skipping pre-diagonalization
+
+ ORCA Calculation done. 
+ORCA converged in 17 iterations
+ORCA energy: -836.118327088186
+  ------------ENDING ORCA-INTERFACE------------- 
+
+----------------------------------------------------------------
+Time to calculate step (ORCA run): 434.844 seconds, 7.2 minutes.
+----------------------------------------------------------------
+
+---------------------------------------------------------------
+Time to calculate step (QM step): 434.844 seconds, 7.2 minutes.
+---------------------------------------------------------------
+
+----------------------------------------------------------------------
+Time to calculate step (QMpcgrad prepare): 0.000 seconds, 0.0 minutes.
+----------------------------------------------------------------------
+
+--------------------------------------------------------------------------
+Time to calculate step (linkatomgrad prepare): 0.000 seconds, 0.0 minutes.
+--------------------------------------------------------------------------
+
+----------------------------------------------------------------------------
+Time to calculate step (QM/MM gradient prepare): 0.000 seconds, 0.0 minutes.
+----------------------------------------------------------------------------
+Using OpenMM theory as part of QM/MM.
+Using MM on full system. Charges for QM region [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23] have been set to zero 
+
+--------------------------------------------------------------------------------
+                   Creating/updating OpenMM simulation object                   
+--------------------------------------------------------------------------------
+
+Integrator name: VerletIntegrator
+Timestep: 0.001
+Temperature: 300
+Coupling frequency: 1
+Properties: {'Threads': '1'}
+Topology: <Topology; 1 chains, 1 residues, 82 atoms, 0 bonds>
+
+----------------------------------------------------------------------------------
+Time to calculate step (creating/updating simulation): 0.002 seconds, 0.0 minutes.
+----------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+                     Running Single-point OpenMM Interface                      
+--------------------------------------------------------------------------------
+
+Number of OpenMM system constraints defined: 0
+
+-----------------------------------------------------------------------------------
+Time to calculate step (OpenMMTheory.run: const-check): 0.002 seconds, 0.0 minutes.
+-----------------------------------------------------------------------------------
+Updating coordinates.
+
+------------------------------------------------------------------------
+Time to calculate step (Creating pos array): 0.000 seconds, 0.0 minutes.
+------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+Time to calculate step (Updating MM positions): 0.000 seconds, 0.0 minutes.
+---------------------------------------------------------------------------
+Calling OpenMM getState.
+
+---------------------------------------------------------------------
+Time to calculate step (OpenMM getState): 0.001 seconds, 0.0 minutes.
+---------------------------------------------------------------------
+OpenMM Energy: -1.2811791035761522 Eh
+OpenMM Energy: -803.9520254657052 kcal/mol
+
+-----------------------
+Ending OpenMM interface
+-----------------------
+
+----------------------------------------------------------------
+Time to calculate step (OpenMM run): 0.003 seconds, 0.0 minutes.
+----------------------------------------------------------------
+
+-------------------------------------------------------------
+Time to calculate step (MM step): 0.004 seconds, 0.0 minutes.
+-------------------------------------------------------------
+
+Note: You are using electrostatic embedding. This means that the QM-energy is actually the polarized QM-energy
+Note: MM energy also contains the QM-MM Lennard-Jones interaction
+
+QM energy:              -836.118327088186 
+MM energy:                -1.281179103576
+QM/MM energy:           -837.399506191762 
+
+  ------------ENDING QM/MM MODULE------------- 
+
+-----------------------------------------------------------------
+Time to calculate step (QM/MM run): 434.848 seconds, 7.2 minutes.
+-----------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 82
+Formula: N9O20H33C20
+Label: CHHCCOOOCHCHCCHCHCHOHCOOCNHHNHHNHHCNHHNHHNHHCOOHCOOHCOOHCOOHCOOHCOOHCOOHCNHHNHHNHH
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 1 (print_atoms_list region)
+---------------------------------------------------
+        C  60.05156359   34.23839830   56.90289232
+        H  60.60686472   33.32660875   57.13953493
+        H  60.61034825   35.02991249   56.39403492
+        C  58.73614326   34.48240487   57.33435472
+        C  58.07144807   35.87068558   56.94231968
+        O  58.84484314   36.79167031   56.61563124
+        O  56.80719264   35.95092753   57.04034910
+        O  58.02712707   33.61379276   57.95201168
+        C  57.49053255   32.10229127   55.95549853
+        H  56.85285102   31.53994771   56.64602776
+        C  58.80154232   31.82989163   55.78949936
+        H  59.34249643   31.06325846   56.35448029
+        C  59.61548227   32.68949109   54.99035641
+        C  58.97312900   33.58768656   54.04535339
+        H  59.61356192   34.06347501   53.30159732
+        C  57.64203392   33.77294158   54.07740460
+        H  57.14277254   34.42268486   53.35209288
+        C  56.76985223   33.12280958   55.10908531
+        H  56.37949089   33.92211120   55.77939081
+        O  55.66290037   32.48124194   54.43042535
+        H  55.05881520   32.21576041   55.13378093
+        C  61.11358933   32.29221055   54.80314858
+        O  61.69057200   31.79915175   55.79538080
+        O  61.47900979   32.49029134   53.64138381
+        C  55.73300000   32.77150000   70.09050000
+        N  55.88357700   33.15672000   68.82644600
+        H  55.57306000   33.81922200   69.52270000
+        H  56.07974600   32.20168200   69.09011300
+        N  55.32410100   33.64390400   71.00734900
+        H  55.52027000   32.68886600   71.27101600
+        H  55.43844900   33.93644000   70.04742800
+        N  55.99132100   31.51387600   70.43770500
+        H  56.10567000   31.80641100   69.47778400
+        H  55.68080400   32.17637800   71.13395900
+        C  51.95560000   29.35290000   67.74710000
+        N  52.10617700   29.73812000   66.48304600
+        H  51.79566000   30.40062200   67.17930000
+        H  52.30234600   28.78308200   66.74671300
+        N  51.54670100   30.22530400   68.66394900
+        H  51.74287000   29.27026600   68.92761600
+        H  51.66104900   30.51784000   67.70402800
+        N  52.21392100   28.09527600   68.09430500
+        H  52.32827000   28.38781100   67.13438400
+        H  51.90340400   28.75777800   68.79055900
+        C  66.68130000   28.98960000   42.37150000
+        O  67.86512500   29.05137600   41.97496300
+        O  65.97001600   27.96221700   42.40405900
+        H  66.22332100   29.92545000   42.72426100
+        C  70.24600000   31.86160000   44.36020000
+        O  71.42982500   31.92337600   43.96366300
+        O  69.53471600   30.83421700   44.39275900
+        H  69.78802100   32.79745000   44.71296100
+        C  62.52960000   24.88590000   43.17370000
+        O  63.71342500   24.94767600   42.77716300
+        O  61.81831600   23.85851700   43.20625900
+        H  62.07162100   25.82175000   43.52646100
+        C  64.14630000   21.16730000   47.85290000
+        O  65.33012500   21.22907600   47.45636300
+        O  63.43501600   20.13991700   47.88545900
+        H  63.68832100   22.10315000   48.20566100
+        C  66.96520000   24.44620000   45.06990000
+        O  68.14902500   24.50797600   44.67336300
+        O  66.25391600   23.41881700   45.10245900
+        H  66.50722100   25.38205000   45.42266100
+        C  69.19040000   22.82840000   49.87250000
+        O  70.37422500   22.89017600   49.47596300
+        O  68.47911600   21.80101700   49.90505900
+        H  68.73242100   23.76425000   50.22526100
+        C  71.85490000   27.72720000   47.77060000
+        O  73.03872500   27.78897600   47.37406300
+        O  71.14361600   26.69981700   47.80315900
+        H  71.39692100   28.66305000   48.12336100
+        C  56.37030000   28.05720000   68.87920000
+        N  56.52087700   28.44242000   67.61514600
+        H  56.21036000   29.10492200   68.31140000
+        H  56.71704600   27.48738200   67.87881300
+        N  55.96140100   28.92960400   69.79604900
+        H  56.15757000   27.97456600   70.05971600
+        H  56.07574900   29.22214000   68.83612800
+        N  56.62862100   26.79957600   69.22640500
+        H  56.74297000   27.09211100   68.26648400
+        H  56.31810400   27.46207800   69.92265900
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING QM/MM MODULE------------- 
+QM Module: ORCATheory
+MM Module: OpenMMTheory
+Charge provided from QMMMTheory object:  -2
+Mult provided from QMMMTheory object:  1
+QM-region Charge: -2 Mult: 1
+Embedding: Electrostatic
+Number of pointcharges (to QM program): 58
+Number of charge coordinates: 58
+Running QM/MM object with 8 cores available
+
+-------------------------------------------------------------------
+Time to calculate step (before-QMstep): 0.000 seconds, 0.0 minutes.
+-------------------------------------------------------------------
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+Pointcharge embedding is on!
+ ORCA Calculation starting. 
+Found warning messages in ORCA outputfile:
+WARNING: The chosen methods will break translational/rotational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ Warning: op=0 Small HOMO/LUMO gap (   0.059) - skipping pre-diagonalization
+
+ ORCA Calculation done. 
+ORCA converged in 17 iterations
+ORCA energy: -836.122609367332
+  ------------ENDING ORCA-INTERFACE------------- 
+
+----------------------------------------------------------------
+Time to calculate step (ORCA run): 448.852 seconds, 7.5 minutes.
+----------------------------------------------------------------
+
+---------------------------------------------------------------
+Time to calculate step (QM step): 448.852 seconds, 7.5 minutes.
+---------------------------------------------------------------
+
+----------------------------------------------------------------------
+Time to calculate step (QMpcgrad prepare): 0.000 seconds, 0.0 minutes.
+----------------------------------------------------------------------
+
+--------------------------------------------------------------------------
+Time to calculate step (linkatomgrad prepare): 0.000 seconds, 0.0 minutes.
+--------------------------------------------------------------------------
+
+----------------------------------------------------------------------------
+Time to calculate step (QM/MM gradient prepare): 0.000 seconds, 0.0 minutes.
+----------------------------------------------------------------------------
+Using OpenMM theory as part of QM/MM.
+Using MM on full system. Charges for QM region [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23] have been set to zero 
+
+--------------------------------------------------------------------------------
+                   Creating/updating OpenMM simulation object                   
+--------------------------------------------------------------------------------
+
+Integrator name: VerletIntegrator
+Timestep: 0.001
+Temperature: 300
+Coupling frequency: 1
+Properties: {'Threads': '1'}
+Topology: <Topology; 1 chains, 1 residues, 82 atoms, 0 bonds>
+
+----------------------------------------------------------------------------------
+Time to calculate step (creating/updating simulation): 0.003 seconds, 0.0 minutes.
+----------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+                     Running Single-point OpenMM Interface                      
+--------------------------------------------------------------------------------
+
+Number of OpenMM system constraints defined: 0
+
+-----------------------------------------------------------------------------------
+Time to calculate step (OpenMMTheory.run: const-check): 0.003 seconds, 0.0 minutes.
+-----------------------------------------------------------------------------------
+Updating coordinates.
+
+------------------------------------------------------------------------
+Time to calculate step (Creating pos array): 0.000 seconds, 0.0 minutes.
+------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+Time to calculate step (Updating MM positions): 0.000 seconds, 0.0 minutes.
+---------------------------------------------------------------------------
+Calling OpenMM getState.
+
+---------------------------------------------------------------------
+Time to calculate step (OpenMM getState): 0.001 seconds, 0.0 minutes.
+---------------------------------------------------------------------
+OpenMM Energy: -1.28117924144155 Eh
+OpenMM Energy: -803.9521119775484 kcal/mol
+
+-----------------------
+Ending OpenMM interface
+-----------------------
+
+----------------------------------------------------------------
+Time to calculate step (OpenMM run): 0.004 seconds, 0.0 minutes.
+----------------------------------------------------------------
+
+-------------------------------------------------------------
+Time to calculate step (MM step): 0.005 seconds, 0.0 minutes.
+-------------------------------------------------------------
+
+Note: You are using electrostatic embedding. This means that the QM-energy is actually the polarized QM-energy
+Note: MM energy also contains the QM-MM Lennard-Jones interaction
+
+QM energy:              -836.122609367332 
+MM energy:                -1.281179241442
+QM/MM energy:           -837.403788608774 
+
+  ------------ENDING QM/MM MODULE------------- 
+
+-----------------------------------------------------------------
+Time to calculate step (QM/MM run): 448.857 seconds, 7.5 minutes.
+-----------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 82
+Formula: N9O20H33C20
+Label: CHHCCOOOCHCHCCHCHCHOHCOOCNHHNHHNHHCNHHNHHNHHCOOHCOOHCOOHCOOHCOOHCOOHCOOHCNHHNHHNHH
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 2 (print_atoms_list region)
+---------------------------------------------------
+        C  59.97935336   34.20987820   56.89099987
+        H  60.55540432   33.31264288   57.12735156
+        H  60.50289570   34.99091456   56.32839253
+        C  58.69407243   34.49781451   57.43917013
+        C  58.03991217   35.91028249   57.04820369
+        O  58.81845028   36.80669410   56.67748594
+        O  56.77452410   35.99819714   57.13149550
+        O  58.03140062   33.69547278   58.16526947
+        C  57.44085763   32.02728659   55.90690182
+        H  56.80304605   31.48267245   56.61395077
+        C  58.76097664   31.82393376   55.81598584
+        H  59.30967276   31.03586422   56.34533228
+        C  59.60214681   32.74500414   55.06420265
+        C  58.96580541   33.60677133   54.08749651
+        H  59.61301424   34.07279160   53.34169083
+        C  57.63034974   33.77534310   54.10028075
+        H  57.13039086   34.41651010   53.36813662
+        C  56.75659311   33.11173722   55.11945881
+        H  56.38810192   33.89254660   55.82552522
+        O  55.61628941   32.53116763   54.42672904
+        H  55.04602856   32.21818112   55.14012955
+        C  61.12481872   32.36862764   54.91270881
+        O  61.67121021   31.86364472   55.91251947
+        O  61.53446171   32.61341690   53.77423886
+        C  55.73300000   32.77150000   70.09050000
+        N  55.88357700   33.15672000   68.82644600
+        H  55.57306000   33.81922200   69.52270000
+        H  56.07974600   32.20168200   69.09011300
+        N  55.32410100   33.64390400   71.00734900
+        H  55.52027000   32.68886600   71.27101600
+        H  55.43844900   33.93644000   70.04742800
+        N  55.99132100   31.51387600   70.43770500
+        H  56.10567000   31.80641100   69.47778400
+        H  55.68080400   32.17637800   71.13395900
+        C  51.95560000   29.35290000   67.74710000
+        N  52.10617700   29.73812000   66.48304600
+        H  51.79566000   30.40062200   67.17930000
+        H  52.30234600   28.78308200   66.74671300
+        N  51.54670100   30.22530400   68.66394900
+        H  51.74287000   29.27026600   68.92761600
+        H  51.66104900   30.51784000   67.70402800
+        N  52.21392100   28.09527600   68.09430500
+        H  52.32827000   28.38781100   67.13438400
+        H  51.90340400   28.75777800   68.79055900
+        C  66.68130000   28.98960000   42.37150000
+        O  67.86512500   29.05137600   41.97496300
+        O  65.97001600   27.96221700   42.40405900
+        H  66.22332100   29.92545000   42.72426100
+        C  70.24600000   31.86160000   44.36020000
+        O  71.42982500   31.92337600   43.96366300
+        O  69.53471600   30.83421700   44.39275900
+        H  69.78802100   32.79745000   44.71296100
+        C  62.52960000   24.88590000   43.17370000
+        O  63.71342500   24.94767600   42.77716300
+        O  61.81831600   23.85851700   43.20625900
+        H  62.07162100   25.82175000   43.52646100
+        C  64.14630000   21.16730000   47.85290000
+        O  65.33012500   21.22907600   47.45636300
+        O  63.43501600   20.13991700   47.88545900
+        H  63.68832100   22.10315000   48.20566100
+        C  66.96520000   24.44620000   45.06990000
+        O  68.14902500   24.50797600   44.67336300
+        O  66.25391600   23.41881700   45.10245900
+        H  66.50722100   25.38205000   45.42266100
+        C  69.19040000   22.82840000   49.87250000
+        O  70.37422500   22.89017600   49.47596300
+        O  68.47911600   21.80101700   49.90505900
+        H  68.73242100   23.76425000   50.22526100
+        C  71.85490000   27.72720000   47.77060000
+        O  73.03872500   27.78897600   47.37406300
+        O  71.14361600   26.69981700   47.80315900
+        H  71.39692100   28.66305000   48.12336100
+        C  56.37030000   28.05720000   68.87920000
+        N  56.52087700   28.44242000   67.61514600
+        H  56.21036000   29.10492200   68.31140000
+        H  56.71704600   27.48738200   67.87881300
+        N  55.96140100   28.92960400   69.79604900
+        H  56.15757000   27.97456600   70.05971600
+        H  56.07574900   29.22214000   68.83612800
+        N  56.62862100   26.79957600   69.22640500
+        H  56.74297000   27.09211100   68.26648400
+        H  56.31810400   27.46207800   69.92265900
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING QM/MM MODULE------------- 
+QM Module: ORCATheory
+MM Module: OpenMMTheory
+Charge provided from QMMMTheory object:  -2
+Mult provided from QMMMTheory object:  1
+QM-region Charge: -2 Mult: 1
+Embedding: Electrostatic
+Number of pointcharges (to QM program): 58
+Number of charge coordinates: 58
+Running QM/MM object with 8 cores available
+
+-------------------------------------------------------------------
+Time to calculate step (before-QMstep): 0.000 seconds, 0.0 minutes.
+-------------------------------------------------------------------
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+Pointcharge embedding is on!
+ ORCA Calculation starting. 
+Found warning messages in ORCA outputfile:
+WARNING: The chosen methods will break translational/rotational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ Warning: op=0 Small HOMO/LUMO gap (   0.062) - skipping pre-diagonalization
+
+ ORCA Calculation done. 
+ORCA converged in 16 iterations
+ORCA energy: -836.127631307462
+  ------------ENDING ORCA-INTERFACE------------- 
+
+----------------------------------------------------------------
+Time to calculate step (ORCA run): 403.474 seconds, 6.7 minutes.
+----------------------------------------------------------------
+
+---------------------------------------------------------------
+Time to calculate step (QM step): 403.474 seconds, 6.7 minutes.
+---------------------------------------------------------------
+
+----------------------------------------------------------------------
+Time to calculate step (QMpcgrad prepare): 0.000 seconds, 0.0 minutes.
+----------------------------------------------------------------------
+
+--------------------------------------------------------------------------
+Time to calculate step (linkatomgrad prepare): 0.000 seconds, 0.0 minutes.
+--------------------------------------------------------------------------
+
+----------------------------------------------------------------------------
+Time to calculate step (QM/MM gradient prepare): 0.000 seconds, 0.0 minutes.
+----------------------------------------------------------------------------
+Using OpenMM theory as part of QM/MM.
+Using MM on full system. Charges for QM region [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23] have been set to zero 
+
+--------------------------------------------------------------------------------
+                   Creating/updating OpenMM simulation object                   
+--------------------------------------------------------------------------------
+
+Integrator name: VerletIntegrator
+Timestep: 0.001
+Temperature: 300
+Coupling frequency: 1
+Properties: {'Threads': '1'}
+Topology: <Topology; 1 chains, 1 residues, 82 atoms, 0 bonds>
+
+----------------------------------------------------------------------------------
+Time to calculate step (creating/updating simulation): 0.003 seconds, 0.0 minutes.
+----------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+                     Running Single-point OpenMM Interface                      
+--------------------------------------------------------------------------------
+
+Number of OpenMM system constraints defined: 0
+
+-----------------------------------------------------------------------------------
+Time to calculate step (OpenMMTheory.run: const-check): 0.003 seconds, 0.0 minutes.
+-----------------------------------------------------------------------------------
+Updating coordinates.
+
+------------------------------------------------------------------------
+Time to calculate step (Creating pos array): 0.000 seconds, 0.0 minutes.
+------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+Time to calculate step (Updating MM positions): 0.000 seconds, 0.0 minutes.
+---------------------------------------------------------------------------
+Calling OpenMM getState.
+
+---------------------------------------------------------------------
+Time to calculate step (OpenMM getState): 0.001 seconds, 0.0 minutes.
+---------------------------------------------------------------------
+OpenMM Energy: -1.2811794096642333 Eh
+OpenMM Energy: -803.952217538876 kcal/mol
+
+-----------------------
+Ending OpenMM interface
+-----------------------
+
+----------------------------------------------------------------
+Time to calculate step (OpenMM run): 0.004 seconds, 0.0 minutes.
+----------------------------------------------------------------
+
+-------------------------------------------------------------
+Time to calculate step (MM step): 0.005 seconds, 0.0 minutes.
+-------------------------------------------------------------
+
+Note: You are using electrostatic embedding. This means that the QM-energy is actually the polarized QM-energy
+Note: MM energy also contains the QM-MM Lennard-Jones interaction
+
+QM energy:              -836.127631307462 
+MM energy:                -1.281179409664
+QM/MM energy:           -837.408810717126 
+
+  ------------ENDING QM/MM MODULE------------- 
+
+-----------------------------------------------------------------
+Time to calculate step (QM/MM run): 403.479 seconds, 6.7 minutes.
+-----------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+geometric called clearCalcs option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 82
+Formula: N9O20H33C20
+Label: CHHCCOOOCHCHCCHCHCHOHCOOCNHHNHHNHHCNHHNHHNHHCOOHCOOHCOOHCOOHCOOHCOOHCOOHCNHHNHHNHH
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 3 (print_atoms_list region)
+---------------------------------------------------
+        C  59.70617098   34.07240534   56.80855254
+        H  60.40371617   33.29215790   57.13565470
+        H  60.15444274   34.84155689   56.13677522
+        C  58.57357502   34.53682125   57.72386187
+        C  57.94136091   35.99831837   57.33529734
+        O  58.72953603   36.84604106   56.88844305
+        O  56.68343952   36.11218661   57.45873757
+        O  58.10998191   33.95832711   58.75833972
+        C  57.30321910   31.83340051   55.75284345
+        H  56.67468988   31.27498368   56.47741911
+        C  58.64078023   31.83312276   55.91452665
+        H  59.19568826   30.98115375   56.34539135
+        C  59.55603060   32.96376898   55.36001895
+        C  58.93684236   33.67880435   54.24524209
+        H  59.60548550   34.10898085   53.48829579
+        C  57.58877456   33.77761396   54.17108488
+        H  57.08933841   34.38298539   53.40781606
+        C  56.70293278   33.08064164   55.15395313
+        H  56.41202456   33.80648185   55.95913265
+        O  55.45991067   32.70680530   54.44449877
+        H  54.98604394   32.21808770   55.14108042
+        C  61.13949377   32.62463900   55.27304878
+        O  61.60976393   32.05143983   56.27407739
+        O  61.69274561   33.00303439   54.22015184
+        C  55.73300000   32.77150000   70.09050000
+        N  55.88357700   33.15672000   68.82644600
+        H  55.57306000   33.81922200   69.52270000
+        H  56.07974600   32.20168200   69.09011300
+        N  55.32410100   33.64390400   71.00734900
+        H  55.52027000   32.68886600   71.27101600
+        H  55.43844900   33.93644000   70.04742800
+        N  55.99132100   31.51387600   70.43770500
+        H  56.10567000   31.80641100   69.47778400
+        H  55.68080400   32.17637800   71.13395900
+        C  51.95560000   29.35290000   67.74710000
+        N  52.10617700   29.73812000   66.48304600
+        H  51.79566000   30.40062200   67.17930000
+        H  52.30234600   28.78308200   66.74671300
+        N  51.54670100   30.22530400   68.66394900
+        H  51.74287000   29.27026600   68.92761600
+        H  51.66104900   30.51784000   67.70402800
+        N  52.21392100   28.09527600   68.09430500
+        H  52.32827000   28.38781100   67.13438400
+        H  51.90340400   28.75777800   68.79055900
+        C  66.68130000   28.98960000   42.37150000
+        O  67.86512500   29.05137600   41.97496300
+        O  65.97001600   27.96221700   42.40405900
+        H  66.22332100   29.92545000   42.72426100
+        C  70.24600000   31.86160000   44.36020000
+        O  71.42982500   31.92337600   43.96366300
+        O  69.53471600   30.83421700   44.39275900
+        H  69.78802100   32.79745000   44.71296100
+        C  62.52960000   24.88590000   43.17370000
+        O  63.71342500   24.94767600   42.77716300
+        O  61.81831600   23.85851700   43.20625900
+        H  62.07162100   25.82175000   43.52646100
+        C  64.14630000   21.16730000   47.85290000
+        O  65.33012500   21.22907600   47.45636300
+        O  63.43501600   20.13991700   47.88545900
+        H  63.68832100   22.10315000   48.20566100
+        C  66.96520000   24.44620000   45.06990000
+        O  68.14902500   24.50797600   44.67336300
+        O  66.25391600   23.41881700   45.10245900
+        H  66.50722100   25.38205000   45.42266100
+        C  69.19040000   22.82840000   49.87250000
+        O  70.37422500   22.89017600   49.47596300
+        O  68.47911600   21.80101700   49.90505900
+        H  68.73242100   23.76425000   50.22526100
+        C  71.85490000   27.72720000   47.77060000
+        O  73.03872500   27.78897600   47.37406300
+        O  71.14361600   26.69981700   47.80315900
+        H  71.39692100   28.66305000   48.12336100
+        C  56.37030000   28.05720000   68.87920000
+        N  56.52087700   28.44242000   67.61514600
+        H  56.21036000   29.10492200   68.31140000
+        H  56.71704600   27.48738200   67.87881300
+        N  55.96140100   28.92960400   69.79604900
+        H  56.15757000   27.97456600   70.05971600
+        H  56.07574900   29.22214000   68.83612800
+        N  56.62862100   26.79957600   69.22640500
+        H  56.74297000   27.09211100   68.26648400
+        H  56.31810400   27.46207800   69.92265900
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING QM/MM MODULE------------- 
+QM Module: ORCATheory
+MM Module: OpenMMTheory
+Charge provided from QMMMTheory object:  -2
+Mult provided from QMMMTheory object:  1
+QM-region Charge: -2 Mult: 1
+Embedding: Electrostatic
+Number of pointcharges (to QM program): 58
+Number of charge coordinates: 58
+Running QM/MM object with 8 cores available
+
+-------------------------------------------------------------------
+Time to calculate step (before-QMstep): 0.000 seconds, 0.0 minutes.
+-------------------------------------------------------------------
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+Pointcharge embedding is on!
+ ORCA Calculation starting. 
+Found warning messages in ORCA outputfile:
+WARNING: The chosen methods will break translational/rotational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ Warning: op=0 Small HOMO/LUMO gap (   0.092) - skipping pre-diagonalization
+
+ ORCA Calculation done. 
+ORCA converged in 15 iterations
+ORCA energy: -836.130424432843
+  ------------ENDING ORCA-INTERFACE------------- 
+
+----------------------------------------------------------------
+Time to calculate step (ORCA run): 386.071 seconds, 6.4 minutes.
+----------------------------------------------------------------
+
+---------------------------------------------------------------
+Time to calculate step (QM step): 386.071 seconds, 6.4 minutes.
+---------------------------------------------------------------
+
+----------------------------------------------------------------------
+Time to calculate step (QMpcgrad prepare): 0.000 seconds, 0.0 minutes.
+----------------------------------------------------------------------
+
+--------------------------------------------------------------------------
+Time to calculate step (linkatomgrad prepare): 0.000 seconds, 0.0 minutes.
+--------------------------------------------------------------------------
+
+----------------------------------------------------------------------------
+Time to calculate step (QM/MM gradient prepare): 0.000 seconds, 0.0 minutes.
+----------------------------------------------------------------------------
+Using OpenMM theory as part of QM/MM.
+Using MM on full system. Charges for QM region [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23] have been set to zero 
+
+--------------------------------------------------------------------------------
+                   Creating/updating OpenMM simulation object                   
+--------------------------------------------------------------------------------
+
+Integrator name: VerletIntegrator
+Timestep: 0.001
+Temperature: 300
+Coupling frequency: 1
+Properties: {'Threads': '1'}
+Topology: <Topology; 1 chains, 1 residues, 82 atoms, 0 bonds>
+
+----------------------------------------------------------------------------------
+Time to calculate step (creating/updating simulation): 0.003 seconds, 0.0 minutes.
+----------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+                     Running Single-point OpenMM Interface                      
+--------------------------------------------------------------------------------
+
+Number of OpenMM system constraints defined: 0
+
+-----------------------------------------------------------------------------------
+Time to calculate step (OpenMMTheory.run: const-check): 0.003 seconds, 0.0 minutes.
+-----------------------------------------------------------------------------------
+Updating coordinates.
+
+------------------------------------------------------------------------
+Time to calculate step (Creating pos array): 0.000 seconds, 0.0 minutes.
+------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+Time to calculate step (Updating MM positions): 0.000 seconds, 0.0 minutes.
+---------------------------------------------------------------------------
+Calling OpenMM getState.
+
+---------------------------------------------------------------------
+Time to calculate step (OpenMM getState): 0.001 seconds, 0.0 minutes.
+---------------------------------------------------------------------
+OpenMM Energy: -1.281180116818408 Eh
+OpenMM Energy: -803.9526612848202 kcal/mol
+
+-----------------------
+Ending OpenMM interface
+-----------------------
+
+----------------------------------------------------------------
+Time to calculate step (OpenMM run): 0.004 seconds, 0.0 minutes.
+----------------------------------------------------------------
+
+-------------------------------------------------------------
+Time to calculate step (MM step): 0.004 seconds, 0.0 minutes.
+-------------------------------------------------------------
+
+Note: You are using electrostatic embedding. This means that the QM-energy is actually the polarized QM-energy
+Note: MM energy also contains the QM-MM Lennard-Jones interaction
+
+QM energy:              -836.130424432843 
+MM energy:                -1.281180116818
+QM/MM energy:           -837.411604549661 
+
+  ------------ENDING QM/MM MODULE------------- 
+
+-----------------------------------------------------------------
+Time to calculate step (QM/MM run): 386.075 seconds, 6.4 minutes.
+-----------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 82
+Formula: N9O20H33C20
+Label: CHHCCOOOCHCHCCHCHCHOHCOOCNHHNHHNHHCNHHNHHNHHCOOHCOOHCOOHCOOHCOOHCOOHCOOHCNHHNHHNHH
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 4 (print_atoms_list region)
+---------------------------------------------------
+        C  59.79325907   34.09746357   56.79385112
+        H  60.45093442   33.33137306   57.21450427
+        H  60.27407893   34.90896631   56.24280280
+        C  58.60954092   34.51688784   57.57168990
+        C  57.97172713   35.95802488   57.25685429
+        O  58.75250615   36.83285419   56.83969439
+        O  56.71876393   36.04732135   57.38685288
+        O  58.09844845   33.85594313   58.48870716
+        C  57.34848222   31.91752192   55.82143382
+        H  56.72147804   31.31800601   56.49666967
+        C  58.68373832   31.84472093   55.90260101
+        H  59.21894594   31.00923909   56.36789871
+        C  59.56733574   32.92018155   55.31555022
+        C  58.93630696   33.66734992   54.22180460
+        H  59.60366905   34.10266859   53.46738020
+        C  57.59406873   33.77725568   54.15310893
+        H  57.09711819   34.38361991   53.39008762
+        C  56.70709783   33.09459166   55.14631516
+        H  56.39758857   33.83726199   55.91555689
+        O  55.50204619   32.65798798   54.44551839
+        H  54.98227076   32.21496005   55.13294565
+        C  61.10993345   32.54404809   55.16589645
+        O  61.61794776   31.99483980   56.16493638
+        O  61.64216421   32.88769151   54.09484166
+        C  55.73300000   32.77150000   70.09050000
+        N  55.88357700   33.15672000   68.82644600
+        H  55.57306000   33.81922200   69.52270000
+        H  56.07974600   32.20168200   69.09011300
+        N  55.32410100   33.64390400   71.00734900
+        H  55.52027000   32.68886600   71.27101600
+        H  55.43844900   33.93644000   70.04742800
+        N  55.99132100   31.51387600   70.43770500
+        H  56.10567000   31.80641100   69.47778400
+        H  55.68080400   32.17637800   71.13395900
+        C  51.95560000   29.35290000   67.74710000
+        N  52.10617700   29.73812000   66.48304600
+        H  51.79566000   30.40062200   67.17930000
+        H  52.30234600   28.78308200   66.74671300
+        N  51.54670100   30.22530400   68.66394900
+        H  51.74287000   29.27026600   68.92761600
+        H  51.66104900   30.51784000   67.70402800
+        N  52.21392100   28.09527600   68.09430500
+        H  52.32827000   28.38781100   67.13438400
+        H  51.90340400   28.75777800   68.79055900
+        C  66.68130000   28.98960000   42.37150000
+        O  67.86512500   29.05137600   41.97496300
+        O  65.97001600   27.96221700   42.40405900
+        H  66.22332100   29.92545000   42.72426100
+        C  70.24600000   31.86160000   44.36020000
+        O  71.42982500   31.92337600   43.96366300
+        O  69.53471600   30.83421700   44.39275900
+        H  69.78802100   32.79745000   44.71296100
+        C  62.52960000   24.88590000   43.17370000
+        O  63.71342500   24.94767600   42.77716300
+        O  61.81831600   23.85851700   43.20625900
+        H  62.07162100   25.82175000   43.52646100
+        C  64.14630000   21.16730000   47.85290000
+        O  65.33012500   21.22907600   47.45636300
+        O  63.43501600   20.13991700   47.88545900
+        H  63.68832100   22.10315000   48.20566100
+        C  66.96520000   24.44620000   45.06990000
+        O  68.14902500   24.50797600   44.67336300
+        O  66.25391600   23.41881700   45.10245900
+        H  66.50722100   25.38205000   45.42266100
+        C  69.19040000   22.82840000   49.87250000
+        O  70.37422500   22.89017600   49.47596300
+        O  68.47911600   21.80101700   49.90505900
+        H  68.73242100   23.76425000   50.22526100
+        C  71.85490000   27.72720000   47.77060000
+        O  73.03872500   27.78897600   47.37406300
+        O  71.14361600   26.69981700   47.80315900
+        H  71.39692100   28.66305000   48.12336100
+        C  56.37030000   28.05720000   68.87920000
+        N  56.52087700   28.44242000   67.61514600
+        H  56.21036000   29.10492200   68.31140000
+        H  56.71704600   27.48738200   67.87881300
+        N  55.96140100   28.92960400   69.79604900
+        H  56.15757000   27.97456600   70.05971600
+        H  56.07574900   29.22214000   68.83612800
+        N  56.62862100   26.79957600   69.22640500
+        H  56.74297000   27.09211100   68.26648400
+        H  56.31810400   27.46207800   69.92265900
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING QM/MM MODULE------------- 
+QM Module: ORCATheory
+MM Module: OpenMMTheory
+Charge provided from QMMMTheory object:  -2
+Mult provided from QMMMTheory object:  1
+QM-region Charge: -2 Mult: 1
+Embedding: Electrostatic
+Number of pointcharges (to QM program): 58
+Number of charge coordinates: 58
+Running QM/MM object with 8 cores available
+
+-------------------------------------------------------------------
+Time to calculate step (before-QMstep): 0.000 seconds, 0.0 minutes.
+-------------------------------------------------------------------
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+Pointcharge embedding is on!
+ ORCA Calculation starting. 
+Found warning messages in ORCA outputfile:
+WARNING: The chosen methods will break translational/rotational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ Warning: op=0 Small HOMO/LUMO gap (   0.092) - skipping pre-diagonalization
+
+ ORCA Calculation done. 
+ORCA converged in 15 iterations
+ORCA energy: -836.15290204275
+  ------------ENDING ORCA-INTERFACE------------- 
+
+----------------------------------------------------------------
+Time to calculate step (ORCA run): 379.836 seconds, 6.3 minutes.
+----------------------------------------------------------------
+
+---------------------------------------------------------------
+Time to calculate step (QM step): 379.836 seconds, 6.3 minutes.
+---------------------------------------------------------------
+
+----------------------------------------------------------------------
+Time to calculate step (QMpcgrad prepare): 0.000 seconds, 0.0 minutes.
+----------------------------------------------------------------------
+
+--------------------------------------------------------------------------
+Time to calculate step (linkatomgrad prepare): 0.000 seconds, 0.0 minutes.
+--------------------------------------------------------------------------
+
+----------------------------------------------------------------------------
+Time to calculate step (QM/MM gradient prepare): 0.000 seconds, 0.0 minutes.
+----------------------------------------------------------------------------
+Using OpenMM theory as part of QM/MM.
+Using MM on full system. Charges for QM region [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23] have been set to zero 
+
+--------------------------------------------------------------------------------
+                   Creating/updating OpenMM simulation object                   
+--------------------------------------------------------------------------------
+
+Integrator name: VerletIntegrator
+Timestep: 0.001
+Temperature: 300
+Coupling frequency: 1
+Properties: {'Threads': '1'}
+Topology: <Topology; 1 chains, 1 residues, 82 atoms, 0 bonds>
+
+----------------------------------------------------------------------------------
+Time to calculate step (creating/updating simulation): 0.002 seconds, 0.0 minutes.
+----------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+                     Running Single-point OpenMM Interface                      
+--------------------------------------------------------------------------------
+
+Number of OpenMM system constraints defined: 0
+
+-----------------------------------------------------------------------------------
+Time to calculate step (OpenMMTheory.run: const-check): 0.002 seconds, 0.0 minutes.
+-----------------------------------------------------------------------------------
+Updating coordinates.
+
+------------------------------------------------------------------------
+Time to calculate step (Creating pos array): 0.000 seconds, 0.0 minutes.
+------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+Time to calculate step (Updating MM positions): 0.000 seconds, 0.0 minutes.
+---------------------------------------------------------------------------
+Calling OpenMM getState.
+
+---------------------------------------------------------------------
+Time to calculate step (OpenMM getState): 0.000 seconds, 0.0 minutes.
+---------------------------------------------------------------------
+OpenMM Energy: -1.28117961741415 Eh
+OpenMM Energy: -803.952347903917 kcal/mol
+
+-----------------------
+Ending OpenMM interface
+-----------------------
+
+----------------------------------------------------------------
+Time to calculate step (OpenMM run): 0.003 seconds, 0.0 minutes.
+----------------------------------------------------------------
+
+-------------------------------------------------------------
+Time to calculate step (MM step): 0.003 seconds, 0.0 minutes.
+-------------------------------------------------------------
+
+Note: You are using electrostatic embedding. This means that the QM-energy is actually the polarized QM-energy
+Note: MM energy also contains the QM-MM Lennard-Jones interaction
+
+QM energy:              -836.152902042750 
+MM energy:                -1.281179617414
+QM/MM energy:           -837.434081660164 
+
+  ------------ENDING QM/MM MODULE------------- 
+
+-----------------------------------------------------------------
+Time to calculate step (QM/MM run): 379.840 seconds, 6.3 minutes.
+-----------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 82
+Formula: N9O20H33C20
+Label: CHHCCOOOCHCHCCHCHCHOHCOOCNHHNHHNHHCNHHNHHNHHCOOHCOOHCOOHCOOHCOOHCOOHCOOHCNHHNHHNHH
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 5 (print_atoms_list region)
+---------------------------------------------------
+        C  59.61217898   33.85849423   56.53061907
+        H  60.39155508   33.58201504   57.43787614
+        H  60.16457286   34.83362593   56.34939792
+        C  58.54991835   34.48131908   57.46856033
+        C  57.94560885   35.94173308   57.38545578
+        O  58.70545969   36.84420882   56.98048463
+        O  56.71574802   36.01967863   57.62669574
+        O  58.20970694   33.89626300   58.46407358
+        C  57.31680209   31.91707894   55.82215704
+        H  56.68634712   31.16698036   56.33312387
+        C  58.64789090   31.91836542   56.00269058
+        H  59.13740304   31.03208068   56.42529795
+        C  59.53370310   33.15923187   55.67845133
+        C  58.89406261   33.73974681   54.39820259
+        H  59.58511842   34.12817718   53.62407970
+        C  57.56011066   33.77909602   54.20898340
+        H  57.07534275   34.31703664   53.38115820
+        C  56.64698287   33.10087913   55.18790395
+        H  56.37407332   33.81471436   55.98295113
+        O  55.43276796   32.74141314   54.49465117
+        H  54.90079812   32.20821379   55.10430706
+        C  61.03322024   32.67611088   55.36000343
+        O  61.55166841   32.05424702   56.32739414
+        O  61.63784602   33.06225694   54.33966498
+        C  55.73300000   32.77150000   70.09050000
+        N  55.88357700   33.15672000   68.82644600
+        H  55.57306000   33.81922200   69.52270000
+        H  56.07974600   32.20168200   69.09011300
+        N  55.32410100   33.64390400   71.00734900
+        H  55.52027000   32.68886600   71.27101600
+        H  55.43844900   33.93644000   70.04742800
+        N  55.99132100   31.51387600   70.43770500
+        H  56.10567000   31.80641100   69.47778400
+        H  55.68080400   32.17637800   71.13395900
+        C  51.95560000   29.35290000   67.74710000
+        N  52.10617700   29.73812000   66.48304600
+        H  51.79566000   30.40062200   67.17930000
+        H  52.30234600   28.78308200   66.74671300
+        N  51.54670100   30.22530400   68.66394900
+        H  51.74287000   29.27026600   68.92761600
+        H  51.66104900   30.51784000   67.70402800
+        N  52.21392100   28.09527600   68.09430500
+        H  52.32827000   28.38781100   67.13438400
+        H  51.90340400   28.75777800   68.79055900
+        C  66.68130000   28.98960000   42.37150000
+        O  67.86512500   29.05137600   41.97496300
+        O  65.97001600   27.96221700   42.40405900
+        H  66.22332100   29.92545000   42.72426100
+        C  70.24600000   31.86160000   44.36020000
+        O  71.42982500   31.92337600   43.96366300
+        O  69.53471600   30.83421700   44.39275900
+        H  69.78802100   32.79745000   44.71296100
+        C  62.52960000   24.88590000   43.17370000
+        O  63.71342500   24.94767600   42.77716300
+        O  61.81831600   23.85851700   43.20625900
+        H  62.07162100   25.82175000   43.52646100
+        C  64.14630000   21.16730000   47.85290000
+        O  65.33012500   21.22907600   47.45636300
+        O  63.43501600   20.13991700   47.88545900
+        H  63.68832100   22.10315000   48.20566100
+        C  66.96520000   24.44620000   45.06990000
+        O  68.14902500   24.50797600   44.67336300
+        O  66.25391600   23.41881700   45.10245900
+        H  66.50722100   25.38205000   45.42266100
+        C  69.19040000   22.82840000   49.87250000
+        O  70.37422500   22.89017600   49.47596300
+        O  68.47911600   21.80101700   49.90505900
+        H  68.73242100   23.76425000   50.22526100
+        C  71.85490000   27.72720000   47.77060000
+        O  73.03872500   27.78897600   47.37406300
+        O  71.14361600   26.69981700   47.80315900
+        H  71.39692100   28.66305000   48.12336100
+        C  56.37030000   28.05720000   68.87920000
+        N  56.52087700   28.44242000   67.61514600
+        H  56.21036000   29.10492200   68.31140000
+        H  56.71704600   27.48738200   67.87881300
+        N  55.96140100   28.92960400   69.79604900
+        H  56.15757000   27.97456600   70.05971600
+        H  56.07574900   29.22214000   68.83612800
+        N  56.62862100   26.79957600   69.22640500
+        H  56.74297000   27.09211100   68.26648400
+        H  56.31810400   27.46207800   69.92265900
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING QM/MM MODULE------------- 
+QM Module: ORCATheory
+MM Module: OpenMMTheory
+Charge provided from QMMMTheory object:  -2
+Mult provided from QMMMTheory object:  1
+QM-region Charge: -2 Mult: 1
+Embedding: Electrostatic
+Number of pointcharges (to QM program): 58
+Number of charge coordinates: 58
+Running QM/MM object with 8 cores available
+
+-------------------------------------------------------------------
+Time to calculate step (before-QMstep): 0.000 seconds, 0.0 minutes.
+-------------------------------------------------------------------
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+Pointcharge embedding is on!
+ ORCA Calculation starting. 
+Found warning messages in ORCA outputfile:
+WARNING: The chosen methods will break translational/rotational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ WARNING: The chosen methods will break translational symmetry
+
+ ORCA Calculation done. 
+ORCA converged in 15 iterations
+ORCA energy: -835.949150425936
+  ------------ENDING ORCA-INTERFACE------------- 
+
+----------------------------------------------------------------
+Time to calculate step (ORCA run): 366.574 seconds, 6.1 minutes.
+----------------------------------------------------------------
+
+---------------------------------------------------------------
+Time to calculate step (QM step): 366.574 seconds, 6.1 minutes.
+---------------------------------------------------------------
+
+----------------------------------------------------------------------
+Time to calculate step (QMpcgrad prepare): 0.000 seconds, 0.0 minutes.
+----------------------------------------------------------------------
+
+--------------------------------------------------------------------------
+Time to calculate step (linkatomgrad prepare): 0.000 seconds, 0.0 minutes.
+--------------------------------------------------------------------------
+
+----------------------------------------------------------------------------
+Time to calculate step (QM/MM gradient prepare): 0.000 seconds, 0.0 minutes.
+----------------------------------------------------------------------------
+Using OpenMM theory as part of QM/MM.
+Using MM on full system. Charges for QM region [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23] have been set to zero 
+
+--------------------------------------------------------------------------------
+                   Creating/updating OpenMM simulation object                   
+--------------------------------------------------------------------------------
+
+Integrator name: VerletIntegrator
+Timestep: 0.001
+Temperature: 300
+Coupling frequency: 1
+Properties: {'Threads': '1'}
+Topology: <Topology; 1 chains, 1 residues, 82 atoms, 0 bonds>
+
+----------------------------------------------------------------------------------
+Time to calculate step (creating/updating simulation): 0.003 seconds, 0.0 minutes.
+----------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+                     Running Single-point OpenMM Interface                      
+--------------------------------------------------------------------------------
+
+Number of OpenMM system constraints defined: 0
+
+-----------------------------------------------------------------------------------
+Time to calculate step (OpenMMTheory.run: const-check): 0.003 seconds, 0.0 minutes.
+-----------------------------------------------------------------------------------
+Updating coordinates.
+
+------------------------------------------------------------------------
+Time to calculate step (Creating pos array): 0.000 seconds, 0.0 minutes.
+------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+Time to calculate step (Updating MM positions): 0.000 seconds, 0.0 minutes.
+---------------------------------------------------------------------------
+Calling OpenMM getState.
+
+---------------------------------------------------------------------
+Time to calculate step (OpenMM getState): 0.001 seconds, 0.0 minutes.
+---------------------------------------------------------------------
+OpenMM Energy: -1.2811792965453774 Eh
+OpenMM Energy: -803.9521465557223 kcal/mol
+
+-----------------------
+Ending OpenMM interface
+-----------------------
+
+----------------------------------------------------------------
+Time to calculate step (OpenMM run): 0.005 seconds, 0.0 minutes.
+----------------------------------------------------------------
+
+-------------------------------------------------------------
+Time to calculate step (MM step): 0.005 seconds, 0.0 minutes.
+-------------------------------------------------------------
+
+Note: You are using electrostatic embedding. This means that the QM-energy is actually the polarized QM-energy
+Note: MM energy also contains the QM-MM Lennard-Jones interaction
+
+QM energy:              -835.949150425936 
+MM energy:                -1.281179296545
+QM/MM energy:           -837.230329722481 
+
+  ------------ENDING QM/MM MODULE------------- 
+
+-----------------------------------------------------------------
+Time to calculate step (QM/MM run): 366.580 seconds, 6.1 minutes.
+-----------------------------------------------------------------
+geometric called load_guess_files option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 82
+Formula: N9O20H33C20
+Label: CHHCCOOOCHCHCCHCHCHOHCOOCNHHNHHNHHCNHHNHHNHHCOOHCOOHCOOHCOOHCOOHCOOHCOOHCNHHNHHNHH
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 6 (print_atoms_list region)
+---------------------------------------------------
+        C  59.72644008   33.98883471   56.64353199
+        H  60.43839030   33.42777578   57.32589524
+        H  60.25476000   34.88635704   56.28855640
+        C  58.58705515   34.48747803   57.48035194
+        C  57.96555102   35.92722110   57.27170888
+        O  58.73818543   36.83031299   56.89038920
+        O  56.73040248   36.01523397   57.48649277
+        O  58.15124447   33.84512099   58.41918806
+        C  57.35010456   31.94328732   55.84310668
+        H  56.71657453   31.25747110   56.42251908
+        C  58.68407316   31.89374405   55.95684873
+        H  59.18836554   31.03605382   56.41169618
+        C  59.56102721   33.03804450   55.49212387
+        C  58.91505424   33.70912167   54.30615237
+        H  59.59341065   34.12054758   53.54300036
+        C  57.58027273   33.78145596   54.17788976
+        H  57.09087539   34.35087885   53.37899676
+        C  56.67702902   33.10350601   55.16663457
+        H  56.37506551   33.83709516   55.93743391
+        O  55.48414194   32.68432848   54.46861466
+        H  54.94341178   32.20960394   55.11422636
+        C  61.06913378   32.59924694   55.24022694
+        O  61.58733069   31.99715971   56.21435360
+        O  61.61666436   32.93818617   54.17925926
+        C  55.73300000   32.77150000   70.09050000
+        N  55.88357700   33.15672000   68.82644600
+        H  55.57306000   33.81922200   69.52270000
+        H  56.07974600   32.20168200   69.09011300
+        N  55.32410100   33.64390400   71.00734900
+        H  55.52027000   32.68886600   71.27101600
+        H  55.43844900   33.93644000   70.04742800
+        N  55.99132100   31.51387600   70.43770500
+        H  56.10567000   31.80641100   69.47778400
+        H  55.68080400   32.17637800   71.13395900
+        C  51.95560000   29.35290000   67.74710000
+        N  52.10617700   29.73812000   66.48304600
+        H  51.79566000   30.40062200   67.17930000
+        H  52.30234600   28.78308200   66.74671300
+        N  51.54670100   30.22530400   68.66394900
+        H  51.74287000   29.27026600   68.92761600
+        H  51.66104900   30.51784000   67.70402800
+        N  52.21392100   28.09527600   68.09430500
+        H  52.32827000   28.38781100   67.13438400
+        H  51.90340400   28.75777800   68.79055900
+        C  66.68130000   28.98960000   42.37150000
+        O  67.86512500   29.05137600   41.97496300
+        O  65.97001600   27.96221700   42.40405900
+        H  66.22332100   29.92545000   42.72426100
+        C  70.24600000   31.86160000   44.36020000
+        O  71.42982500   31.92337600   43.96366300
+        O  69.53471600   30.83421700   44.39275900
+        H  69.78802100   32.79745000   44.71296100
+        C  62.52960000   24.88590000   43.17370000
+        O  63.71342500   24.94767600   42.77716300
+        O  61.81831600   23.85851700   43.20625900
+        H  62.07162100   25.82175000   43.52646100
+        C  64.14630000   21.16730000   47.85290000
+        O  65.33012500   21.22907600   47.45636300
+        O  63.43501600   20.13991700   47.88545900
+        H  63.68832100   22.10315000   48.20566100
+        C  66.96520000   24.44620000   45.06990000
+        O  68.14902500   24.50797600   44.67336300
+        O  66.25391600   23.41881700   45.10245900
+        H  66.50722100   25.38205000   45.42266100
+        C  69.19040000   22.82840000   49.87250000
+        O  70.37422500   22.89017600   49.47596300
+        O  68.47911600   21.80101700   49.90505900
+        H  68.73242100   23.76425000   50.22526100
+        C  71.85490000   27.72720000   47.77060000
+        O  73.03872500   27.78897600   47.37406300
+        O  71.14361600   26.69981700   47.80315900
+        H  71.39692100   28.66305000   48.12336100
+        C  56.37030000   28.05720000   68.87920000
+        N  56.52087700   28.44242000   67.61514600
+        H  56.21036000   29.10492200   68.31140000
+        H  56.71704600   27.48738200   67.87881300
+        N  55.96140100   28.92960400   69.79604900
+        H  56.15757000   27.97456600   70.05971600
+        H  56.07574900   29.22214000   68.83612800
+        N  56.62862100   26.79957600   69.22640500
+        H  56.74297000   27.09211100   68.26648400
+        H  56.31810400   27.46207800   69.92265900
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING QM/MM MODULE------------- 
+QM Module: ORCATheory
+MM Module: OpenMMTheory
+Charge provided from QMMMTheory object:  -2
+Mult provided from QMMMTheory object:  1
+QM-region Charge: -2 Mult: 1
+Embedding: Electrostatic
+Number of pointcharges (to QM program): 58
+Number of charge coordinates: 58
+Running QM/MM object with 8 cores available
+
+-------------------------------------------------------------------
+Time to calculate step (before-QMstep): 0.000 seconds, 0.0 minutes.
+-------------------------------------------------------------------
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+Pointcharge embedding is on!
+ ORCA Calculation starting. 
+Found warning messages in ORCA outputfile:
+WARNING: The chosen methods will break translational/rotational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ Warning: op=0 Small HOMO/LUMO gap (   0.093) - skipping pre-diagonalization
+
+ ORCA Calculation done. 
+ORCA converged in 12 iterations
+ORCA energy: -836.175024321547
+  ------------ENDING ORCA-INTERFACE------------- 
+
+----------------------------------------------------------------
+Time to calculate step (ORCA run): 334.399 seconds, 5.6 minutes.
+----------------------------------------------------------------
+
+---------------------------------------------------------------
+Time to calculate step (QM step): 334.399 seconds, 5.6 minutes.
+---------------------------------------------------------------
+
+----------------------------------------------------------------------
+Time to calculate step (QMpcgrad prepare): 0.000 seconds, 0.0 minutes.
+----------------------------------------------------------------------
+
+--------------------------------------------------------------------------
+Time to calculate step (linkatomgrad prepare): 0.000 seconds, 0.0 minutes.
+--------------------------------------------------------------------------
+
+----------------------------------------------------------------------------
+Time to calculate step (QM/MM gradient prepare): 0.000 seconds, 0.0 minutes.
+----------------------------------------------------------------------------
+Using OpenMM theory as part of QM/MM.
+Using MM on full system. Charges for QM region [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23] have been set to zero 
+
+--------------------------------------------------------------------------------
+                   Creating/updating OpenMM simulation object                   
+--------------------------------------------------------------------------------
+
+Integrator name: VerletIntegrator
+Timestep: 0.001
+Temperature: 300
+Coupling frequency: 1
+Properties: {'Threads': '1'}
+Topology: <Topology; 1 chains, 1 residues, 82 atoms, 0 bonds>
+
+----------------------------------------------------------------------------------
+Time to calculate step (creating/updating simulation): 0.002 seconds, 0.0 minutes.
+----------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+                     Running Single-point OpenMM Interface                      
+--------------------------------------------------------------------------------
+
+Number of OpenMM system constraints defined: 0
+
+-----------------------------------------------------------------------------------
+Time to calculate step (OpenMMTheory.run: const-check): 0.002 seconds, 0.0 minutes.
+-----------------------------------------------------------------------------------
+Updating coordinates.
+
+------------------------------------------------------------------------
+Time to calculate step (Creating pos array): 0.000 seconds, 0.0 minutes.
+------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+Time to calculate step (Updating MM positions): 0.000 seconds, 0.0 minutes.
+---------------------------------------------------------------------------
+Calling OpenMM getState.
+
+---------------------------------------------------------------------
+Time to calculate step (OpenMM getState): 0.000 seconds, 0.0 minutes.
+---------------------------------------------------------------------
+OpenMM Energy: -1.2811793215961487 Eh
+OpenMM Energy: -803.9521622753185 kcal/mol
+
+-----------------------
+Ending OpenMM interface
+-----------------------
+
+----------------------------------------------------------------
+Time to calculate step (OpenMM run): 0.003 seconds, 0.0 minutes.
+----------------------------------------------------------------
+
+-------------------------------------------------------------
+Time to calculate step (MM step): 0.004 seconds, 0.0 minutes.
+-------------------------------------------------------------
+
+Note: You are using electrostatic embedding. This means that the QM-energy is actually the polarized QM-energy
+Note: MM energy also contains the QM-MM Lennard-Jones interaction
+
+QM energy:              -836.175024321547 
+MM energy:                -1.281179321596
+QM/MM energy:           -837.456203643143 
+
+  ------------ENDING QM/MM MODULE------------- 
+
+-----------------------------------------------------------------
+Time to calculate step (QM/MM run): 334.403 seconds, 5.6 minutes.
+-----------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 82
+Formula: N9O20H33C20
+Label: CHHCCOOOCHCHCCHCHCHOHCOOCNHHNHHNHHCNHHNHHNHHCOOHCOOHCOOHCOOHCOOHCOOHCOOHCNHHNHHNHH
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 7 (print_atoms_list region)
+---------------------------------------------------
+        C  59.80557629   34.07261269   56.71293637
+        H  60.45874132   33.44270813   57.32987615
+        H  60.31968783   34.93881692   56.29355047
+        C  58.59735893   34.48214734   57.46425421
+        C  57.96959580   35.89150961   57.17326988
+        O  58.75886402   36.81472532   56.87034381
+        O  56.74418466   35.99310552   57.44302512
+        O  58.13736989   33.78953897   58.37554183
+        C  57.37119908   31.97521430   55.87662521
+        H  56.72806924   31.26640668   56.41602041
+        C  58.70402690   31.88854500   55.94567633
+        H  59.21645323   31.06405926   56.44160343
+        C  59.56113334   32.98476978   55.42393326
+        C  58.91407146   33.70271136   54.27655477
+        H  59.59523058   34.13254298   53.53723155
+        C  57.58516099   33.78236518   54.16822715
+        H  57.10124522   34.34706867   53.36419271
+        C  56.67597619   33.11354168   55.16632475
+        H  56.36181458   33.86373460   55.92225235
+        O  55.50500130   32.66156167   54.46632930
+        H  54.95138863   32.20471885   55.11302848
+        C  61.06381683   32.54907150   55.18066349
+        O  61.58525932   31.93706858   56.15122589
+        O  61.57010725   32.87476902   54.10092800
+        C  55.73300000   32.77150000   70.09050000
+        N  55.88357700   33.15672000   68.82644600
+        H  55.57306000   33.81922200   69.52270000
+        H  56.07974600   32.20168200   69.09011300
+        N  55.32410100   33.64390400   71.00734900
+        H  55.52027000   32.68886600   71.27101600
+        H  55.43844900   33.93644000   70.04742800
+        N  55.99132100   31.51387600   70.43770500
+        H  56.10567000   31.80641100   69.47778400
+        H  55.68080400   32.17637800   71.13395900
+        C  51.95560000   29.35290000   67.74710000
+        N  52.10617700   29.73812000   66.48304600
+        H  51.79566000   30.40062200   67.17930000
+        H  52.30234600   28.78308200   66.74671300
+        N  51.54670100   30.22530400   68.66394900
+        H  51.74287000   29.27026600   68.92761600
+        H  51.66104900   30.51784000   67.70402800
+        N  52.21392100   28.09527600   68.09430500
+        H  52.32827000   28.38781100   67.13438400
+        H  51.90340400   28.75777800   68.79055900
+        C  66.68130000   28.98960000   42.37150000
+        O  67.86512500   29.05137600   41.97496300
+        O  65.97001600   27.96221700   42.40405900
+        H  66.22332100   29.92545000   42.72426100
+        C  70.24600000   31.86160000   44.36020000
+        O  71.42982500   31.92337600   43.96366300
+        O  69.53471600   30.83421700   44.39275900
+        H  69.78802100   32.79745000   44.71296100
+        C  62.52960000   24.88590000   43.17370000
+        O  63.71342500   24.94767600   42.77716300
+        O  61.81831600   23.85851700   43.20625900
+        H  62.07162100   25.82175000   43.52646100
+        C  64.14630000   21.16730000   47.85290000
+        O  65.33012500   21.22907600   47.45636300
+        O  63.43501600   20.13991700   47.88545900
+        H  63.68832100   22.10315000   48.20566100
+        C  66.96520000   24.44620000   45.06990000
+        O  68.14902500   24.50797600   44.67336300
+        O  66.25391600   23.41881700   45.10245900
+        H  66.50722100   25.38205000   45.42266100
+        C  69.19040000   22.82840000   49.87250000
+        O  70.37422500   22.89017600   49.47596300
+        O  68.47911600   21.80101700   49.90505900
+        H  68.73242100   23.76425000   50.22526100
+        C  71.85490000   27.72720000   47.77060000
+        O  73.03872500   27.78897600   47.37406300
+        O  71.14361600   26.69981700   47.80315900
+        H  71.39692100   28.66305000   48.12336100
+        C  56.37030000   28.05720000   68.87920000
+        N  56.52087700   28.44242000   67.61514600
+        H  56.21036000   29.10492200   68.31140000
+        H  56.71704600   27.48738200   67.87881300
+        N  55.96140100   28.92960400   69.79604900
+        H  56.15757000   27.97456600   70.05971600
+        H  56.07574900   29.22214000   68.83612800
+        N  56.62862100   26.79957600   69.22640500
+        H  56.74297000   27.09211100   68.26648400
+        H  56.31810400   27.46207800   69.92265900
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING QM/MM MODULE------------- 
+QM Module: ORCATheory
+MM Module: OpenMMTheory
+Charge provided from QMMMTheory object:  -2
+Mult provided from QMMMTheory object:  1
+QM-region Charge: -2 Mult: 1
+Embedding: Electrostatic
+Number of pointcharges (to QM program): 58
+Number of charge coordinates: 58
+Running QM/MM object with 8 cores available
+
+-------------------------------------------------------------------
+Time to calculate step (before-QMstep): 0.000 seconds, 0.0 minutes.
+-------------------------------------------------------------------
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+Pointcharge embedding is on!
+ ORCA Calculation starting. 
+Found warning messages in ORCA outputfile:
+WARNING: The chosen methods will break translational/rotational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ Warning: op=0 Small HOMO/LUMO gap (   0.091) - skipping pre-diagonalization
+Step   10 : Displace = [0m1.540e-02[0m/[0m5.636e-02[0m (rms/max) Trust = 1.611e-02 ([91m-[0m) Grad_T = [92m2.705e-03[0m/[0m1.528e-02[0m (rms/max) E (change) = -837.4643819122 ([0m-5.790e-03[0m) Quality = [0m1.343[0m
+Hessian Eigenvalues: 8.86439e-03 1.66120e-02 2.63687e-02 ... 5.78010e-01 5.78010e-01 5.88326e-01
+Step   11 : Displace = [0m2.243e-02[0m/[0m8.420e-02[0m (rms/max) Trust = 2.278e-02 ([92m+[0m) Grad_T = [0m4.097e-03[0m/[0m2.803e-02[0m (rms/max) E (change) = -837.4665106724 ([0m-2.129e-03[0m) Quality = [0m0.556[0m
+Hessian Eigenvalues: 8.18030e-03 1.67156e-02 2.63687e-02 ... 5.78010e-01 5.78010e-01 5.87883e-01
+Step   12 : Displace = [0m1.693e-02[0m/[0m5.589e-02[0m (rms/max) Trust = 2.278e-02 (=) Grad_T = [92m2.219e-03[0m/[0m9.199e-03[0m (rms/max) E (change) = -837.4691122715 ([0m-2.602e-03[0m) Quality = [0m1.381[0m
+Hessian Eigenvalues: 5.14275e-03 1.50997e-02 2.63687e-02 ... 5.78010e-01 5.78010e-01 5.90619e-01

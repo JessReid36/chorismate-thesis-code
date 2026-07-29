@@ -1,0 +1,2253 @@
+geometric-optimize called with the following command line:
+relax_bare.py run
+
+                                        [91m())))))))))))))))/[0m                     
+                                    [91m())))))))))))))))))))))))),[0m                
+                                [91m*)))))))))))))))))))))))))))))))))[0m             
+                        [94m#,[0m    [91m()))))))))/[0m                [91m.)))))))))),[0m          
+                      [94m#%%%%,[0m  [91m())))))[0m                        [91m.))))))))*[0m        
+                      [94m*%%%%%%,[0m  [91m))[0m              [93m..[0m              [91m,))))))).[0m      
+                        [94m*%%%%%%,[0m         [93m***************/.[0m        [91m.)))))))[0m     
+                [94m#%%/[0m      [94m(%%%%%%,[0m    [93m/*********************.[0m       [91m)))))))[0m    
+              [94m.%%%%%%#[0m      [94m*%%%%%%,[0m  [93m*******/,[0m     [93m**********,[0m      [91m.))))))[0m   
+                [94m.%%%%%%/[0m      [94m*%%%%%%,[0m  [93m**[0m              [93m********[0m      [91m.))))))[0m  
+          [94m##[0m      [94m.%%%%%%/[0m      [94m(%%%%%%,[0m                  [93m,******[0m      [91m/)))))[0m  
+        [94m%%%%%%[0m      [94m.%%%%%%#[0m      [94m*%%%%%%,[0m    [92m,/////.[0m       [93m******[0m      [91m))))))[0m 
+      [94m#%[0m      [94m%%[0m      [94m.%%%%%%/[0m      [94m*%%%%%%,[0m  [92m////////,[0m      [93m*****/[0m     [91m,)))))[0m 
+    [94m#%%[0m  [94m%%%[0m  [94m%%%#[0m      [94m.%%%%%%/[0m      [94m(%%%%%%,[0m  [92m///////.[0m     [93m/*****[0m      [91m))))).[0m
+  [94m#%%%%.[0m      [94m%%%%%#[0m      [94m/%%%%%%*[0m      [94m#%%%%%%[0m   [92m/////)[0m     [93m******[0m      [91m))))),[0m
+    [94m#%%%%##%[0m  [94m%%%#[0m      [94m.%%%%%%/[0m      [94m(%%%%%%,[0m  [92m///////.[0m     [93m/*****[0m      [91m))))).[0m
+      [94m##[0m     [94m%%%[0m      [94m.%%%%%%/[0m      [94m*%%%%%%,[0m  [92m////////.[0m      [93m*****/[0m     [91m,)))))[0m 
+        [94m#%%%%#[0m      [94m/%%%%%%/[0m      [94m(%%%%%%[0m      [92m/)/)//[0m       [93m******[0m      [91m))))))[0m 
+          [94m##[0m      [94m.%%%%%%/[0m      [94m(%%%%%%,[0m                  [93m*******[0m      [91m))))))[0m  
+                [94m.%%%%%%/[0m      [94m*%%%%%%,[0m  [93m**.[0m             [93m/*******[0m      [91m.))))))[0m  
+              [94m*%%%%%%/[0m      [94m(%%%%%%[0m   [93m********/*..,*/*********[0m       [91m*))))))[0m   
+                [94m#%%/[0m      [94m(%%%%%%,[0m    [93m*********************/[0m        [91m)))))))[0m    
+                        [94m*%%%%%%,[0m         [93m,**************/[0m         [91m,))))))/[0m     
+                      [94m(%%%%%%[0m   [91m()[0m                              [91m))))))))[0m       
+                      [94m#%%%%,[0m  [91m())))))[0m                        [91m,)))))))),[0m        
+                        [94m#,[0m    [91m())))))))))[0m                [91m,)))))))))).[0m          
+                                 [91m()))))))))))))))))))))))))))))))/[0m             
+                                    [91m())))))))))))))))))))))))).[0m                
+                                         [91m())))))))))))))),[0m                     
+
+-=# [1;94m geomeTRIC started. Version: 1.1.1 [0m #=-
+Current date and time: 2026-07-28 21:44:03
+#========================================================#
+#| [92m    Arguments passed to driver run_optimizer():     [0m |#
+#========================================================#
+bothre                    0.0 
+convergence_cmax          0.01 
+convergence_dmax          0.015 
+convergence_drms          0.01 
+convergence_energy        1e-05 
+convergence_gmax          0.006 
+convergence_grms          0.003 
+coordsys                  hdlc 
+customengine              <ash.interfaces.interface_geometric_new.ASHengineclass object at 0x1471eb01bbd0> 
+input                     dummyinputname 
+irc                       False 
+logIni                    /home/18660916/envs/ash/lib/python3.11/site-packages/ash/log.ini 
+maxiter                   400 
+prefix                    geometric_OPTtraj 
+rigid                     False 
+subfrctor                 1 
+transition                False 
+verbose                   0 
+----------------------------------------------------------
+Custom engine selected.
+Bonds will be generated from interatomic distances less than 1.20 times sum of covalent radii
+72 internal coordinates being used (instead of 72 Cartesians)
+Internal coordinate system (atoms numbered from 1):
+Distance 1-2
+Distance 1-3
+Distance 1-4
+Distance 4-5
+Distance 4-8
+Distance 5-6
+Distance 5-7
+Distance 8-9
+Distance 9-10
+Distance 9-11
+Distance 9-18
+Distance 11-12
+Distance 11-13
+Distance 13-14
+Distance 13-22
+Distance 14-15
+Distance 14-16
+Distance 16-17
+Distance 16-18
+Distance 18-19
+Distance 18-20
+Distance 20-21
+Distance 22-23
+Distance 22-24
+Angle 2-1-4
+Angle 3-1-4
+Angle 1-4-8
+Angle 5-4-8
+Angle 4-5-7
+Angle 6-5-7
+Angle 4-8-9
+Angle 8-9-10
+Angle 8-9-11
+Angle 8-9-18
+Angle 10-9-11
+Angle 10-9-18
+Angle 11-9-18
+Angle 9-11-13
+Angle 12-11-13
+Angle 11-13-22
+Angle 14-13-22
+Angle 13-14-16
+Angle 15-14-16
+Angle 14-16-18
+Angle 17-16-18
+Angle 9-18-16
+Angle 9-18-19
+Angle 9-18-20
+Angle 16-18-19
+Angle 16-18-20
+Angle 19-18-20
+Angle 18-20-21
+Angle 13-22-24
+Angle 23-22-24
+Out-of-Plane 1-2-3-4
+Out-of-Plane 4-1-5-8
+Out-of-Plane 5-4-6-7
+Out-of-Plane 11-9-12-13
+Out-of-Plane 13-11-14-22
+Out-of-Plane 14-13-15-16
+Out-of-Plane 16-14-17-18
+Out-of-Plane 22-13-23-24
+Dihedral 2-1-4-5
+Dihedral 2-1-4-8
+Dihedral 3-1-4-5
+Dihedral 3-1-4-8
+Dihedral 1-4-5-6
+Dihedral 1-4-5-7
+Dihedral 8-4-5-6
+Dihedral 8-4-5-7
+Dihedral 1-4-8-9
+Dihedral 5-4-8-9
+Dihedral 4-8-9-10
+Dihedral 4-8-9-11
+Dihedral 4-8-9-18
+Dihedral 8-9-11-12
+Dihedral 8-9-11-13
+Dihedral 10-9-11-12
+Dihedral 10-9-11-13
+Dihedral 18-9-11-12
+Dihedral 18-9-11-13
+Dihedral 8-9-18-16
+Dihedral 8-9-18-19
+Dihedral 8-9-18-20
+Dihedral 10-9-18-16
+Dihedral 10-9-18-19
+Dihedral 10-9-18-20
+Dihedral 11-9-18-16
+Dihedral 11-9-18-19
+Dihedral 11-9-18-20
+Dihedral 9-11-13-14
+Dihedral 9-11-13-22
+Dihedral 12-11-13-14
+Dihedral 12-11-13-22
+Dihedral 11-13-14-15
+Dihedral 11-13-14-16
+Dihedral 22-13-14-15
+Dihedral 22-13-14-16
+Dihedral 11-13-22-23
+Dihedral 11-13-22-24
+Dihedral 14-13-22-23
+Dihedral 14-13-22-24
+Dihedral 13-14-16-17
+Dihedral 13-14-16-18
+Dihedral 15-14-16-17
+Dihedral 15-14-16-18
+Dihedral 14-16-18-9
+Dihedral 14-16-18-19
+Dihedral 14-16-18-20
+Dihedral 17-16-18-9
+Dihedral 17-16-18-19
+Dihedral 17-16-18-20
+Dihedral 9-18-20-21
+Dihedral 16-18-20-21
+Dihedral 19-18-20-21
+Cartesian-X 1
+Cartesian-X 2
+Cartesian-X 3
+Cartesian-X 4
+Cartesian-X 5
+Cartesian-X 6
+Cartesian-X 7
+Cartesian-X 8
+Cartesian-X 9
+Cartesian-X 10
+Cartesian-X 11
+Cartesian-X 12
+Cartesian-X 13
+Cartesian-X 14
+Cartesian-X 15
+Cartesian-X 16
+Cartesian-X 17
+Cartesian-X 18
+Cartesian-X 19
+Cartesian-X 20
+Cartesian-X 21
+Cartesian-X 22
+Cartesian-X 23
+Cartesian-X 24
+Cartesian-Y 1
+Cartesian-Y 2
+Cartesian-Y 3
+Cartesian-Y 4
+Cartesian-Y 5
+Cartesian-Y 6
+Cartesian-Y 7
+Cartesian-Y 8
+Cartesian-Y 9
+Cartesian-Y 10
+Cartesian-Y 11
+Cartesian-Y 12
+Cartesian-Y 13
+Cartesian-Y 14
+Cartesian-Y 15
+Cartesian-Y 16
+Cartesian-Y 17
+Cartesian-Y 18
+Cartesian-Y 19
+Cartesian-Y 20
+Cartesian-Y 21
+Cartesian-Y 22
+Cartesian-Y 23
+Cartesian-Y 24
+Cartesian-Z 1
+Cartesian-Z 2
+Cartesian-Z 3
+Cartesian-Z 4
+Cartesian-Z 5
+Cartesian-Z 6
+Cartesian-Z 7
+Cartesian-Z 8
+Cartesian-Z 9
+Cartesian-Z 10
+Cartesian-Z 11
+Cartesian-Z 12
+Cartesian-Z 13
+Cartesian-Z 14
+Cartesian-Z 15
+Cartesian-Z 16
+Cartesian-Z 17
+Cartesian-Z 18
+Cartesian-Z 19
+Cartesian-Z 20
+Cartesian-Z 21
+Cartesian-Z 22
+Cartesian-Z 23
+Cartesian-Z 24
+<class 'geometric.internal.Distance'> : 24
+<class 'geometric.internal.Angle'> : 30
+<class 'geometric.internal.OutOfPlane'> : 8
+<class 'geometric.internal.Dihedral'> : 53
+<class 'geometric.internal.CartesianX'> : 24
+<class 'geometric.internal.CartesianY'> : 24
+<class 'geometric.internal.CartesianZ'> : 24
+#===================================================================================#
+#| [91mNote: Detected the use of DFT for a system containing only one fragment.[0m        |#
+#|                                                                                 |#
+#| DFT calculations that use small to medium-sized grids can sometimes result in   |#
+#| energies and/or gradients that are not translationally/rotationally invariant,  |#
+#| which varies depending on the QC program used.                                  |#
+#|                                                                                 |#
+#| Spurious translation/rotation contributions to the energy and/or gradient       |#
+#| may cause convergence failure that is observable as 'movement' or 'tumbling'    |#
+#| of the molecule in the optimization output. If observed, rerun the calculation  |#
+#| using --coordsys dlc and --subfrctor 2. It will project out overall translation |#
+#| and rotation from the optimization space.                                       |#
+#===================================================================================#
+> ===== Optimization Info: ====
+> Job type: Energy minimization
+> Maximum number of optimization cycles: 400
+> Initial / maximum trust radius (Angstrom): 0.100 / 0.300
+> Convergence Criteria:
+> Will converge when all 5 criteria are reached:
+>  |Delta-E| < 1.00e-05
+>  RMS-Grad  < 3.00e-03
+>  Max-Grad  < 6.00e-03
+>  RMS-Disp  < 1.00e-02
+>  Max-Disp  < 1.50e-02
+> === End Optimization Info ===
+Step    0 : Gradient = 6.456e-03/2.068e-02 (rms/max) Energy = -836.3672583311
+Hessian Eigenvalues: 2.76389e-02 2.86809e-02 2.98829e-02 ... 4.71621e-01 5.73421e-01 5.74709e-01
+Step    1 : Displace = [0m1.520e-02[0m/[0m2.968e-02[0m (rms/max) Trust = 1.000e-01 (=) Grad = [92m2.958e-03[0m/[0m6.823e-03[0m (rms/max) E (change) = -836.3687851662 ([0m-1.527e-03[0m) Quality = [0m1.135[0m
+Hessian Eigenvalues: 2.46595e-02 2.83142e-02 2.87756e-02 ... 4.72548e-01 5.71437e-01 5.74688e-01
+Step    2 : Displace = [0m1.656e-02[0m/[0m4.297e-02[0m (rms/max) Trust = 1.414e-01 ([92m+[0m) Grad = [92m1.628e-03[0m/[92m3.455e-03[0m (rms/max) E (change) = -836.3696085822 ([0m-8.234e-04[0m) Quality = [0m1.298[0m
+Hessian Eigenvalues: 1.42064e-02 2.78660e-02 2.88054e-02 ... 4.73380e-01 5.73860e-01 5.75278e-01
+Step    3 : Displace = [0m1.862e-02[0m/[0m5.320e-02[0m (rms/max) Trust = 2.000e-01 ([92m+[0m) Grad = [92m1.938e-03[0m/[92m5.192e-03[0m (rms/max) E (change) = -836.3701338403 ([0m-5.253e-04[0m) Quality = [0m1.529[0m
+Hessian Eigenvalues: 5.44640e-03 2.76975e-02 2.88311e-02 ... 4.77062e-01 5.74037e-01 5.79871e-01
+Step    4 : Displace = [0m3.995e-02[0m/[0m1.177e-01[0m (rms/max) Trust = 2.828e-01 ([92m+[0m) Grad = [92m2.546e-03[0m/[0m6.968e-03[0m (rms/max) E (change) = -836.3709722291 ([0m-8.384e-04[0m) Quality = [0m1.472[0m
+Hessian Eigenvalues: 2.70082e-03 2.76141e-02 2.88914e-02 ... 4.74587e-01 5.73776e-01 5.79012e-01
+Step    5 : Displace = [0m5.597e-02[0m/[0m1.748e-01[0m (rms/max) Trust = 3.000e-01 ([92m+[0m) Grad = [92m2.744e-03[0m/[92m5.964e-03[0m (rms/max) E (change) = -836.3717336751 ([0m-7.614e-04[0m) Quality = [0m1.181[0m
+Hessian Eigenvalues: 2.51708e-03 2.73116e-02 2.87499e-02 ... 4.97105e-01 5.74603e-01 5.78156e-01
+Step    6 : Displace = [0m2.545e-02[0m/[0m8.206e-02[0m (rms/max) Trust = 3.000e-01 (=) Grad = [92m1.791e-03[0m/[92m3.971e-03[0m (rms/max) E (change) = -836.3723152336 ([0m-5.816e-04[0m) Quality = [0m1.532[0m
+Hessian Eigenvalues: 1.95008e-03 2.27772e-02 2.79882e-02 ... 4.81658e-01 5.74996e-01 5.82192e-01
+Step    7 : Displace = [0m4.020e-02[0m/[0m1.336e-01[0m (rms/max) Trust = 3.000e-01 (=) Grad = [92m1.801e-03[0m/[92m4.529e-03[0m (rms/max) E (change) = -836.3729042179 ([0m-5.890e-04[0m) Quality = [0m1.315[0m
+Hessian Eigenvalues: 1.52326e-03 1.78876e-02 2.77827e-02 ... 4.77762e-01 5.74463e-01 5.86064e-01
+Step    8 : Displace = [0m3.236e-02[0m/[0m1.116e-01[0m (rms/max) Trust = 3.000e-01 (=) Grad = [92m1.926e-03[0m/[92m4.426e-03[0m (rms/max) E (change) = -836.3731790526 ([0m-2.748e-04[0m) Quality = [0m1.361[0m
+Hessian Eigenvalues: 1.37784e-03 1.27486e-02 2.75533e-02 ... 4.70991e-01 5.70131e-01 5.76610e-01
+Step    9 : Displace = [0m2.582e-02[0m/[0m8.640e-02[0m (rms/max) Trust = 3.000e-01 (=) Grad = [92m1.022e-03[0m/[92m2.534e-03[0m (rms/max) E (change) = -836.3733925123 ([0m-2.135e-04[0m) Quality = [0m1.261[0m
+Hessian Eigenvalues: 9.27899e-04 1.45207e-02 2.70631e-02 ... 4.83168e-01 5.66868e-01 5.75662e-01
+Step   10 : Displace = [0m3.648e-02[0m/[0m1.280e-01[0m (rms/max) Trust = 3.000e-01 (=) Grad = [92m1.814e-03[0m/[0m6.532e-03[0m (rms/max) E (change) = -836.3734823961 ([0m-8.988e-05[0m) Quality = [0m0.743[0m
+Hessian Eigenvalues: 1.49173e-03 1.31157e-02 2.48046e-02 ... 5.60147e-01 5.72295e-01 5.87557e-01
+Step   11 : Displace = [92m8.081e-03[0m/[0m1.836e-02[0m (rms/max) Trust = 3.000e-01 (=) Grad = [92m9.390e-04[0m/[92m2.742e-03[0m (rms/max) E (change) = -836.3735774103 ([0m-9.501e-05[0m) Quality = [0m0.956[0m
+Hessian Eigenvalues: 1.54071e-03 1.42360e-02 2.25131e-02 ... 5.66375e-01 5.75398e-01 6.64767e-01
+Step   12 : Displace = [92m4.786e-03[0m/[92m1.081e-02[0m (rms/max) Trust = 3.000e-01 (=) Grad = [92m6.651e-04[0m/[92m1.640e-03[0m (rms/max) E (change) = -836.3736136376 ([0m-3.623e-05[0m) Quality = [0m1.342[0m
+Hessian Eigenvalues: 1.33907e-03 1.27408e-02 1.64681e-02 ... 5.65073e-01 5.82692e-01 6.29255e-01
+Step   13 : Displace = [0m1.156e-02[0m/[0m3.446e-02[0m (rms/max) Trust = 3.000e-01 (=) Grad = [92m4.518e-04[0m/[92m9.080e-04[0m (rms/max) E (change) = -836.3736554472 ([0m-4.181e-05[0m) Quality = [0m1.233[0m
+Hessian Eigenvalues: 1.20490e-03 8.78566e-03 1.69371e-02 ... 5.76972e-01 5.83959e-01 6.44919e-01
+Step   14 : Displace = [92m8.118e-03[0m/[0m2.067e-02[0m (rms/max) Trust = 3.000e-01 (=) Grad = [92m4.936e-04[0m/[92m1.135e-03[0m (rms/max) E (change) = -836.3736834608 ([0m-2.801e-05[0m) Quality = [0m1.552[0m
+Hessian Eigenvalues: 1.09835e-03 4.41795e-03 1.72477e-02 ... 5.73643e-01 5.86267e-01 6.41205e-01
+Step   15 : Displace = [0m1.391e-02[0m/[0m2.730e-02[0m (rms/max) Trust = 3.000e-01 (=) Grad = [92m5.159e-04[0m/[92m1.375e-03[0m (rms/max) E (change) = -836.3737303356 ([0m-4.687e-05[0m) Quality = [0m1.384[0m
+Hessian Eigenvalues: 9.73537e-04 3.15994e-03 1.73208e-02 ... 5.72027e-01 5.86125e-01 6.52027e-01
+Step   16 : Displace = [0m1.231e-02[0m/[0m2.864e-02[0m (rms/max) Trust = 3.000e-01 (=) Grad = [92m4.237e-04[0m/[92m8.511e-04[0m (rms/max) E (change) = -836.3737669443 ([0m-3.661e-05[0m) Quality = [0m1.402[0m
+Hessian Eigenvalues: 1.10299e-03 2.34568e-03 1.73215e-02 ... 5.70931e-01 5.87575e-01 6.50132e-01
+Step   17 : Displace = [92m7.582e-03[0m/[0m2.310e-02[0m (rms/max) Trust = 3.000e-01 (=) Grad = [92m3.477e-04[0m/[92m1.008e-03[0m (rms/max) E (change) = -836.3737941914 ([0m-2.725e-05[0m) Quality = [0m1.440[0m
+Hessian Eigenvalues: 1.17476e-03 2.09765e-03 1.72935e-02 ... 5.72329e-01 5.86611e-01 6.43374e-01
+Step   18 : Displace = [92m5.734e-03[0m/[92m1.420e-02[0m (rms/max) Trust = 3.000e-01 (=) Grad = [92m2.940e-04[0m/[92m6.342e-04[0m (rms/max) E (change) = -836.3738139814 ([0m-1.979e-05[0m) Quality = [0m1.453[0m
+Hessian Eigenvalues: 1.13729e-03 1.95020e-03 1.27725e-02 ... 5.72638e-01 5.82598e-01 6.35421e-01
+Step   19 : Displace = [92m5.002e-03[0m/[0m1.506e-02[0m (rms/max) Trust = 3.000e-01 (=) Grad = [92m2.440e-04[0m/[92m6.584e-04[0m (rms/max) E (change) = -836.3738265167 ([0m-1.254e-05[0m) Quality = [0m1.496[0m
+Hessian Eigenvalues: 1.21789e-03 1.85866e-03 8.07408e-03 ... 5.71734e-01 5.80152e-01 6.35226e-01
+Step   20 : Displace = [92m4.004e-03[0m/[92m8.591e-03[0m (rms/max) Trust = 3.000e-01 (=) Grad = [92m2.243e-04[0m/[92m5.013e-04[0m (rms/max) E (change) = -836.3738370262 ([0m-1.051e-05[0m) Quality = [0m1.470[0m
+Hessian Eigenvalues: 1.20179e-03 1.76720e-03 5.15928e-03 ... 5.72403e-01 5.89043e-01 6.36055e-01
+Step   21 : Displace = [92m5.935e-03[0m/[92m1.208e-02[0m (rms/max) Trust = 3.000e-01 (=) Grad = [92m2.454e-04[0m/[92m5.395e-04[0m (rms/max) E (change) = -836.3738485203 ([0m-1.149e-05[0m) Quality = [0m1.398[0m
+Hessian Eigenvalues: 1.06634e-03 1.81949e-03 3.97836e-03 ... 5.72836e-01 5.88734e-01 6.47569e-01
+Step   22 : Displace = [92m5.809e-03[0m/[92m9.967e-03[0m (rms/max) Trust = 3.000e-01 (=) Grad = [92m2.317e-04[0m/[92m5.042e-04[0m (rms/max) E (change) = -836.3738570871 ([92m-8.567e-06[0m) Quality = [0m1.335[0m
+Hessian Eigenvalues: 1.06634e-03 1.81949e-03 3.97836e-03 ... 5.72836e-01 5.88734e-01 6.47569e-01
+Converged! =D
+
+    #==========================================================================#
+    #| If this code has benefited your research, please support us by citing: |#
+    #|                                                                        |#
+    #| Wang, L.-P.; Song, C.C. (2016) "Geometry optimization made simple with |#
+    #| translation and rotation coordinates", J. Chem, Phys. 144, 214108.     |#
+    #| http://dx.doi.org/10.1063/1.4952956                                    |#
+    #==========================================================================#
+    Time elapsed since start of run_optimizer: 1508.147 seconds
+ashpath: /home/18660916/envs/ash/lib/python3.11/site-packages/ash
+Sys path: ['/home/18660916/envs/ash/lib/python3.11/site-packages/ash', '/home/18660916/system_development/phase2b_charge_design/05d_shell_ladder/relax/run_ctrl_bare', '/home/18660916/envs/ash/lib/python311.zip', '/home/18660916/envs/ash/lib/python3.11', '/home/18660916/envs/ash/lib/python3.11/lib-dynload', '/home/18660916/envs/ash/lib/python3.11/site-packages']
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+                                           ASH                                            
+                              A MULTISCALE MODELLING PROGRAM                              
+                                        Version: 0.9dev                                        
+                               Git commit version: Unknown                                
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+ASH path: /home/18660916/envs/ash/lib/python3.11/site-packages/ash
+Python version: 3.11.15
+Python interpreter: /home/18660916/envs/ash/bin/python3
+
+ASH Settings after reading defaults and ~/ash_user_settings.ini : 
+See https://ash.readthedocs.io/en/latest/basics.html#ash-settings on how to change settings.
+	 debugflag :  False
+	 load_julia :  False
+	 julia_library :  pythoncall
+	 use_ANSI_color :  False
+	 print_logo :  False
+	 print_input :  True
+	 scale :  1.0
+	 tol :  0.1
+	 conndepth :  10
+	 connectivity_code :  julia
+	 nonbondedMM_code :  julia
+	 print_exit_footer :  True
+	 print_full_timings :  True
+
+Note: ASH can use ANSI escape sequences for displaying color. Use e.g. less -R to display
+To turn on/off escape sequences, set: 'use_ANSI_color = False' in
+~/ash_user_settings.ini
+
+Input script: /home/18660916/system_development/phase2b_charge_design/05d_shell_ladder/relax/run_ctrl_bare/relax_bare.py
+================================================================================
+   > import sys
+   > from ash import Fragment, ORCATheory, Optimizer
+   > ORCADIR="/home/apps2/ORCA/6.0.1"
+   > RUN=(len(sys.argv)>1 and sys.argv[1]=="run")
+   > # bare 24-atom substrate reactant geometry
+   > coords="\n".join(open("reactant.xyz").read().splitlines()[2:26])
+   > frag=Fragment(coordsstring=coords, charge=-2, mult=1)
+   > print(">> BARE control: %d atoms (should be 24), charge -2"%frag.numatoms)
+   > assert frag.numatoms==24
+   > orca=ORCATheory(orcadir=ORCADIR,orcasimpleinput="! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF",
+   >     orcablocks="%cpcm epsilon 4.0 end\n%scf MaxIter 300 Guess PModel end",numcores=8,autostart=False)
+   > CONV={"convergence_energy":1e-5,"convergence_grms":3.0e-3,"convergence_gmax":6.0e-3,"convergence_drms":1.0e-2,"convergence_dmax":1.5e-2}
+   > if not RUN:
+   >     print("=== DRY RUN OK: bare 24-atom substrate, pure QM (no bodies, no field) ==="); sys.exit(0)
+   > # NO frozen atoms (whole substrate free), pure QM optimisation
+   > Optimizer(theory=orca,fragment=frag,coordsystem="hdlc",maxiter=400,conv_criteria=CONV,charge=-2,mult=1)
+   > frag.write_xyzfile("bare_control_relaxed.xyz"); print(">> DONE -> bare_control_relaxed.xyz")
+================================================================================ 
+
+
+--------------------------------------------------------------------------------
+                                New ASH fragment                                
+--------------------------------------------------------------------------------
+
+ASH Fragment creation
+Getting coordinates from string: C     60.11193800    34.38396900    57.21013200
+H     60.60719900    33.42993900    57.38460900
+H     60.72469300    35.27181800    57.05919300
+C     58.78057700    34.50353200    57.15195800
+C     58.09218200    35.83426100    56.89335400
+O     58.81246700    36.81821800    56.57878900
+O     56.83954900    35.84891700    57.00961700
+O     57.93461500    33.42640300    57.34599800
+C     57.67693600    32.53773200    56.20080600
+H     57.01901700    31.76376900    56.62407200
+C     58.98648700    31.96184000    55.79317200
+H     59.46393000    31.24298300    56.46049600
+C     59.68310500    32.48267100    54.76815100
+C     59.06432100    33.48370900    53.89317900
+H     59.70236100    33.90454400    53.11096900
+C     57.78125300    33.86565900    54.03153300
+H     57.33218100    34.60235400    53.35662900
+C     56.88979900    33.27109300    55.08618200
+H     56.34719000    34.09064800    55.58588000
+O     55.96286300    32.39770700    54.43466800
+H     55.31084500    32.10952700    55.09277000
+C     61.12320000    32.06212600    54.53420800
+O     61.78496200    31.70232800    55.54338100
+O     61.54107100    32.10651300    53.35273800
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+>> BARE control: 24 atoms (should be 24), charge -2
+
+
+                     #####################################                      
+                     #                                   #                      
+                     #     ORCATheory initialization     #                      
+                     #                                   #                      
+                     #####################################                      
+Checking for ORCA location
+ Using orcadir path provided: /home/apps2/ORCA/6.0.1 
+Checking if ORCA binary works... yes 
+ORCA parallel job requested with numcores: 8 . Make sure that the correct OpenMPI version (for the ORCA version) is available in your environment
+OpenMPI binary directory found: /apps/openmpi/4.1.1/bin
+Testing that mpirun is executable... yes 
+OpenMPI version (mpirun -V): mpirun (Open MPI) 4.1.1
+
+Report bugs to http://www.open-mpi.org/community/help/
+
+bind_to_core_option: True
+
+Creating ORCA object
+ORCA dir: /home/apps2/ORCA/6.0.1
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+
+ORCATheory object created!
+
+
+                 #############################################                  
+                 #                                           #                  
+                 #     geomeTRICOptimizer initialization     #                  
+                 #                                           #                  
+                 #############################################                  
+Creating optimizer object
+User-defined convergence criteria:
+Theory is not periodic
+Printlevel: 2
+Coordinate system:  hdlc
+Max iterations:  400
+Frozen atoms: []
+Active Region: False
+TS Optimization: False
+Hessian Option: None
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+
+--------------------------------------------------------------------------------
+                            Running geomeTRIC object                            
+--------------------------------------------------------------------------------
+
+ 
+Doing geometry optimization on fragment. Formula: O6C10H8 Label: CHHCCOOOCHCHCCHCHCHOHCOO  
+No constraints provided to run method.
+Testing if constraints present in optimizer object
+No constraints in optimizer object.
+Now testing if constraints in fragment object 
+No constraints in fragment object.
+
+Constraints:  None
+constrainvalue:  False
+Inside define_constraints
+Constraints: None
+Inside write_constraintsfile
+Wrote XYZ file:  initialxyzfiletric.xyz
+No Hessian option provided.
+self.constraintsfile: None
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+Hessian option: None
+Coordinate system: hdlc
+Starting optimization
+
+-------------------------------------------------------------------------------------
+Time to calculate step (Time spent before run_optimizer): 3.101 seconds, 0.1 minutes.
+-------------------------------------------------------------------------------------
+geometric called detect_dft option option for ASHengineclass.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 0 (print_atoms_list region)
+---------------------------------------------------
+        C  60.11193800   34.38396900   57.21013200
+        H  60.60719900   33.42993900   57.38460900
+        H  60.72469300   35.27181800   57.05919300
+        C  58.78057700   34.50353200   57.15195800
+        C  58.09218200   35.83426100   56.89335400
+        O  58.81246700   36.81821800   56.57878900
+        O  56.83954900   35.84891700   57.00961700
+        O  57.93461500   33.42640300   57.34599800
+        C  57.67693600   32.53773200   56.20080600
+        H  57.01901700   31.76376900   56.62407200
+        C  58.98648700   31.96184000   55.79317200
+        H  59.46393000   31.24298300   56.46049600
+        C  59.68310500   32.48267100   54.76815100
+        C  59.06432100   33.48370900   53.89317900
+        H  59.70236100   33.90454400   53.11096900
+        C  57.78125300   33.86565900   54.03153300
+        H  57.33218100   34.60235400   53.35662900
+        C  56.88979900   33.27109300   55.08618200
+        H  56.34719000   34.09064800   55.58588000
+        O  55.96286300   32.39770700   54.43466800
+        H  55.31084500   32.10952700   55.09277000
+        C  61.12320000   32.06212600   54.53420800
+        O  61.78496200   31.70232800   55.54338100
+        O  61.54107100   32.10651300   53.35273800
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+No orca.gbw file is present in dir.
+Checking if a file orca.gbw exists in parentdir:
+Found no file. ORCA will guess new orbitals
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 12 iterations
+ORCA energy: -836.367258331125
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 68.377 seconds, 1.1 minutes.
+---------------------------------------------------------------
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 0 (print_atoms_list region)
+---------------------------------------------------
+        C  60.10734268   34.38921204   57.22158784
+        H  60.60598493   33.43176609   57.38037836
+        H  60.71723930   35.27973388   57.06502146
+        C  58.77295046   34.50901965   57.14955781
+        C  58.06813540   35.84905785   56.88458902
+        O  58.82988898   36.80701121   56.59761386
+        O  56.81553760   35.86490499   57.00299472
+        O  57.93838965   33.42397004   57.34673853
+        C  57.68029475   32.54211474   56.20533798
+        H  57.01466063   31.77366308   56.63112654
+        C  58.98395946   31.95586272   55.78703539
+        H  59.46226409   31.23907565   56.45839588
+        C  59.68992440   32.47482339   54.76471112
+        C  59.06542725   33.47462349   53.89016963
+        H  59.70069009   33.89963338   53.10885257
+        C  57.78404533   33.86014518   54.03386377
+        H  57.33661544   34.60029142   53.36141626
+        C  56.89255339   33.27225986   55.09195878
+        H  56.35262702   34.09323213   55.59567339
+        O  55.97210175   32.38934383   54.43581482
+        H  55.31718025   32.11775437   55.09556325
+        C  61.13834981   32.05197658   54.52135920
+        O  61.78181092   31.68294871   55.53838044
+        O  61.54476748   32.11983574   53.33434344
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 10 iterations
+ORCA energy: -836.36878516624
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 65.120 seconds, 1.1 minutes.
+---------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 0 (print_atoms_list region)
+---------------------------------------------------
+        C  60.09839378   34.39622873   57.23427880
+        H  60.60163220   33.43715392   57.37677254
+        H  60.70369482   35.29061252   57.07565698
+        C  58.76214446   34.50836231   57.15218809
+        C  58.06284652   35.86798093   56.89025806
+        O  58.82149948   36.82538727   56.61194122
+        O  56.80964897   35.87983999   56.98514793
+        O  57.93835128   33.41588476   57.34901742
+        C  57.68271407   32.54413010   56.21074664
+        H  57.00847741   31.78222313   56.63693321
+        C  58.98070906   31.94656381   55.78171064
+        H  59.46199638   31.23186619   56.45477734
+        C  59.69129167   32.46382877   54.75986122
+        C  59.06707076   33.46407937   53.88513557
+        H  59.69872187   33.89175884   53.10298461
+        C  57.78869367   33.85618259   54.03625947
+        H  57.34250944   34.59986429   53.36733805
+        C  56.89782275   33.27353831   55.09761159
+        H  56.35704162   34.09378400   55.60411225
+        O  55.98397922   32.38024786   54.43963850
+        H  55.32229724   32.12762537   55.09902846
+        C  61.14845641   32.03973367   54.51178999
+        O  61.79492916   31.64855335   55.51611190
+        O  61.54781883   32.13682995   53.32318358
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 10 iterations
+ORCA energy: -836.369608582219
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 64.914 seconds, 1.1 minutes.
+---------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 1 (print_atoms_list region)
+---------------------------------------------------
+        C  60.08996675   34.40717118   57.24431145
+        H  60.59408917   33.44710502   57.37775084
+        H  60.68991825   35.30514513   57.09020625
+        C  58.75533644   34.51602288   57.15617704
+        C  58.05363050   35.88066293   56.88893798
+        O  58.81221771   36.84280171   56.63766351
+        O  56.80021136   35.89025273   56.96848886
+        O  57.94074478   33.41676514   57.35067050
+        C  57.68713477   32.54605911   56.21715460
+        H  57.00520227   31.78899733   56.64045789
+        C  58.98236804   31.93801832   55.78124994
+        H  59.46594034   31.22277572   56.45217156
+        C  59.69127100   32.45087319   54.75547735
+        C  59.07010499   33.45366834   53.88119279
+        H  59.69903755   33.87736914   53.09479503
+        C  57.79541709   33.85474507   54.03935842
+        H  57.34994430   34.60140143   53.37386048
+        C  56.90586437   33.27423283   55.10190454
+        H  56.35996764   34.09199974   55.60709759
+        O  55.99675957   32.37221303   54.44664575
+        H  55.32399263   32.13770978   55.10204161
+        C  61.15147388   32.02515796   54.49691187
+        O  61.79997686   31.60499261   55.48581718
+        O  61.55217080   32.15611972   53.31214104
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 10 iterations
+ORCA energy: -836.370133840319
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 63.801 seconds, 1.1 minutes.
+---------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 2 (print_atoms_list region)
+---------------------------------------------------
+        C  60.07577054   34.43542595   57.25907081
+        H  60.57962920   33.47504166   57.38690098
+        H  60.66691197   35.34042258   57.12263726
+        C  58.74351128   34.53593355   57.16458281
+        C  58.03495508   35.90367844   56.90390201
+        O  58.79204200   36.87518978   56.69164756
+        O  56.77916338   35.89958744   56.92729741
+        O  57.94526040   33.42414416   57.35382307
+        C  57.69820209   32.55010215   56.22863540
+        H  57.00576985   31.79929546   56.64591003
+        C  58.99166938   31.92683543   55.78528613
+        H  59.47670027   31.20609998   56.44956905
+        C  59.69302330   32.42506701   54.74614224
+        C  59.07576266   33.43348692   53.87489166
+        H  59.70338617   33.84112188   53.07890892
+        C  57.80870368   33.85305198   54.04590915
+        H  57.36653555   34.60628768   53.38627531
+        C  56.92156242   33.27354297   55.10854276
+        H  56.36416698   34.08602445   55.60817454
+        O  56.02051223   32.35719550   54.46006442
+        H  55.32498141   32.15839579   55.10483484
+        C  61.15208906   31.99398004   54.46012326
+        O  61.79293306   31.50599624   55.42215206
+        O  61.55949911   32.19635297   53.28720237
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 10 iterations
+ORCA energy: -836.370972229061
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 63.544 seconds, 1.1 minutes.
+---------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+geometric called clearCalcs option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 3 (print_atoms_list region)
+---------------------------------------------------
+        C  60.06160349   34.48014689   57.27749327
+        H  60.56644132   33.52232185   57.41130726
+        H  60.64476341   35.39276796   57.16561249
+        C  58.72960865   34.56450812   57.17668514
+        C  58.00933823   35.92357159   56.91279804
+        O  58.75898886   36.91835998   56.77834749
+        O  56.75317506   35.90154483   56.87705154
+        O  57.94935313   33.43871639   57.35937070
+        C  57.71559283   32.55669389   56.24091840
+        H  57.01860277   31.80799866   56.65299474
+        C  59.00913248   31.92213869   55.79470861
+        H  59.49197612   31.19073678   56.44980491
+        C  59.69464105   32.39368442   54.73175188
+        C  59.08142765   33.40848231   53.86571265
+        H  59.71133223   33.79045375   53.05887988
+        C  57.82441195   33.85059788   54.05214322
+        H  57.38876004   34.61381646   53.39995270
+        C  56.93970091   33.27008066   55.11448931
+        H  56.36951862   34.07682274   55.60590348
+        O  56.04723571   32.33907709   54.47382263
+        H  55.32457447   32.18472344   55.10179840
+        C  61.14443995   31.94883125   54.41148432
+        O  61.77416072   31.35967191   55.32808387
+        O  61.56396139   32.24651250   53.26136914
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 10 iterations
+ORCA energy: -836.371733675088
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 63.995 seconds, 1.1 minutes.
+---------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 4 (print_atoms_list region)
+---------------------------------------------------
+        C  60.06110807   34.50279678   57.28374464
+        H  60.56816062   33.54781854   57.42975997
+        H  60.64250655   35.41810788   57.18256800
+        C  58.72789991   34.57885406   57.18226458
+        C  57.99758379   35.92575562   56.92676701
+        O  58.73854681   36.93118858   56.81675531
+        O  56.74306612   35.89048590   56.85437403
+        O  57.95174752   33.44968514   57.36178662
+        C  57.72572572   32.56094130   56.24247110
+        H  57.03661943   31.80651379   56.65620686
+        C  59.02124735   31.93031587   55.80189507
+        H  59.49980076   31.19377646   56.45432759
+        C  59.69532785   32.38491744   54.72488177
+        C  59.08272392   33.40017833   53.86041510
+        H  59.71507128   33.77228763   53.05146690
+        C  57.82894902   33.84821200   54.05084548
+        H  57.39666562   34.61619436   53.40181221
+        C  56.94484243   33.26679591   55.11389791
+        H  56.37253635   34.07298969   55.60206908
+        O  56.05346817   32.33436472   54.47475152
+        H  55.32238181   32.19239346   55.09392883
+        C  61.13344857   31.92758719   54.39202369
+        O  61.74958402   31.29364628   55.28640834
+        O  61.56372938   32.25645313   53.25706249
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 10 iterations
+ORCA energy: -836.372315233592
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 63.248 seconds, 1.1 minutes.
+---------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 5 (print_atoms_list region)
+---------------------------------------------------
+        C  60.06239269   34.53697439   57.29736233
+        H  60.57740790   33.58811831   57.46036045
+        H  60.64015741   35.45676940   57.20502706
+        C  58.72641101   34.59661945   57.19059033
+        C  57.98089864   35.92687488   56.94108508
+        O  58.70144436   36.95297854   56.87904800
+        O  56.73047243   35.86919361   56.82760044
+        O  57.95460916   33.46432669   57.36545150
+        C  57.74220141   32.56867429   56.24251174
+        H  57.07056383   31.80227196   56.66273277
+        C  59.04013395   31.94886727   55.81138189
+        H  59.51279519   31.20880253   56.46359918
+        C  59.69850822   32.37623399   54.71451335
+        C  59.08463216   33.39033395   53.85077801
+        H  59.71834693   33.75607993   53.04070053
+        C  57.83332678   33.84220544   54.04490138
+        H  57.40434267   34.61587393   53.40003682
+        C  56.95088665   33.26190649   55.11186935
+        H  56.37968991   34.06991600   55.59713355
+        O  56.06151879   32.32801563   54.47282948
+        H  55.31865974   32.20097238   55.07907038
+        C  61.11735341   31.88965524   54.36456883
+        O  61.70077757   31.18478901   55.22715991
+        O  61.56521025   32.26580673   53.25217175
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 10 iterations
+ORCA energy: -836.372904217857
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 61.402 seconds, 1.0 minutes.
+---------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 6 (print_atoms_list region)
+---------------------------------------------------
+        C  60.06200441   34.56223835   57.31152480
+        H  60.58543932   33.61910301   57.48333813
+        H  60.63344657   35.48691272   57.22160703
+        C  58.72518959   34.60970192   57.19785241
+        C  57.96439593   35.93250468   56.95544457
+        O  58.67262064   36.96849419   56.92718235
+        O  56.71787269   35.85567308   56.80845597
+        O  57.95844248   33.47428245   57.36818428
+        C  57.75507307   32.57598086   56.24326029
+        H  57.09564767   31.80086969   56.66770857
+        C  59.05386338   31.96307284   55.81607699
+        H  59.52679894   31.22478675   56.46967752
+        C  59.70131966   32.37151446   54.70593717
+        C  59.08689007   33.38482454   53.84194499
+        H  59.71897152   33.75185807   53.03128878
+        C  57.83603832   33.83676869   54.03872438
+        H  57.40666029   34.61169153   53.39555147
+        C  56.95645422   33.25941612   55.11080913
+        H  56.38706066   34.06980253   55.59434470
+        O  56.06953205   32.32187850   54.47327668
+        H  55.31677343   32.20673627   55.06967660
+        C  61.10703767   31.85636185   54.34515265
+        O  61.66447949   31.09310629   55.17543580
+        O  61.57072896   32.26468064   53.25002883
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 10 iterations
+ORCA energy: -836.373179052614
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 64.665 seconds, 1.1 minutes.
+---------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 7 (print_atoms_list region)
+---------------------------------------------------
+        C  60.06074886   34.58023397   57.32481038
+        H  60.59418202   33.64332472   57.50087446
+        H  60.62429267   35.50986397   57.23244868
+        C  58.72405591   34.61681411   57.20491548
+        C  57.95282799   35.93790199   56.96575187
+        O  58.64575865   36.98189200   56.96180549
+        O  56.71035073   35.84754154   56.80438806
+        O  57.96141355   33.47935861   57.37071284
+        C  57.76540644   32.58213546   56.24362461
+        H  57.11503048   31.80000019   56.66959385
+        C  59.06566057   31.97562034   55.81748237
+        H  59.54339113   31.24346133   56.47386549
+        C  59.70587850   32.37092861   54.69869264
+        C  59.09009406   33.38402389   53.83468072
+        H  59.71846501   33.75864781   53.02431667
+        C  57.83734616   33.83144559   54.03176808
+        H  57.40345221   34.60264495   53.38691393
+        C  56.96139871   33.25808877   55.10953377
+        H  56.39479712   34.07187316   55.59155648
+        O  56.07540464   32.31730695   54.47519087
+        H  55.31684341   32.20807735   55.06518962
+        C  61.09853176   31.82532884   54.32818749
+        O  61.62647289   31.02571835   55.13778569
+        O  61.58093756   32.25002752   53.24839455
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 10 iterations
+ORCA energy: -836.373392512318
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 63.491 seconds, 1.1 minutes.
+---------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+geometric called clearCalcs option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 8 (print_atoms_list region)
+---------------------------------------------------
+        C  60.05304099   34.60700919   57.34293859
+        H  60.59665769   33.67564572   57.51838985
+        H  60.60486536   35.54410594   57.25512231
+        C  58.71727334   34.63080858   57.21585468
+        C  57.93373442   35.95183632   56.98151564
+        O  58.61393097   37.00358902   57.01343664
+        O  56.69591341   35.84600428   56.78905395
+        O  57.96567319   33.48574187   57.37458912
+        C  57.77959062   32.58992997   56.24813326
+        H  57.13147940   31.80382567   56.67043660
+        C  59.08089514   31.98331652   55.81802005
+        H  59.56512000   31.25546439   56.47433959
+        C  59.71223887   32.36333852   54.68848467
+        C  59.09606805   33.37796824   53.82548507
+        H  59.72053393   33.75424370   53.01231119
+        C  57.84363707   33.82599508   54.02675242
+        H  57.40453761   34.59308068   53.38041168
+        C  56.97259058   33.25717313   55.11049751
+        H  56.40430908   34.07231851   55.58862767
+        O  56.08899488   32.30751665   54.48466422
+        H  55.32046854   32.21581725   55.06591706
+        C  61.09277062   31.78705622   54.30182988
+        O  61.58477303   30.92328099   55.07399580
+        O  61.59364425   32.24719360   53.24167669
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 10 iterations
+ORCA energy: -836.373482396144
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 63.792 seconds, 1.1 minutes.
+---------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 9 (print_atoms_list region)
+---------------------------------------------------
+        C  60.05082360   34.60249754   57.34268353
+        H  60.59563038   33.67092190   57.51163422
+        H  60.60026831   35.54035235   57.25359404
+        C  58.71589072   34.62833137   57.21727804
+        C  57.93423402   35.95238056   56.98271507
+        O  58.61875533   36.99912564   57.00283564
+        O  56.69562462   35.85135752   56.80169799
+        O  57.96515171   33.48252950   57.37455048
+        C  57.77884805   32.58995919   56.24795453
+        H  57.12612850   31.80525208   56.66542083
+        C  59.07986179   31.98180656   55.81424514
+        H  59.56848128   31.25638789   56.47008381
+        C  59.71328198   32.36801744   54.68856034
+        C  59.09752716   33.38226874   53.82539619
+        H  59.72083816   33.76257989   53.01299504
+        C  57.84331003   33.82616988   54.02495361
+        H  57.39985516   34.58727526   53.37466696
+        C  56.97379196   33.25874975   55.10995151
+        H  56.40578538   34.07454573   55.58773501
+        O  56.08814159   32.30848887   54.48822142
+        H  55.32484756   32.21227828   55.07494011
+        C  61.09415500   31.79036173   54.30568208
+        O  61.58624778   30.93926145   55.08322271
+        O  61.59526096   32.23136093   53.24146582
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 10 iterations
+ORCA energy: -836.373577410342
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 62.250 seconds, 1.0 minutes.
+---------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 10 (print_atoms_list region)
+---------------------------------------------------
+        C  60.04815963   34.60614035   57.34374412
+        H  60.59308726   33.67430834   57.51025759
+        H  60.59606629   35.54515466   57.25916524
+        C  58.71311058   34.63058409   57.21941682
+        C  57.93190017   35.95355660   56.98570369
+        O  58.61601549   37.00146016   57.00730552
+        O  56.69324887   35.85372412   56.80398582
+        O  57.96469333   33.48268061   57.37506853
+        C  57.78084900   32.59075311   56.24852670
+        H  57.12582482   31.80636927   56.66295662
+        C  59.08177190   31.98126962   55.81439109
+        H  59.57044989   31.25360923   56.46774628
+        C  59.71440708   32.36647916   54.68753131
+        C  59.09938992   33.38116771   53.82435844
+        H  59.72279849   33.75859892   53.01068245
+        C  57.84552717   33.82585587   54.02413497
+        H  57.40129381   34.58536313   53.37250723
+        C  56.97665157   33.25922606   55.10976526
+        H  56.40776341   34.07483922   55.58643912
+        O  56.08998717   32.30779974   54.49138479
+        H  55.32864168   32.21329041   55.08060974
+        C  61.09189121   31.78440405   54.30021448
+        O  61.58276838   30.93165183   55.07646558
+        O  61.59644391   32.23397375   53.24012271
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 10 iterations
+ORCA energy: -836.373613637566
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 62.918 seconds, 1.0 minutes.
+---------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 11 (print_atoms_list region)
+---------------------------------------------------
+        C  60.04305853   34.61552861   57.34725129
+        H  60.58936962   33.68391048   57.50944255
+        H  60.58731906   35.55721359   57.27127155
+        C  58.70771169   34.63601208   57.22463943
+        C  57.92520824   35.95570787   56.99402560
+        O  58.60725875   37.00626558   57.01934373
+        O  56.68678624   35.85611171   56.81071170
+        O  57.96407680   33.48393030   57.37634790
+        C  57.78639282   32.59327665   56.24884694
+        H  57.12910202   31.80794292   56.65797913
+        C  59.08719149   31.98269725   55.81433652
+        H  59.57516082   31.25066889   56.46353278
+        C  59.71723232   32.36464136   54.68453677
+        C  59.10302918   33.37908306   53.82079620
+        H  59.72697627   33.75182385   53.00546746
+        C  57.84940116   33.82419754   54.02045746
+        H  57.40370286   34.58027924   53.36581858
+        C  56.98260072   33.26029876   55.10873238
+        H  56.41340144   34.07660219   55.58336993
+        O  56.09333326   32.30708670   54.49721226
+        H  55.33683032   32.21448993   55.09246293
+        C  61.08922951   31.77578051   54.29174183
+        O  61.57049046   30.90602548   55.05733371
+        O  61.59787743   32.23268546   53.23682551
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 10 iterations
+ORCA energy: -836.373655447199
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 63.014 seconds, 1.1 minutes.
+---------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 12 (print_atoms_list region)
+---------------------------------------------------
+        C  60.03993141   34.62151508   57.34991557
+        H  60.58767867   33.69022704   57.50857619
+        H  60.58181882   35.56487103   57.27862434
+        C  58.70442262   34.63941043   57.22843223
+        C  57.91906628   35.95677322   57.00248598
+        O  58.60080792   37.00787691   57.02582365
+        O  56.68038337   35.85558823   56.82014927
+        O  57.96370529   33.48488655   57.37709066
+        C  57.79019260   32.59559981   56.24800336
+        H  57.13306750   31.80870009   56.65447316
+        C  59.09071869   31.98501230   55.81399270
+        H  59.57676333   31.24955730   56.46081629
+        C  59.71924401   32.36390372   54.68239019
+        C  59.10581870   33.37765847   53.81762462
+        H  59.72998417   33.74798311   53.00138662
+        C  57.85186621   33.82235173   54.01606753
+        H  57.40533765   34.57577983   53.35887025
+        C  56.98643568   33.26197979   55.10726120
+        H  56.41908807   34.08009095   55.58110530
+        O  56.09405631   32.30890858   54.50021105
+        H  55.34359413   32.21350680   55.10271102
+        C  61.08694393   31.76899587   54.28628469
+        O  61.56307638   30.89106140   55.04544228
+        O  61.59873930   32.23002181   53.23474597
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 14 iterations
+ORCA energy: -836.373683460818
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 69.482 seconds, 1.2 minutes.
+---------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+geometric called clearCalcs option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 13 (print_atoms_list region)
+---------------------------------------------------
+        C  60.03511852   34.62970199   57.35383331
+        H  60.58572715   33.69916266   57.50608131
+        H  60.57358138   35.57538400   57.28836795
+        C  58.69939281   34.64311240   57.23441404
+        C  57.90842687   35.95747095   57.01741489
+        O  58.58816790   37.01000037   57.03293112
+        O  56.66830670   35.85250896   56.84683382
+        O  57.96276268   33.48544564   57.37789379
+        C  57.79571909   32.59950057   56.24503808
+        H  57.14044857   31.80937791   56.64827593
+        C  59.09598304   31.98941045   55.81264479
+        H  59.57632958   31.24784996   56.45676520
+        C  59.72293323   32.36301877   54.67881075
+        C  59.11063977   33.37477531   53.81156408
+        H  59.73528084   33.74125763   52.99404495
+        C  57.85591562   33.81850980   54.00686666
+        H  57.40880172   34.56741156   53.34470291
+        C  56.99219534   33.26638663   55.10389367
+        H  56.43101244   34.08952373   55.57716617
+        O  56.09200641   32.31654872   54.50385268
+        H  55.35662386   32.20891776   55.12324874
+        C  61.08495572   31.76071096   54.27819408
+        O  61.55220812   30.87208592   55.02959148
+        O  61.60020363   32.22418740   53.23005373
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 14 iterations
+ORCA energy: -836.373730335606
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 72.336 seconds, 1.2 minutes.
+---------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 14 (print_atoms_list region)
+---------------------------------------------------
+        C  60.03183630   34.63543833   57.35697748
+        H  60.58568903   33.70608393   57.50508541
+        H  60.56761559   35.58283729   57.29349692
+        C  58.69596599   34.64506668   57.23874153
+        C  57.89833030   35.95796483   57.03066059
+        O  58.57511120   37.01216868   57.03843458
+        O  56.65654676   35.84770926   56.87521884
+        O  57.96246470   33.48529170   57.37805303
+        C  57.79927187   32.60272422   56.24178801
+        H  57.14653048   31.80979972   56.64359474
+        C  59.09977810   31.99296102   55.81096025
+        H  59.57514840   31.24796793   56.45465292
+        C  59.72600644   32.36164229   54.67524629
+        C  59.11425119   33.37155300   53.80565362
+        H  59.73888630   33.73508949   52.98677749
+        C  57.85916497   33.81523504   53.99874140
+        H  57.41227937   34.56068533   53.33251744
+        C  56.99625905   33.27152977   55.10094659
+        H  56.44232317   34.10009456   55.57409025
+        O  56.08786020   32.32676131   54.50577082
+        H  55.36754223   32.20356123   55.14052772
+        C  61.08461103   31.75312204   54.27160889
+        O  61.54693837   30.85746821   55.01708275
+        O  61.60232998   32.21950417   53.22585659
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 14 iterations
+ORCA energy: -836.373766944318
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 68.908 seconds, 1.1 minutes.
+---------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 15 (print_atoms_list region)
+---------------------------------------------------
+        C  60.03101722   34.63516015   57.35640287
+        H  60.58652860   33.70649734   57.50347154
+        H  60.56632962   35.58278276   57.29115773
+        C  58.69504130   34.64347955   57.23943042
+        C  57.89346297   35.95675662   57.03779742
+        O  58.56824919   37.01186219   57.03624112
+        O  56.64994717   35.84332515   56.89896257
+        O  57.96255110   33.48324044   57.37732626
+        C  57.79887063   32.60334955   56.23897389
+        H  57.14688469   31.80977087   56.64071754
+        C  59.09978294   31.99292123   55.80894173
+        H  59.57257318   31.24808458   56.45457424
+        C  59.72713297   32.36017409   54.67335421
+        C  59.11530877   33.36878836   53.80220372
+        H  59.73958412   33.73046046   52.98220204
+        C  57.86072694   33.81413027   53.99478261
+        H  57.41492154   34.55851575   53.32673137
+        C  56.99708917   33.27611716   55.09936188
+        H  56.44903314   34.10853728   55.57323032
+        O  56.08208614   32.33750843   54.50520708
+        H  55.37361475   32.19922118   55.15051762
+        C  61.08736852   31.75317296   54.27019226
+        O  61.55095152   30.86023467   55.01771268
+        O  61.60368482   32.21816900   53.22299104
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 12 iterations
+ORCA energy: -836.373794191353
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 67.359 seconds, 1.1 minutes.
+---------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 16 (print_atoms_list region)
+---------------------------------------------------
+        C  60.03172074   34.63251010   57.35383155
+        H  60.58795518   33.70438664   57.50242978
+        H  60.56724102   35.57987437   57.28520545
+        C  58.69571460   34.64059447   57.23809720
+        C  57.89199063   35.95463356   57.04025779
+        O  58.56561231   37.01015770   57.03240378
+        O  56.64743912   35.83963660   56.91386521
+        O  57.96350882   33.48034313   57.37656644
+        C  57.79671714   32.60239920   56.23729628
+        H  57.14365586   31.80961779   56.63909749
+        C  59.09791893   31.99087228   55.80695211
+        H  59.57174129   31.24943838   56.45576923
+        C  59.72669372   32.35868317   54.67220908
+        C  59.11438144   33.36658910   53.80039390
+        H  59.73788702   33.72709222   52.97926134
+        C  57.86115592   33.81495833   53.99444396
+        H  57.41642914   34.56003846   53.32654722
+        C  56.99626216   33.27944660   55.09917982
+        H  56.45161052   34.11357812   55.57428157
+        O  56.07733025   32.34600519   54.50347726
+        H  55.37500270   32.19780839   55.15316761
+        C  61.09070967   31.75568796   54.27179483
+        O  61.55967329   30.86908388   55.02377025
+        O  61.60438955   32.21882441   53.22218501
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 12 iterations
+ORCA energy: -836.37381398144
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 66.273 seconds, 1.1 minutes.
+---------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 17 (print_atoms_list region)
+---------------------------------------------------
+        C  60.03253779   34.62997703   57.35053596
+        H  60.58906065   33.70218682   57.50045988
+        H  60.56787777   35.57733335   57.27971532
+        C  58.69638563   34.63770889   57.23668151
+        C  57.89187256   35.95191150   57.04157132
+        O  58.56514496   37.00763711   57.02902151
+        O  56.64661767   35.83677221   56.92315914
+        O  57.96488461   33.47695774   57.37636099
+        C  57.79482453   32.60091787   56.23641253
+        H  57.13936676   31.80946702   56.63720935
+        C  59.09593362   31.98827442   55.80522076
+        H  59.57252965   31.25083118   56.45669610
+        C  59.72568297   32.35717668   54.67120990
+        C  59.11299610   33.36467300   53.79906845
+        H  59.73565783   33.72387126   52.97674987
+        C  57.86141925   33.81659401   53.99541609
+        H  57.41746274   34.56289210   53.32837348
+        C  56.99556749   33.28181391   55.09961175
+        H  56.45240784   34.11617817   55.57607622
+        O  56.07442251   32.35191279   54.50204794
+        H  55.37472279   32.19904266   55.15346118
+        C  61.09341971   31.75911499   54.27396036
+        O  61.56718561   30.87929319   55.03136445
+        O  61.60475994   32.21972215   53.22210011
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 12 iterations
+ORCA energy: -836.373826516669
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 66.245 seconds, 1.1 minutes.
+---------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+geometric called clearCalcs option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 18 (print_atoms_list region)
+---------------------------------------------------
+        C  60.03269374   34.63000465   57.34800944
+        H  60.59063672   33.70309113   57.49807469
+        H  60.56628777   35.57831367   57.27649660
+        C  58.69633323   34.63581455   57.23671659
+        C  57.88996515   35.94890501   57.04510434
+        O  58.56220089   37.00541118   57.03012140
+        O  56.64432034   35.83293642   56.93212085
+        O  57.96704854   33.47342311   57.37705713
+        C  57.79471375   32.60007461   56.23573624
+        H  57.13676469   31.80936250   56.63423502
+        C  59.09549560   31.98688043   55.80345936
+        H  59.57580356   31.25362949   56.45710619
+        C  59.72491151   32.35534031   54.66901673
+        C  59.11193180   33.36227873   53.79641930
+        H  59.73353114   33.71952000   52.97244517
+        C  57.86225783   33.81817347   53.99568907
+        H  57.41870244   34.56544580   53.32942140
+        C  56.99626329   33.28427528   55.10008928
+        H  56.45418106   34.11853859   55.57790829
+        O  56.07310487   32.35687133   54.50168448
+        H  55.37470923   32.20257513   55.15418321
+        C  61.09461864   31.75946681   54.27444459
+        O  61.57056263   30.88298947   55.03490241
+        O  61.60570258   32.21893837   53.22204243
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 10 iterations
+ORCA energy: -836.373837026219
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 63.522 seconds, 1.1 minutes.
+---------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 19 (print_atoms_list region)
+---------------------------------------------------
+        C  60.03224853   34.63255042   57.34585297
+        H  60.59328772   33.70722177   57.49400566
+        H  60.56227098   35.58293878   57.27502540
+        C  58.69543736   34.63443174   57.23849081
+        C  57.88549730   35.94489854   57.05233623
+        O  58.55539940   37.00323653   57.03589398
+        O  56.63951991   35.82673675   56.94404238
+        O  57.97024526   33.46906335   57.37882276
+        C  57.79644241   32.59985128   56.23483341
+        H  57.13625866   31.80907797   56.62966656
+        C  59.09671643   31.98676507   55.80153713
+        H  59.58113998   31.25786733   56.45706301
+        C  59.72442131   32.35265519   54.66517386
+        C  59.11113665   33.35871744   53.79170518
+        H  59.73132823   33.71272599   52.96523894
+        C  57.86385352   33.81968198   53.99477219
+        H  57.42082270   34.56800553   53.32930832
+        C  56.99858378   33.28761620   55.10058030
+        H  56.45780659   34.12172974   55.57992484
+        O  56.07278000   32.36235857   54.50242114
+        H  55.37516918   32.20913014   55.15609511
+        C  61.09477938   31.75718769   54.27305774
+        O  61.57004439   30.88156857   55.03531317
+        O  61.60755134   32.21624349   53.22132311
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 12 iterations
+ORCA energy: -836.373848520306
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 66.164 seconds, 1.1 minutes.
+---------------------------------------------------------------
+geometric called save_guess_files option option for ASHengineclass.
+This option is currently unsupported in ASH. Continuing.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 20 (print_atoms_list region)
+---------------------------------------------------
+        C  60.03157544   34.63580673   57.34477151
+        H  60.59613191   33.71211307   57.48914634
+        H  60.55784103   35.58831634   57.27516525
+        C  58.69459271   34.63374066   57.24120991
+        C  57.88078666   35.94159799   57.05961548
+        O  58.54813705   37.00157023   57.04325165
+        O  56.63489263   35.82043465   56.95302574
+        O  57.97318306   33.46580613   57.38085533
+        C  57.79909650   32.60034936   56.23417011
+        H  57.13815438   31.80861416   56.62593387
+        C  59.09888667   31.98806392   55.80010031
+        H  59.58564067   31.26167049   56.45665471
+        C  59.72428777   32.35073194   54.66168809
+        C  59.11076226   33.35570545   53.78735669
+        H  59.72969515   33.70685311   52.95870198
+        C  57.86540952   33.82046014   53.99343206
+        H  57.42273140   34.56973813   53.32874113
+        C  57.00126876   33.29019538   55.10100554
+        H  56.46130027   34.12417127   55.58146756
+        O  56.07371001   32.36560722   54.50393490
+        H  55.37482378   32.21674389   55.15724522
+        C  61.09394344   31.75392380   54.27101868
+        O  61.56698425   30.87761479   55.03366522
+        O  61.60890568   32.21243120   53.22032692
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+ ORCA Calculation starting. 
+ ORCA Calculation done. 
+ORCA converged in 14 iterations
+ORCA energy: -836.373857087132
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 71.388 seconds, 1.2 minutes.
+---------------------------------------------------------------
+
+geomeTRIC Geometry optimization converged in 22 steps!
+
+Final optimized energy: -836.373857087132
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 24
+Formula: O6C10H8
+Label: CHHCCOOOCHCHCCHCHCHOHCOO
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Printing fragment to disk:  Fragment-optimized.ygg
+Wrote XYZ file:  Fragment-optimized.xyz
+Final geometry
+Cartesian coordinates (Å):
+ 0    C       60.031575    34.635807    57.344772
+ 1    H       60.596132    33.712113    57.489146
+ 2    H       60.557841    35.588316    57.275165
+ 3    C       58.694593    34.633741    57.241210
+ 4    C       57.880787    35.941598    57.059615
+ 5    O       58.548137    37.001570    57.043252
+ 6    O       56.634893    35.820435    56.953026
+ 7    O       57.973183    33.465806    57.380855
+ 8    C       57.799096    32.600349    56.234170
+ 9    H       57.138154    31.808614    56.625934
+ 10   C       59.098887    31.988064    55.800100
+ 11   H       59.585641    31.261670    56.456655
+ 12   C       59.724288    32.350732    54.661688
+ 13   C       59.110762    33.355705    53.787357
+ 14   H       59.729695    33.706853    52.958702
+ 15   C       57.865410    33.820460    53.993432
+ 16   H       57.422731    34.569738    53.328741
+ 17   C       57.001269    33.290195    55.101006
+ 18   H       56.461300    34.124171    55.581468
+ 19   O       56.073710    32.365607    54.503935
+ 20   H       55.374824    32.216744    55.157245
+ 21   C       61.093943    31.753924    54.271019
+ 22   O       61.566984    30.877615    55.033665
+ 23   O       61.608906    32.212431    53.220327
+
+
+==============================
+Internal Coordinates
+==============================
+Type       Atoms                Elements             Value
+------------------------------------------------------------
+Bond       (0, 1)               C-H                 1.0921 Å
+Angle      (1,0,2)              H-C-H               119.85°
+Angle      (1,0,3)              H-C-C               121.62°
+Angle      (2,0,3)              H-C-C               118.53°
+Bond       (0, 2)               C-H                 1.0904 Å
+Bond       (0, 3)               C-C                 1.3410 Å
+Dihedral   (1, 0, 3, 4)         H-C-C-C            -178.97°
+Dihedral   (1, 0, 3, 7)         H-C-C-O              -3.29°
+Dihedral   (2, 0, 3, 4)         H-C-C-C               1.44°
+Dihedral   (2, 0, 3, 7)         H-C-C-O             177.11°
+Angle      (0,3,4)              C-C-C               122.06°
+Angle      (0,3,7)              C-C-O               120.98°
+Angle      (4,3,7)              C-C-O               116.82°
+Bond       (3, 4)               C-C                 1.5510 Å
+Bond       (3, 7)               C-O                 1.3799 Å
+Dihedral   (0, 3, 4, 5)         C-C-C-O               1.41°
+Dihedral   (0, 3, 4, 6)         C-C-C-O            -178.94°
+Dihedral   (7, 3, 4, 5)         O-C-C-O            -174.44°
+Dihedral   (7, 3, 4, 6)         O-C-C-O               5.21°
+Dihedral   (0, 3, 7, 8)         C-C-O-C              84.66°
+Dihedral   (4, 3, 7, 8)         C-C-O-C             -99.45°
+Angle      (3,4,5)              C-C-O               115.82°
+Angle      (3,4,6)              C-C-O               116.68°
+Angle      (5,4,6)              O-C-O               127.51°
+Bond       (4, 5)               C-O                 1.2527 Å
+Bond       (4, 6)               C-O                 1.2563 Å
+Bond       (7, 8)               O-C                 1.4471 Å
+Angle      (8,7,3)              C-O-C               119.27°
+Dihedral   (3, 7, 8, 9)         C-O-C-H             176.15°
+Dihedral   (3, 7, 8, 10)        C-O-C-C             -66.98°
+Dihedral   (3, 7, 8, 17)        C-O-C-C              63.13°
+Bond       (8, 9)               C-H                 1.1033 Å
+Angle      (9,8,10)             H-C-C               109.19°
+Angle      (9,8,17)             H-C-C               105.72°
+Angle      (9,8,7)              H-C-O               102.70°
+Angle      (10,8,17)            C-C-C               114.61°
+Angle      (10,8,7)             C-C-O               111.65°
+Angle      (17,8,7)             C-C-O               112.06°
+Bond       (8, 10)              C-C                 1.5009 Å
+Bond       (8, 17)              C-C                 1.5481 Å
+Dihedral   (9, 8, 10, 11)       H-C-C-H              45.27°
+Dihedral   (9, 8, 10, 12)       H-C-C-C            -138.20°
+Dihedral   (17, 8, 10, 11)      C-C-C-H             163.63°
+Dihedral   (17, 8, 10, 12)      C-C-C-C             -19.84°
+Dihedral   (7, 8, 10, 11)       O-C-C-H             -67.60°
+Dihedral   (7, 8, 10, 12)       O-C-C-C             108.93°
+Dihedral   (9, 8, 17, 18)       H-C-C-H             -91.32°
+Dihedral   (9, 8, 17, 19)       H-C-C-O              28.25°
+Dihedral   (9, 8, 17, 15)       H-C-C-C             148.45°
+Dihedral   (10, 8, 17, 18)      C-C-C-H             148.38°
+Dihedral   (10, 8, 17, 19)      C-C-C-O             -92.05°
+Dihedral   (10, 8, 17, 15)      C-C-C-C              28.15°
+Dihedral   (7, 8, 17, 18)       O-C-C-H              19.81°
+Dihedral   (7, 8, 17, 19)       O-C-C-O             139.38°
+Dihedral   (7, 8, 17, 15)       O-C-C-C            -100.42°
+Angle      (8,10,11)            C-C-H               118.87°
+Angle      (8,10,12)            C-C-C               122.41°
+Angle      (11,10,12)           H-C-C               118.63°
+Bond       (10, 11)             C-H                 1.0935 Å
+Bond       (10, 12)             C-C                 1.3486 Å
+Dihedral   (8, 10, 12, 21)      C-C-C-C            -177.06°
+Dihedral   (8, 10, 12, 13)      C-C-C-C               1.50°
+Dihedral   (11, 10, 12, 21)     H-C-C-C              -0.53°
+Dihedral   (11, 10, 12, 13)     H-C-C-C             178.03°
+Angle      (10,12,21)           C-C-C               121.40°
+Angle      (10,12,13)           C-C-C               119.57°
+Angle      (21,12,13)           C-C-C               119.02°
+Bond       (12, 21)             C-C                 1.5443 Å
+Bond       (12, 13)             C-C                 1.4666 Å
+Dihedral   (10, 12, 21, 22)     C-C-C-O              -2.89°
+Dihedral   (10, 12, 21, 23)     C-C-C-O             176.82°
+Dihedral   (13, 12, 21, 22)     C-C-C-O             178.54°
+Dihedral   (13, 12, 21, 23)     C-C-C-O              -1.75°
+Dihedral   (10, 12, 13, 14)     C-C-C-H            -171.71°
+Dihedral   (10, 12, 13, 15)     C-C-C-C               8.10°
+Dihedral   (21, 12, 13, 14)     C-C-C-H               6.89°
+Dihedral   (21, 12, 13, 15)     C-C-C-C            -173.31°
+Angle      (12,13,14)           C-C-H               115.82°
+Angle      (12,13,15)           C-C-C               122.19°
+Angle      (14,13,15)           H-C-C               121.99°
+Bond       (13, 14)             C-H                 1.0923 Å
+Bond       (13, 15)             C-C                 1.3451 Å
+Dihedral   (12, 13, 15, 16)     C-C-C-H             179.88°
+Dihedral   (12, 13, 15, 17)     C-C-C-C               2.80°
+Dihedral   (14, 13, 15, 16)     H-C-C-H              -0.33°
+Dihedral   (14, 13, 15, 17)     H-C-C-C            -177.41°
+Bond       (15, 16)             C-H                 1.0951 Å
+Angle      (16,15,17)           H-C-C               117.18°
+Angle      (16,15,13)           H-C-C               121.18°
+Angle      (17,15,13)           C-C-C               121.59°
+Bond       (15, 17)             C-C                 1.5015 Å
+Dihedral   (16, 15, 17, 8)      H-C-C-C             161.85°
+Dihedral   (16, 15, 17, 18)     H-C-C-H              43.88°
+Dihedral   (16, 15, 17, 19)     H-C-C-O             -75.99°
+Dihedral   (13, 15, 17, 8)      C-C-C-C             -20.95°
+Dihedral   (13, 15, 17, 18)     C-C-C-H            -138.93°
+Dihedral   (13, 15, 17, 19)     C-C-C-O             101.20°
+Angle      (8,17,18)            C-C-H               105.68°
+Angle      (8,17,19)            C-C-O               110.46°
+Angle      (8,17,15)            C-C-C               113.62°
+Angle      (18,17,19)           H-C-O               110.53°
+Angle      (18,17,15)           H-C-C               109.62°
+Angle      (19,17,15)           O-C-C               106.96°
+Bond       (17, 18)             C-H                 1.1036 Å
+Bond       (17, 19)             C-O                 1.4393 Å
+Dihedral   (8, 17, 19, 20)      C-C-O-H             -71.19°
+Dihedral   (18, 17, 19, 20)     H-C-O-H              45.41°
+Dihedral   (15, 17, 19, 20)     C-C-O-H             164.69°
+Angle      (17,19,20)           C-O-H               106.50°
+Bond       (19, 20)             O-H                 0.9682 Å
+Angle      (12,21,22)           C-C-O               116.79°
+Angle      (12,21,23)           C-C-O               115.72°
+Angle      (22,21,23)           O-C-O               127.49°
+Bond       (21, 22)             C-O                 1.2543 Å
+Bond       (21, 23)             C-O                 1.2567 Å
+------------------------------------------------------------
+
+
+Writing to disk defined attributes of ASH_Results dataclass
+Results object data:
+label : Optimizer
+energy : -836.373857087132
+
+-------------------------------------------------------------------
+Time to calculate step (geomeTRIC): 1512.304 seconds, 25.2 minutes.
+-------------------------------------------------------------------
+Wrote XYZ file:  bare_control_relaxed.xyz
+>> DONE -> bare_control_relaxed.xyz
+
+
+--------------------------------------------------------------------------------
+                          Total timings of all modules                          
+--------------------------------------------------------------------------------
+
+To turn off timing output add to settings file: ~/ash_user_settings.ini
+print_full_timings = False   
+
+Modulename                                   Time (sec) Percentage of total     Times called
+----------------------------------------------------------------------------------------------------
+Jobtype modules
+------------------------------
+geomeTRIC                                       1512.30     100.0                   1
+
+Theory-run modules
+------------------------------
+Time spent before run_optimizer                    3.10       0.2                   1
+ORCA run                                        1506.21      99.6                  23
+
+
+Sum of all moduletimes (flawed)                 3021.61
+Total walltime                                  1512.63     100.0
+
+ ------------------------------------------------------------------- 
+ ASH Total Walltime: 1512.6 seconds, 25.2 minutes. 
+ ------------------------------------------------------------------- 

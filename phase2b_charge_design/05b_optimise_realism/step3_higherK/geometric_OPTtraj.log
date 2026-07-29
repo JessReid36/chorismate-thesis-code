@@ -1,0 +1,341 @@
+geometric-optimize called with the following command line:
+relax_higherK.py K10_aforce run
+
+                                        [91m())))))))))))))))/[0m                     
+                                    [91m())))))))))))))))))))))))),[0m                
+                                [91m*)))))))))))))))))))))))))))))))))[0m             
+                        [94m#,[0m    [91m()))))))))/[0m                [91m.)))))))))),[0m          
+                      [94m#%%%%,[0m  [91m())))))[0m                        [91m.))))))))*[0m        
+                      [94m*%%%%%%,[0m  [91m))[0m              [93m..[0m              [91m,))))))).[0m      
+                        [94m*%%%%%%,[0m         [93m***************/.[0m        [91m.)))))))[0m     
+                [94m#%%/[0m      [94m(%%%%%%,[0m    [93m/*********************.[0m       [91m)))))))[0m    
+              [94m.%%%%%%#[0m      [94m*%%%%%%,[0m  [93m*******/,[0m     [93m**********,[0m      [91m.))))))[0m   
+                [94m.%%%%%%/[0m      [94m*%%%%%%,[0m  [93m**[0m              [93m********[0m      [91m.))))))[0m  
+          [94m##[0m      [94m.%%%%%%/[0m      [94m(%%%%%%,[0m                  [93m,******[0m      [91m/)))))[0m  
+        [94m%%%%%%[0m      [94m.%%%%%%#[0m      [94m*%%%%%%,[0m    [92m,/////.[0m       [93m******[0m      [91m))))))[0m 
+      [94m#%[0m      [94m%%[0m      [94m.%%%%%%/[0m      [94m*%%%%%%,[0m  [92m////////,[0m      [93m*****/[0m     [91m,)))))[0m 
+    [94m#%%[0m  [94m%%%[0m  [94m%%%#[0m      [94m.%%%%%%/[0m      [94m(%%%%%%,[0m  [92m///////.[0m     [93m/*****[0m      [91m))))).[0m
+  [94m#%%%%.[0m      [94m%%%%%#[0m      [94m/%%%%%%*[0m      [94m#%%%%%%[0m   [92m/////)[0m     [93m******[0m      [91m))))),[0m
+    [94m#%%%%##%[0m  [94m%%%#[0m      [94m.%%%%%%/[0m      [94m(%%%%%%,[0m  [92m///////.[0m     [93m/*****[0m      [91m))))).[0m
+      [94m##[0m     [94m%%%[0m      [94m.%%%%%%/[0m      [94m*%%%%%%,[0m  [92m////////.[0m      [93m*****/[0m     [91m,)))))[0m 
+        [94m#%%%%#[0m      [94m/%%%%%%/[0m      [94m(%%%%%%[0m      [92m/)/)//[0m       [93m******[0m      [91m))))))[0m 
+          [94m##[0m      [94m.%%%%%%/[0m      [94m(%%%%%%,[0m                  [93m*******[0m      [91m))))))[0m  
+                [94m.%%%%%%/[0m      [94m*%%%%%%,[0m  [93m**.[0m             [93m/*******[0m      [91m.))))))[0m  
+              [94m*%%%%%%/[0m      [94m(%%%%%%[0m   [93m********/*..,*/*********[0m       [91m*))))))[0m   
+                [94m#%%/[0m      [94m(%%%%%%,[0m    [93m*********************/[0m        [91m)))))))[0m    
+                        [94m*%%%%%%,[0m         [93m,**************/[0m         [91m,))))))/[0m     
+                      [94m(%%%%%%[0m   [91m()[0m                              [91m))))))))[0m       
+                      [94m#%%%%,[0m  [91m())))))[0m                        [91m,)))))))),[0m        
+                        [94m#,[0m    [91m())))))))))[0m                [91m,)))))))))).[0m          
+                                 [91m()))))))))))))))))))))))))))))))/[0m             
+                                    [91m())))))))))))))))))))))))).[0m                
+                                         [91m())))))))))))))),[0m                     
+
+-=# [1;94m geomeTRIC started. Version: 1.1.1 [0m #=-
+Current date and time: 2026-07-28 08:59:17
+#========================================================#
+#| [92m    Arguments passed to driver run_optimizer():     [0m |#
+#========================================================#
+bothre                    0.0 
+constraints               constraints.txt 
+convergence_cmax          0.01 
+convergence_dmax          0.015 
+convergence_drms          0.01 
+convergence_energy        1e-05 
+convergence_gmax          0.006 
+convergence_grms          0.003 
+coordsys                  hdlc 
+customengine              <ash.interfaces.interface_geometric_new.ASHengineclass object at 0x146f639805d0> 
+input                     dummyinputname 
+irc                       False 
+logIni                    /home/18660916/envs/ash/lib/python3.11/site-packages/ash/log.ini 
+maxiter                   400 
+prefix                    geometric_OPTtraj 
+rigid                     False 
+subfrctor                 1 
+transition                False 
+verbose                   0 
+----------------------------------------------------------
+Custom engine selected.
+$freeze
+xyz 25
+xyz 26
+xyz 27
+xyz 28
+xyz 29
+xyz 30
+xyz 31
+xyz 32
+xyz 33
+xyz 34
+xyz 35
+xyz 36
+xyz 37
+xyz 38
+xyz 39
+xyz 40
+xyz 41
+xyz 42
+xyz 43
+xyz 44
+xyz 45
+xyz 46
+xyz 47
+xyz 48
+xyz 49
+xyz 50
+xyz 51
+xyz 52
+xyz 53
+xyz 54
+xyz 55
+xyz 56
+xyz 57
+xyz 58
+xyz 59
+xyz 60
+xyz 61
+xyz 62
+xyz 63
+xyz 64
+xyz 65
+xyz 66
+xyz 67
+xyz 68
+xyz 69
+xyz 70
+xyz 71
+xyz 72
+xyz 73
+xyz 74
+xyz 75
+xyz 76
+xyz 77
+xyz 78
+xyz 79
+xyz 80
+xyz 81
+xyz 82
+xyz 83
+xyz 84
+xyz 85
+xyz 86
+xyz 87
+xyz 88
+Bonds will be generated from interatomic distances less than 1.20 times sum of covalent radii
+264 internal coordinates being used (instead of 264 Cartesians)
+<class 'geometric.internal.CartesianX'> : 88
+<class 'geometric.internal.CartesianY'> : 88
+<class 'geometric.internal.CartesianZ'> : 88
+<class 'geometric.internal.Distance'> : 114
+<class 'geometric.internal.Angle'> : 134
+<class 'geometric.internal.OutOfPlane'> : 386
+<class 'geometric.internal.Dihedral'> : 665
+Constraint                         Current      Target       Diff.
+Cartesian-X 25                    61.34690    61.34690     0.00000
+Cartesian-Y 25                    37.08200    37.08200     0.00000
+Cartesian-Z 25                    59.61740    59.61740     0.00000
+Cartesian-X 26                    61.49748    61.49748     0.00000
+Cartesian-Y 26                    37.46722    37.46722     0.00000
+Cartesian-Z 26                    58.35335    58.35335     0.00000
+Cartesian-X 27                    61.18696    61.18696     0.00000
+Cartesian-Y 27                    38.12972    38.12972     0.00000
+Cartesian-Z 27                    59.04960    59.04960     0.00000
+Cartesian-X 28                    61.69365    61.69365     0.00000
+Cartesian-Y 28                    36.51218    36.51218     0.00000
+Cartesian-Z 28                    58.61701    58.61701     0.00000
+Cartesian-X 29                    60.93800    60.93800     0.00000
+Cartesian-Y 29                    37.95440    37.95440     0.00000
+Cartesian-Z 29                    60.53425    60.53425     0.00000
+Cartesian-X 30                    61.13417    61.13417     0.00000
+Cartesian-Y 30                    36.99937    36.99937     0.00000
+Cartesian-Z 30                    60.79792    60.79792     0.00000
+Cartesian-X 31                    61.05235    61.05235     0.00000
+Cartesian-Y 31                    38.24694    38.24694     0.00000
+Cartesian-Z 31                    59.57433    59.57433     0.00000
+Cartesian-X 32                    61.60522    61.60522     0.00000
+Cartesian-Y 32                    35.82438    35.82438     0.00000
+Cartesian-Z 32                    59.96460    59.96460     0.00000
+Cartesian-X 33                    61.71957    61.71957     0.00000
+Cartesian-Y 33                    36.11691    36.11691     0.00000
+Cartesian-Z 33                    59.00468    59.00468     0.00000
+Cartesian-X 34                    61.29470    61.29470     0.00000
+Cartesian-Y 34                    36.48688    36.48688     0.00000
+Cartesian-Z 34                    60.66086    60.66086     0.00000
+Cartesian-X 35                    54.33450    54.33450     0.00000
+Cartesian-Y 35                    28.69850    28.69850     0.00000
+Cartesian-Z 35                    60.13480    60.13480     0.00000
+Cartesian-X 36                    54.48508    54.48508     0.00000
+Cartesian-Y 36                    29.08372    29.08372     0.00000
+Cartesian-Z 36                    58.87075    58.87075     0.00000
+Cartesian-X 37                    54.17456    54.17456     0.00000
+Cartesian-Y 37                    29.74622    29.74622     0.00000
+Cartesian-Z 37                    59.56700    59.56700     0.00000
+Cartesian-X 38                    54.68125    54.68125     0.00000
+Cartesian-Y 38                    28.12868    28.12868     0.00000
+Cartesian-Z 38                    59.13441    59.13441     0.00000
+Cartesian-X 39                    53.92560    53.92560     0.00000
+Cartesian-Y 39                    29.57090    29.57090     0.00000
+Cartesian-Z 39                    61.05165    61.05165     0.00000
+Cartesian-X 40                    54.12177    54.12177     0.00000
+Cartesian-Y 40                    28.61587    28.61587     0.00000
+Cartesian-Z 40                    61.31532    61.31532     0.00000
+Cartesian-X 41                    54.03995    54.03995     0.00000
+Cartesian-Y 41                    29.86344    29.86344     0.00000
+Cartesian-Z 41                    60.09173    60.09173     0.00000
+Cartesian-X 42                    54.59282    54.59282     0.00000
+Cartesian-Y 42                    27.44088    27.44088     0.00000
+Cartesian-Z 42                    60.48200    60.48200     0.00000
+Cartesian-X 43                    54.70717    54.70717     0.00000
+Cartesian-Y 43                    27.73341    27.73341     0.00000
+Cartesian-Z 43                    59.52208    59.52208     0.00000
+Cartesian-X 44                    54.28230    54.28230     0.00000
+Cartesian-Y 44                    28.10338    28.10338     0.00000
+Cartesian-Z 44                    61.17826    61.17826     0.00000
+Cartesian-X 45                    57.80540    57.80540     0.00000
+Cartesian-Y 45                    32.04890    32.04890     0.00000
+Cartesian-Z 45                    50.67380    50.67380     0.00000
+Cartesian-X 46                    58.98922    58.98922     0.00000
+Cartesian-Y 46                    32.11068    32.11068     0.00000
+Cartesian-Z 46                    50.27726    50.27726     0.00000
+Cartesian-X 47                    57.09412    57.09412     0.00000
+Cartesian-Y 47                    31.02152    31.02152     0.00000
+Cartesian-Z 47                    50.70636    50.70636     0.00000
+Cartesian-X 48                    57.34742    57.34742     0.00000
+Cartesian-Y 48                    32.98475    32.98475     0.00000
+Cartesian-Z 48                    51.02656    51.02656     0.00000
+Cartesian-X 49                    62.96580    62.96580     0.00000
+Cartesian-Y 49                    34.02300    34.02300     0.00000
+Cartesian-Z 49                    50.77250    50.77250     0.00000
+Cartesian-X 50                    64.14963    64.14963     0.00000
+Cartesian-Y 50                    34.08478    34.08478     0.00000
+Cartesian-Z 50                    50.37596    50.37596     0.00000
+Cartesian-X 51                    62.25452    62.25452     0.00000
+Cartesian-Y 51                    32.99562    32.99562     0.00000
+Cartesian-Z 51                    50.80506    50.80506     0.00000
+Cartesian-X 52                    62.50782    62.50782     0.00000
+Cartesian-Y 52                    34.95885    34.95885     0.00000
+Cartesian-Z 52                    51.12526    51.12526     0.00000
+Cartesian-X 53                    65.74010    65.74010     0.00000
+Cartesian-Y 53                    30.15960    30.15960     0.00000
+Cartesian-Z 53                    50.34760    50.34760     0.00000
+Cartesian-X 54                    66.92392    66.92392     0.00000
+Cartesian-Y 54                    30.22138    30.22138     0.00000
+Cartesian-Z 54                    49.95106    49.95106     0.00000
+Cartesian-X 55                    65.02882    65.02882     0.00000
+Cartesian-Y 55                    29.13222    29.13222     0.00000
+Cartesian-Z 55                    50.38016    50.38016     0.00000
+Cartesian-X 56                    65.28212    65.28212     0.00000
+Cartesian-Y 56                    31.09545    31.09545     0.00000
+Cartesian-Z 56                    50.70036    50.70036     0.00000
+Cartesian-X 57                    62.38720    62.38720     0.00000
+Cartesian-Y 57                    28.69680    28.69680     0.00000
+Cartesian-Z 57                    53.61720    53.61720     0.00000
+Cartesian-X 58                    63.57102    63.57102     0.00000
+Cartesian-Y 58                    28.75858    28.75858     0.00000
+Cartesian-Z 58                    53.22066    53.22066     0.00000
+Cartesian-X 59                    61.67592    61.67592     0.00000
+Cartesian-Y 59                    27.66942    27.66942     0.00000
+Cartesian-Z 59                    53.64976    53.64976     0.00000
+Cartesian-X 60                    61.92922    61.92922     0.00000
+Cartesian-Y 60                    29.63265    29.63265     0.00000
+Cartesian-Z 60                    53.96996    53.96996     0.00000
+Cartesian-X 61                    55.33790    55.33790     0.00000
+Cartesian-Y 61                    33.73470    33.73470     0.00000
+Cartesian-Z 61                    59.83180    59.83180     0.00000
+Cartesian-X 62                    55.48848    55.48848     0.00000
+Cartesian-Y 62                    34.11992    34.11992     0.00000
+Cartesian-Z 62                    58.56775    58.56775     0.00000
+Cartesian-X 63                    55.17796    55.17796     0.00000
+Cartesian-Y 63                    34.78242    34.78242     0.00000
+Cartesian-Z 63                    59.26400    59.26400     0.00000
+Cartesian-X 64                    55.68465    55.68465     0.00000
+Cartesian-Y 64                    33.16488    33.16488     0.00000
+Cartesian-Z 64                    58.83141    58.83141     0.00000
+Cartesian-X 65                    54.92900    54.92900     0.00000
+Cartesian-Y 65                    34.60710    34.60710     0.00000
+Cartesian-Z 65                    60.74865    60.74865     0.00000
+Cartesian-X 66                    55.12517    55.12517     0.00000
+Cartesian-Y 66                    33.65207    33.65207     0.00000
+Cartesian-Z 66                    61.01232    61.01232     0.00000
+Cartesian-X 67                    55.04335    55.04335     0.00000
+Cartesian-Y 67                    34.89964    34.89964     0.00000
+Cartesian-Z 67                    59.78873    59.78873     0.00000
+Cartesian-X 68                    55.59622    55.59622     0.00000
+Cartesian-Y 68                    32.47708    32.47708     0.00000
+Cartesian-Z 68                    60.17900    60.17900     0.00000
+Cartesian-X 69                    55.71057    55.71057     0.00000
+Cartesian-Y 69                    32.76961    32.76961     0.00000
+Cartesian-Z 69                    59.21908    59.21908     0.00000
+Cartesian-X 70                    55.28570    55.28570     0.00000
+Cartesian-Y 70                    33.13958    33.13958     0.00000
+Cartesian-Z 70                    60.87526    60.87526     0.00000
+Cartesian-X 71                    59.64430    59.64430     0.00000
+Cartesian-Y 71                    31.49730    31.49730     0.00000
+Cartesian-Z 71                    60.26190    60.26190     0.00000
+Cartesian-X 72                    59.79488    59.79488     0.00000
+Cartesian-Y 72                    31.88252    31.88252     0.00000
+Cartesian-Z 72                    58.99785    58.99785     0.00000
+Cartesian-X 73                    59.48436    59.48436     0.00000
+Cartesian-Y 73                    32.54502    32.54502     0.00000
+Cartesian-Z 73                    59.69410    59.69410     0.00000
+Cartesian-X 74                    59.99105    59.99105     0.00000
+Cartesian-Y 74                    30.92748    30.92748     0.00000
+Cartesian-Z 74                    59.26151    59.26151     0.00000
+Cartesian-X 75                    59.23540    59.23540     0.00000
+Cartesian-Y 75                    32.36970    32.36970     0.00000
+Cartesian-Z 75                    61.17875    61.17875     0.00000
+Cartesian-X 76                    59.43157    59.43157     0.00000
+Cartesian-Y 76                    31.41467    31.41467     0.00000
+Cartesian-Z 76                    61.44242    61.44242     0.00000
+Cartesian-X 77                    59.34975    59.34975     0.00000
+Cartesian-Y 77                    32.66224    32.66224     0.00000
+Cartesian-Z 77                    60.21883    60.21883     0.00000
+Cartesian-X 78                    59.90262    59.90262     0.00000
+Cartesian-Y 78                    30.23968    30.23968     0.00000
+Cartesian-Z 78                    60.60910    60.60910     0.00000
+Cartesian-X 79                    60.01697    60.01697     0.00000
+Cartesian-Y 79                    30.53221    30.53221     0.00000
+Cartesian-Z 79                    59.64918    59.64918     0.00000
+Cartesian-X 80                    59.59210    59.59210     0.00000
+Cartesian-Y 80                    30.90218    30.90218     0.00000
+Cartesian-Z 80                    61.30536    61.30536     0.00000
+Cartesian-X 81                    64.95880    64.95880     0.00000
+Cartesian-Y 81                    33.22390    33.22390     0.00000
+Cartesian-Z 81                    55.78220    55.78220     0.00000
+Cartesian-X 82                    66.14262    66.14262     0.00000
+Cartesian-Y 82                    33.28568    33.28568     0.00000
+Cartesian-Z 82                    55.38566    55.38566     0.00000
+Cartesian-X 83                    64.24752    64.24752     0.00000
+Cartesian-Y 83                    32.19652    32.19652     0.00000
+Cartesian-Z 83                    55.81476    55.81476     0.00000
+Cartesian-X 84                    64.50082    64.50082     0.00000
+Cartesian-Y 84                    34.15975    34.15975     0.00000
+Cartesian-Z 84                    56.13496    56.13496     0.00000
+Cartesian-X 85                    60.80950    60.80950     0.00000
+Cartesian-Y 85                    28.66820    28.66820     0.00000
+Cartesian-Z 85                    49.10060    49.10060     0.00000
+Cartesian-X 86                    61.99332    61.99332     0.00000
+Cartesian-Y 86                    28.72998    28.72998     0.00000
+Cartesian-Z 86                    48.70406    48.70406     0.00000
+Cartesian-X 87                    60.09822    60.09822     0.00000
+Cartesian-Y 87                    27.64082    27.64082     0.00000
+Cartesian-Z 87                    49.13316    49.13316     0.00000
+Cartesian-X 88                    60.35152    60.35152     0.00000
+Cartesian-Y 88                    29.60405    29.60405     0.00000
+Cartesian-Z 88                    49.45336    49.45336     0.00000
+> ===== Optimization Info: ====
+> Job type: Energy minimization
+> Maximum number of optimization cycles: 400
+> Initial / maximum trust radius (Angstrom): 0.100 / 0.300
+> Convergence Criteria:
+> Will converge when all 5 criteria are reached:
+>  |Delta-E| < 1.00e-05
+>  RMS-Ortho-Grad < 3.00e-03
+>  Max-Ortho-Grad < 6.00e-03
+>  RMS-Disp  < 1.00e-02
+>  Max-Disp  < 1.50e-02
+> 
+> Constraints are requested. The following criterion is added:
+>  Max Constraint Violation (in Angstroms/degrees) < 1.00e-02 
+> === End Optimization Info ===

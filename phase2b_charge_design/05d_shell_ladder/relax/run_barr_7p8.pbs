@@ -1,0 +1,15 @@
+#!/bin/bash
+#PBS -N barr_7p8
+#PBS -l select=1:ncpus=8:mem=32gb
+#PBS -l walltime=48:00:00
+#PBS -M 18660916@sun.ac.za -m ae
+#PBS -o barr_7p8.stdout
+#PBS -e barr_7p8.stderr
+cd $PBS_O_WORKDIR
+source /apps/mambaforge/etc/profile.d/conda.sh
+conda activate $HOME/envs/ash
+export PYTHONNOUSERSITE=1
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1
+export PATH=/apps/openmpi/4.1.1/bin:$PATH
+export LD_LIBRARY_PATH=/home/apps2/ORCA/6.0.1/lib:/apps/openmpi/4.1.1/lib:/apps/mambaforge/envs/medaka/lib:$LD_LIBRARY_PATH
+python3 relax_barrier.py shell7p8ts run > barr_7p8_relax.log 2>&1

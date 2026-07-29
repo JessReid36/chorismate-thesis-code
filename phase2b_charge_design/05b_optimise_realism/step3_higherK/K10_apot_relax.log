@@ -1,0 +1,1055 @@
+geometric-optimize called with the following command line:
+relax_higherK.py K10_apot run
+
+                                        [91m())))))))))))))))/[0m                     
+                                    [91m())))))))))))))))))))))))),[0m                
+                                [91m*)))))))))))))))))))))))))))))))))[0m             
+                        [94m#,[0m    [91m()))))))))/[0m                [91m.)))))))))),[0m          
+                      [94m#%%%%,[0m  [91m())))))[0m                        [91m.))))))))*[0m        
+                      [94m*%%%%%%,[0m  [91m))[0m              [93m..[0m              [91m,))))))).[0m      
+                        [94m*%%%%%%,[0m         [93m***************/.[0m        [91m.)))))))[0m     
+                [94m#%%/[0m      [94m(%%%%%%,[0m    [93m/*********************.[0m       [91m)))))))[0m    
+              [94m.%%%%%%#[0m      [94m*%%%%%%,[0m  [93m*******/,[0m     [93m**********,[0m      [91m.))))))[0m   
+                [94m.%%%%%%/[0m      [94m*%%%%%%,[0m  [93m**[0m              [93m********[0m      [91m.))))))[0m  
+          [94m##[0m      [94m.%%%%%%/[0m      [94m(%%%%%%,[0m                  [93m,******[0m      [91m/)))))[0m  
+        [94m%%%%%%[0m      [94m.%%%%%%#[0m      [94m*%%%%%%,[0m    [92m,/////.[0m       [93m******[0m      [91m))))))[0m 
+      [94m#%[0m      [94m%%[0m      [94m.%%%%%%/[0m      [94m*%%%%%%,[0m  [92m////////,[0m      [93m*****/[0m     [91m,)))))[0m 
+    [94m#%%[0m  [94m%%%[0m  [94m%%%#[0m      [94m.%%%%%%/[0m      [94m(%%%%%%,[0m  [92m///////.[0m     [93m/*****[0m      [91m))))).[0m
+  [94m#%%%%.[0m      [94m%%%%%#[0m      [94m/%%%%%%*[0m      [94m#%%%%%%[0m   [92m/////)[0m     [93m******[0m      [91m))))),[0m
+    [94m#%%%%##%[0m  [94m%%%#[0m      [94m.%%%%%%/[0m      [94m(%%%%%%,[0m  [92m///////.[0m     [93m/*****[0m      [91m))))).[0m
+      [94m##[0m     [94m%%%[0m      [94m.%%%%%%/[0m      [94m*%%%%%%,[0m  [92m////////.[0m      [93m*****/[0m     [91m,)))))[0m 
+        [94m#%%%%#[0m      [94m/%%%%%%/[0m      [94m(%%%%%%[0m      [92m/)/)//[0m       [93m******[0m      [91m))))))[0m 
+          [94m##[0m      [94m.%%%%%%/[0m      [94m(%%%%%%,[0m                  [93m*******[0m      [91m))))))[0m  
+                [94m.%%%%%%/[0m      [94m*%%%%%%,[0m  [93m**.[0m             [93m/*******[0m      [91m.))))))[0m  
+              [94m*%%%%%%/[0m      [94m(%%%%%%[0m   [93m********/*..,*/*********[0m       [91m*))))))[0m   
+                [94m#%%/[0m      [94m(%%%%%%,[0m    [93m*********************/[0m        [91m)))))))[0m    
+                        [94m*%%%%%%,[0m         [93m,**************/[0m         [91m,))))))/[0m     
+                      [94m(%%%%%%[0m   [91m()[0m                              [91m))))))))[0m       
+                      [94m#%%%%,[0m  [91m())))))[0m                        [91m,)))))))),[0m        
+                        [94m#,[0m    [91m())))))))))[0m                [91m,)))))))))).[0m          
+                                 [91m()))))))))))))))))))))))))))))))/[0m             
+                                    [91m())))))))))))))))))))))))).[0m                
+                                         [91m())))))))))))))),[0m                     
+
+-=# [1;94m geomeTRIC started. Version: 1.1.1 [0m #=-
+Current date and time: 2026-07-28 08:59:12
+#========================================================#
+#| [92m    Arguments passed to driver run_optimizer():     [0m |#
+#========================================================#
+bothre                    0.0 
+constraints               constraints.txt 
+convergence_cmax          0.01 
+convergence_dmax          0.015 
+convergence_drms          0.01 
+convergence_energy        1e-05 
+convergence_gmax          0.006 
+convergence_grms          0.003 
+coordsys                  hdlc 
+customengine              <ash.interfaces.interface_geometric_new.ASHengineclass object at 0x1500bc904310> 
+input                     dummyinputname 
+irc                       False 
+logIni                    /home/18660916/envs/ash/lib/python3.11/site-packages/ash/log.ini 
+maxiter                   400 
+prefix                    geometric_OPTtraj 
+rigid                     False 
+subfrctor                 1 
+transition                False 
+verbose                   0 
+----------------------------------------------------------
+Custom engine selected.
+$freeze
+xyz 25
+xyz 26
+xyz 27
+xyz 28
+xyz 29
+xyz 30
+xyz 31
+xyz 32
+xyz 33
+xyz 34
+xyz 35
+xyz 36
+xyz 37
+xyz 38
+xyz 39
+xyz 40
+xyz 41
+xyz 42
+xyz 43
+xyz 44
+xyz 45
+xyz 46
+xyz 47
+xyz 48
+xyz 49
+xyz 50
+xyz 51
+xyz 52
+xyz 53
+xyz 54
+xyz 55
+xyz 56
+xyz 57
+xyz 58
+xyz 59
+xyz 60
+xyz 61
+xyz 62
+xyz 63
+xyz 64
+xyz 65
+xyz 66
+xyz 67
+xyz 68
+xyz 69
+xyz 70
+xyz 71
+xyz 72
+xyz 73
+xyz 74
+xyz 75
+xyz 76
+xyz 77
+xyz 78
+xyz 79
+xyz 80
+xyz 81
+xyz 82
+xyz 83
+xyz 84
+xyz 85
+xyz 86
+xyz 87
+xyz 88
+xyz 89
+xyz 90
+xyz 91
+xyz 92
+xyz 93
+xyz 94
+xyz 95
+xyz 96
+xyz 97
+xyz 98
+xyz 99
+xyz 100
+Bonds will be generated from interatomic distances less than 1.20 times sum of covalent radii
+300 internal coordinates being used (instead of 300 Cartesians)
+<class 'geometric.internal.CartesianX'> : 100
+<class 'geometric.internal.CartesianY'> : 100
+<class 'geometric.internal.CartesianZ'> : 100
+<class 'geometric.internal.Distance'> : 144
+<class 'geometric.internal.Angle'> : 176
+<class 'geometric.internal.OutOfPlane'> : 570
+<class 'geometric.internal.Dihedral'> : 971
+Constraint                         Current      Target       Diff.
+Cartesian-X 25                    63.81050    63.81050     0.00000
+Cartesian-Y 25                    29.09560    29.09560     0.00000
+Cartesian-Z 25                    54.34790    54.34790     0.00000
+Cartesian-X 26                    64.99433    64.99433     0.00000
+Cartesian-Y 26                    29.15738    29.15738     0.00000
+Cartesian-Z 26                    53.95136    53.95136     0.00000
+Cartesian-X 27                    63.09922    63.09922     0.00000
+Cartesian-Y 27                    28.06822    28.06822     0.00000
+Cartesian-Z 27                    54.38046    54.38046     0.00000
+Cartesian-X 28                    63.35252    63.35252     0.00000
+Cartesian-Y 28                    30.03145    30.03145     0.00000
+Cartesian-Z 28                    54.70066    54.70066     0.00000
+Cartesian-X 29                    62.71590    62.71590     0.00000
+Cartesian-Y 29                    31.47760    31.47760     0.00000
+Cartesian-Z 29                    50.09950    50.09950     0.00000
+Cartesian-X 30                    63.89972    63.89972     0.00000
+Cartesian-Y 30                    31.53938    31.53938     0.00000
+Cartesian-Z 30                    49.70296    49.70296     0.00000
+Cartesian-X 31                    62.00462    62.00462     0.00000
+Cartesian-Y 31                    30.45022    30.45022     0.00000
+Cartesian-Z 31                    50.13206    50.13206     0.00000
+Cartesian-X 32                    62.25792    62.25792     0.00000
+Cartesian-Y 32                    32.41345    32.41345     0.00000
+Cartesian-Z 32                    50.45226    50.45226     0.00000
+Cartesian-X 33                    54.33450    54.33450     0.00000
+Cartesian-Y 33                    28.69850    28.69850     0.00000
+Cartesian-Z 33                    60.13480    60.13480     0.00000
+Cartesian-X 34                    54.48508    54.48508     0.00000
+Cartesian-Y 34                    29.08372    29.08372     0.00000
+Cartesian-Z 34                    58.87075    58.87075     0.00000
+Cartesian-X 35                    54.17456    54.17456     0.00000
+Cartesian-Y 35                    29.74622    29.74622     0.00000
+Cartesian-Z 35                    59.56700    59.56700     0.00000
+Cartesian-X 36                    54.68125    54.68125     0.00000
+Cartesian-Y 36                    28.12868    28.12868     0.00000
+Cartesian-Z 36                    59.13441    59.13441     0.00000
+Cartesian-X 37                    53.92560    53.92560     0.00000
+Cartesian-Y 37                    29.57090    29.57090     0.00000
+Cartesian-Z 37                    61.05165    61.05165     0.00000
+Cartesian-X 38                    54.12177    54.12177     0.00000
+Cartesian-Y 38                    28.61587    28.61587     0.00000
+Cartesian-Z 38                    61.31532    61.31532     0.00000
+Cartesian-X 39                    54.03995    54.03995     0.00000
+Cartesian-Y 39                    29.86344    29.86344     0.00000
+Cartesian-Z 39                    60.09173    60.09173     0.00000
+Cartesian-X 40                    54.59282    54.59282     0.00000
+Cartesian-Y 40                    27.44088    27.44088     0.00000
+Cartesian-Z 40                    60.48200    60.48200     0.00000
+Cartesian-X 41                    54.70717    54.70717     0.00000
+Cartesian-Y 41                    27.73341    27.73341     0.00000
+Cartesian-Z 41                    59.52208    59.52208     0.00000
+Cartesian-X 42                    54.28230    54.28230     0.00000
+Cartesian-Y 42                    28.10338    28.10338     0.00000
+Cartesian-Z 42                    61.17826    61.17826     0.00000
+Cartesian-X 43                    53.18540    53.18540     0.00000
+Cartesian-Y 43                    33.55520    33.55520     0.00000
+Cartesian-Z 43                    52.03810    52.03810     0.00000
+Cartesian-X 44                    53.33598    53.33598     0.00000
+Cartesian-Y 44                    33.94042    33.94042     0.00000
+Cartesian-Z 44                    50.77405    50.77405     0.00000
+Cartesian-X 45                    53.02546    53.02546     0.00000
+Cartesian-Y 45                    34.60292    34.60292     0.00000
+Cartesian-Z 45                    51.47030    51.47030     0.00000
+Cartesian-X 46                    53.53215    53.53215     0.00000
+Cartesian-Y 46                    32.98538    32.98538     0.00000
+Cartesian-Z 46                    51.03771    51.03771     0.00000
+Cartesian-X 47                    52.77650    52.77650     0.00000
+Cartesian-Y 47                    34.42760    34.42760     0.00000
+Cartesian-Z 47                    52.95495    52.95495     0.00000
+Cartesian-X 48                    52.97267    52.97267     0.00000
+Cartesian-Y 48                    33.47257    33.47257     0.00000
+Cartesian-Z 48                    53.21862    53.21862     0.00000
+Cartesian-X 49                    52.89085    52.89085     0.00000
+Cartesian-Y 49                    34.72014    34.72014     0.00000
+Cartesian-Z 49                    51.99503    51.99503     0.00000
+Cartesian-X 50                    53.44372    53.44372     0.00000
+Cartesian-Y 50                    32.29758    32.29758     0.00000
+Cartesian-Z 50                    52.38531    52.38531     0.00000
+Cartesian-X 51                    53.55807    53.55807     0.00000
+Cartesian-Y 51                    32.59011    32.59011     0.00000
+Cartesian-Z 51                    51.42538    51.42538     0.00000
+Cartesian-X 52                    53.13320    53.13320     0.00000
+Cartesian-Y 52                    32.96008    32.96008     0.00000
+Cartesian-Z 52                    53.08156    53.08156     0.00000
+Cartesian-X 53                    56.45740    56.45740     0.00000
+Cartesian-Y 53                    37.65590    37.65590     0.00000
+Cartesian-Z 53                    52.98690    52.98690     0.00000
+Cartesian-X 54                    56.60798    56.60798     0.00000
+Cartesian-Y 54                    38.04112    38.04112     0.00000
+Cartesian-Z 54                    51.72285    51.72285     0.00000
+Cartesian-X 55                    56.29746    56.29746     0.00000
+Cartesian-Y 55                    38.70362    38.70362     0.00000
+Cartesian-Z 55                    52.41910    52.41910     0.00000
+Cartesian-X 56                    56.80415    56.80415     0.00000
+Cartesian-Y 56                    37.08608    37.08608     0.00000
+Cartesian-Z 56                    51.98651    51.98651     0.00000
+Cartesian-X 57                    56.04850    56.04850     0.00000
+Cartesian-Y 57                    38.52830    38.52830     0.00000
+Cartesian-Z 57                    53.90375    53.90375     0.00000
+Cartesian-X 58                    56.24467    56.24467     0.00000
+Cartesian-Y 58                    37.57327    37.57327     0.00000
+Cartesian-Z 58                    54.16742    54.16742     0.00000
+Cartesian-X 59                    56.16285    56.16285     0.00000
+Cartesian-Y 59                    38.82084    38.82084     0.00000
+Cartesian-Z 59                    52.94383    52.94383     0.00000
+Cartesian-X 60                    56.71572    56.71572     0.00000
+Cartesian-Y 60                    36.39828    36.39828     0.00000
+Cartesian-Z 60                    53.33410    53.33410     0.00000
+Cartesian-X 61                    56.83007    56.83007     0.00000
+Cartesian-Y 61                    36.69081    36.69081     0.00000
+Cartesian-Z 61                    52.37418    52.37418     0.00000
+Cartesian-X 62                    56.40520    56.40520     0.00000
+Cartesian-Y 62                    37.06078    37.06078     0.00000
+Cartesian-Z 62                    54.03036    54.03036     0.00000
+Cartesian-X 63                    64.14040    64.14040     0.00000
+Cartesian-Y 63                    34.07180    34.07180     0.00000
+Cartesian-Z 63                    56.80490    56.80490     0.00000
+Cartesian-X 64                    65.32422    65.32422     0.00000
+Cartesian-Y 64                    34.13358    34.13358     0.00000
+Cartesian-Z 64                    56.40836    56.40836     0.00000
+Cartesian-X 65                    63.42912    63.42912     0.00000
+Cartesian-Y 65                    33.04442    33.04442     0.00000
+Cartesian-Z 65                    56.83746    56.83746     0.00000
+Cartesian-X 66                    63.68242    63.68242     0.00000
+Cartesian-Y 66                    35.00765    35.00765     0.00000
+Cartesian-Z 66                    57.15766    57.15766     0.00000
+Cartesian-X 67                    55.33790    55.33790     0.00000
+Cartesian-Y 67                    33.73470    33.73470     0.00000
+Cartesian-Z 67                    59.83180    59.83180     0.00000
+Cartesian-X 68                    55.48848    55.48848     0.00000
+Cartesian-Y 68                    34.11992    34.11992     0.00000
+Cartesian-Z 68                    58.56775    58.56775     0.00000
+Cartesian-X 69                    55.17796    55.17796     0.00000
+Cartesian-Y 69                    34.78242    34.78242     0.00000
+Cartesian-Z 69                    59.26400    59.26400     0.00000
+Cartesian-X 70                    55.68465    55.68465     0.00000
+Cartesian-Y 70                    33.16488    33.16488     0.00000
+Cartesian-Z 70                    58.83141    58.83141     0.00000
+Cartesian-X 71                    54.92900    54.92900     0.00000
+Cartesian-Y 71                    34.60710    34.60710     0.00000
+Cartesian-Z 71                    60.74865    60.74865     0.00000
+Cartesian-X 72                    55.12517    55.12517     0.00000
+Cartesian-Y 72                    33.65207    33.65207     0.00000
+Cartesian-Z 72                    61.01232    61.01232     0.00000
+Cartesian-X 73                    55.04335    55.04335     0.00000
+Cartesian-Y 73                    34.89964    34.89964     0.00000
+Cartesian-Z 73                    59.78873    59.78873     0.00000
+Cartesian-X 74                    55.59622    55.59622     0.00000
+Cartesian-Y 74                    32.47708    32.47708     0.00000
+Cartesian-Z 74                    60.17900    60.17900     0.00000
+Cartesian-X 75                    55.71057    55.71057     0.00000
+Cartesian-Y 75                    32.76961    32.76961     0.00000
+Cartesian-Z 75                    59.21908    59.21908     0.00000
+Cartesian-X 76                    55.28570    55.28570     0.00000
+Cartesian-Y 76                    33.13958    33.13958     0.00000
+Cartesian-Z 76                    60.87526    60.87526     0.00000
+Cartesian-X 77                    59.64430    59.64430     0.00000
+Cartesian-Y 77                    31.49730    31.49730     0.00000
+Cartesian-Z 77                    60.26190    60.26190     0.00000
+Cartesian-X 78                    59.79488    59.79488     0.00000
+Cartesian-Y 78                    31.88252    31.88252     0.00000
+Cartesian-Z 78                    58.99785    58.99785     0.00000
+Cartesian-X 79                    59.48436    59.48436     0.00000
+Cartesian-Y 79                    32.54502    32.54502     0.00000
+Cartesian-Z 79                    59.69410    59.69410     0.00000
+Cartesian-X 80                    59.99105    59.99105     0.00000
+Cartesian-Y 80                    30.92748    30.92748     0.00000
+Cartesian-Z 80                    59.26151    59.26151     0.00000
+Cartesian-X 81                    59.23540    59.23540     0.00000
+Cartesian-Y 81                    32.36970    32.36970     0.00000
+Cartesian-Z 81                    61.17875    61.17875     0.00000
+Cartesian-X 82                    59.43157    59.43157     0.00000
+Cartesian-Y 82                    31.41467    31.41467     0.00000
+Cartesian-Z 82                    61.44242    61.44242     0.00000
+Cartesian-X 83                    59.34975    59.34975     0.00000
+Cartesian-Y 83                    32.66224    32.66224     0.00000
+Cartesian-Z 83                    60.21883    60.21883     0.00000
+Cartesian-X 84                    59.90262    59.90262     0.00000
+Cartesian-Y 84                    30.23968    30.23968     0.00000
+Cartesian-Z 84                    60.60910    60.60910     0.00000
+Cartesian-X 85                    60.01697    60.01697     0.00000
+Cartesian-Y 85                    30.53221    30.53221     0.00000
+Cartesian-Z 85                    59.64918    59.64918     0.00000
+Cartesian-X 86                    59.59210    59.59210     0.00000
+Cartesian-Y 86                    30.90218    30.90218     0.00000
+Cartesian-Z 86                    61.30536    61.30536     0.00000
+Cartesian-X 87                    56.24140    56.24140     0.00000
+Cartesian-Y 87                    28.33150    28.33150     0.00000
+Cartesian-Z 87                    54.94860    54.94860     0.00000
+Cartesian-X 88                    56.39198    56.39198     0.00000
+Cartesian-Y 88                    28.71672    28.71672     0.00000
+Cartesian-Z 88                    53.68455    53.68455     0.00000
+Cartesian-X 89                    56.08146    56.08146     0.00000
+Cartesian-Y 89                    29.37922    29.37922     0.00000
+Cartesian-Z 89                    54.38080    54.38080     0.00000
+Cartesian-X 90                    56.58815    56.58815     0.00000
+Cartesian-Y 90                    27.76168    27.76168     0.00000
+Cartesian-Z 90                    53.94821    53.94821     0.00000
+Cartesian-X 91                    55.83250    55.83250     0.00000
+Cartesian-Y 91                    29.20390    29.20390     0.00000
+Cartesian-Z 91                    55.86545    55.86545     0.00000
+Cartesian-X 92                    56.02867    56.02867     0.00000
+Cartesian-Y 92                    28.24887    28.24887     0.00000
+Cartesian-Z 92                    56.12912    56.12912     0.00000
+Cartesian-X 93                    55.94685    55.94685     0.00000
+Cartesian-Y 93                    29.49644    29.49644     0.00000
+Cartesian-Z 93                    54.90553    54.90553     0.00000
+Cartesian-X 94                    56.49972    56.49972     0.00000
+Cartesian-Y 94                    27.07388    27.07388     0.00000
+Cartesian-Z 94                    55.29581    55.29581     0.00000
+Cartesian-X 95                    56.61407    56.61407     0.00000
+Cartesian-Y 95                    27.36641    27.36641     0.00000
+Cartesian-Z 95                    54.33588    54.33588     0.00000
+Cartesian-X 96                    56.18920    56.18920     0.00000
+Cartesian-Y 96                    27.73638    27.73638     0.00000
+Cartesian-Z 96                    55.99206    55.99206     0.00000
+Cartesian-X 97                    57.31670    57.31670     0.00000
+Cartesian-Y 97                    38.75550    38.75550     0.00000
+Cartesian-Z 97                    59.11950    59.11950     0.00000
+Cartesian-X 98                    58.50052    58.50052     0.00000
+Cartesian-Y 98                    38.81728    38.81728     0.00000
+Cartesian-Z 98                    58.72296    58.72296     0.00000
+Cartesian-X 99                    56.60542    56.60542     0.00000
+Cartesian-Y 99                    37.72812    37.72812     0.00000
+Cartesian-Z 99                    59.15206    59.15206     0.00000
+Cartesian-X 100                   56.85872    56.85872     0.00000
+Cartesian-Y 100                   39.69135    39.69135     0.00000
+Cartesian-Z 100                   59.47226    59.47226     0.00000
+> ===== Optimization Info: ====
+> Job type: Energy minimization
+> Maximum number of optimization cycles: 400
+> Initial / maximum trust radius (Angstrom): 0.100 / 0.300
+> Convergence Criteria:
+> Will converge when all 5 criteria are reached:
+>  |Delta-E| < 1.00e-05
+>  RMS-Ortho-Grad < 3.00e-03
+>  Max-Ortho-Grad < 6.00e-03
+>  RMS-Disp  < 1.00e-02
+>  Max-Disp  < 1.50e-02
+> 
+> Constraints are requested. The following criterion is added:
+>  Max Constraint Violation (in Angstroms/degrees) < 1.00e-02 
+> === End Optimization Info ===
+ashpath: /home/18660916/envs/ash/lib/python3.11/site-packages/ash
+Sys path: ['/home/18660916/envs/ash/lib/python3.11/site-packages/ash', '/home/18660916/system_development/phase2b_charge_design/05b_optimise_realism/step3_higherK', '/home/18660916/envs/ash/lib/python311.zip', '/home/18660916/envs/ash/lib/python3.11', '/home/18660916/envs/ash/lib/python3.11/lib-dynload', '/home/18660916/envs/ash/lib/python3.11/site-packages']
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+                                           ASH                                            
+                              A MULTISCALE MODELLING PROGRAM                              
+                                        Version: 0.9dev                                        
+                               Git commit version: Unknown                                
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+ASH path: /home/18660916/envs/ash/lib/python3.11/site-packages/ash
+Python version: 3.11.15
+Python interpreter: /home/18660916/envs/ash/bin/python3
+
+ASH Settings after reading defaults and ~/ash_user_settings.ini : 
+See https://ash.readthedocs.io/en/latest/basics.html#ash-settings on how to change settings.
+	 debugflag :  False
+	 load_julia :  False
+	 julia_library :  pythoncall
+	 use_ANSI_color :  False
+	 print_logo :  False
+	 print_input :  True
+	 scale :  1.0
+	 tol :  0.1
+	 conndepth :  10
+	 connectivity_code :  julia
+	 nonbondedMM_code :  julia
+	 print_exit_footer :  True
+	 print_full_timings :  True
+
+Note: ASH can use ANSI escape sequences for displaying color. Use e.g. less -R to display
+To turn on/off escape sequences, set: 'use_ANSI_color = False' in
+~/ash_user_settings.ini
+
+Input script: /home/18660916/system_development/phase2b_charge_design/05b_optimise_realism/step3_higherK/relax_higherK.py
+================================================================================
+   > import sys, openmm
+   > from ash import Fragment, ORCATheory, OpenMMTheory, QMMMTheory, Optimizer
+   > 
+   > # Step 3 higher-K (PLAN + CHARGE_PLACEMENT_EXCLUDED_VOLUME): relax a K6/K10 preorganised design and
+   > # measure relaxed C1-C6. Tests whether MORE charges (toward the GOCAT 5/10/20 regime) recover the
+   > # near-attack geometry that a K=2 pair could not (a_pot 5.28, a_force 4.06). Surrogate-sized placement
+   > # (min_dist 4.7), verified clash-free. Guanidinium(+1)/formate(-1) MM surrogates; QM substrate -2.
+   > #
+   > # Usage: relax_higherK.py <name>            -> dry run
+   > #        relax_higherK.py <name> run        -> real
+   > #   <name> in {K6_apot,K6_aforce,K10_apot,K10_aforce}; reads <name>_coords.xyz + <name>_charges.txt
+   > 
+   > name = sys.argv[1]
+   > RUN  = (len(sys.argv) > 2 and sys.argv[2] == "run")
+   > ORCADIR = "/home/apps2/ORCA/6.0.1"
+   > 
+   > coords = "\n".join(open("%s_coords.xyz"%name).read().splitlines()[2:])   # strip count+comment
+   > mmcharges = [float(x) for x in open("%s_charges.txt"%name).read().split(",")]
+   > frag = Fragment(coordsstring=coords, charge=-2, mult=1)
+   > nmm = frag.numatoms - 24
+   > print(">> %s: %d atoms (24 QM + %d MM), MM net %+.2f, QM -2" % (name,frag.numatoms,nmm,sum(mmcharges)))
+   > assert len(mmcharges)==frag.numatoms, "charge/atom count mismatch"
+   > 
+   > qmatoms=list(range(24))
+   > LJ={"C":(3.40,0.086),"N":(3.25,0.170),"O":(2.96,0.210),"H":(1.06,0.016)}
+   > els=[a.split()[0] for a in coords.strip().split("\n")]
+   > 
+   > orca=ORCATheory(orcadir=ORCADIR,
+   >     orcasimpleinput="! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF",
+   >     orcablocks="%cpcm epsilon 4.0 end\n%scf MaxIter 300 Guess PModel end",
+   >     numcores=8, autostart=False)
+   > mm=OpenMMTheory(fragment=frag, dummysystem=True, platform="CPU", numcores=1,
+   >                 autoconstraints=None, rigidwater=False)
+   > 
+   > lj=openmm.CustomBondForce("4*eps*((sig/r)^12 - (sig/r)^6)")
+   > lj.addPerBondParameter("sig"); lj.addPerBondParameter("eps"); lj.setUsesPeriodicBoundaryConditions(False)
+   > ang=openmm.unit.angstrom; kcal=openmm.unit.kilocalorie_per_mole; npair=0
+   > for i in range(24):
+   >     si,ei=LJ[els[i]]
+   >     for j in range(24,frag.numatoms):
+   >         sj,ej=LJ[els[j]]
+   >         sig=((si+sj)/2*ang).value_in_unit(openmm.unit.nanometer)
+   >         eps=(((ei*ej)**0.5)*kcal).value_in_unit(openmm.unit.kilojoule_per_mole)
+   >         lj.addBond(i,j,[sig,eps]); npair+=1
+   > lj.setForceGroup(11); mm.system.addForce(lj)
+   > print(">> QM-MM LJ pairs: %d"%npair)
+   > 
+   > qmmm=QMMMTheory(qm_theory=orca, mm_theory=mm, fragment=frag, qmatoms=qmatoms,
+   >                 charges=mmcharges, embedding="elstat", qm_charge=-2, qm_mult=1, numcores=8)
+   > FROZEN=list(range(24,frag.numatoms))
+   > CONV={"convergence_energy":1e-5,"convergence_grms":3.0e-3,"convergence_gmax":6.0e-3,
+   >       "convergence_drms":1.0e-2,"convergence_dmax":1.5e-2}
+   > if not RUN:
+   >     print("\n=== DRY RUN OK — %s: %d LJ pairs, QM -2, MM %+.0f, %d frozen. ===" % (name,npair,sum(mmcharges),len(FROZEN)))
+   >     sys.exit(0)
+   > Optimizer(theory=qmmm, fragment=frag, coordsystem="hdlc", frozenatoms=FROZEN,
+   >           maxiter=400, conv_criteria=CONV, charge=-2, mult=1)
+   > frag.write_xyzfile("%s_relaxed.xyz"%name)
+   > print(">> DONE -> %s_relaxed.xyz"%name)
+================================================================================ 
+
+
+--------------------------------------------------------------------------------
+                                New ASH fragment                                
+--------------------------------------------------------------------------------
+
+ASH Fragment creation
+Getting coordinates from string: C     60.111938    34.383969    57.210132
+H     60.607199    33.429939    57.384609
+H     60.724693    35.271818    57.059193
+C     58.780577    34.503532    57.151958
+C     58.092182    35.834261    56.893354
+O     58.812467    36.818218    56.578789
+O     56.839549    35.848917    57.009617
+O     57.934615    33.426403    57.345998
+C     57.676936    32.537732    56.200806
+H     57.019017    31.763769    56.624072
+C     58.986487    31.961840    55.793172
+H     59.463930    31.242983    56.460496
+C     59.683105    32.482671    54.768151
+C     59.064321    33.483709    53.893179
+H     59.702361    33.904544    53.110969
+C     57.781253    33.865659    54.031533
+H     57.332181    34.602354    53.356629
+C     56.889799    33.271093    55.086182
+H     56.347190    34.090648    55.585880
+O     55.962863    32.397707    54.434668
+H     55.310845    32.109527    55.092770
+C     61.123200    32.062126    54.534208
+O     61.784962    31.702328    55.543381
+O     61.541071    32.106513    53.352738
+C     63.810500    29.095600    54.347900
+O     64.994325    29.157376    53.951363
+O     63.099216    28.068217    54.380459
+H     63.352521    30.031450    54.700661
+C     62.715900    31.477600    50.099500
+O     63.899725    31.539376    49.702963
+O     62.004616    30.450217    50.132059
+H     62.257921    32.413450    50.452261
+C     54.334500    28.698500    60.134800
+N     54.485077    29.083720    58.870746
+H     54.174560    29.746222    59.567000
+H     54.681246    28.128682    59.134413
+N     53.925601    29.570904    61.051649
+H     54.121770    28.615866    61.315316
+H     54.039949    29.863440    60.091728
+N     54.592821    27.440876    60.482005
+H     54.707170    27.733411    59.522084
+H     54.282304    28.103378    61.178259
+C     53.185400    33.555200    52.038100
+N     53.335977    33.940420    50.774046
+H     53.025460    34.602922    51.470300
+H     53.532146    32.985382    51.037713
+N     52.776501    34.427604    52.954949
+H     52.972670    33.472566    53.218616
+H     52.890849    34.720140    51.995028
+N     53.443721    32.297576    52.385305
+H     53.558070    32.590111    51.425384
+H     53.133204    32.960078    53.081559
+C     56.457400    37.655900    52.986900
+N     56.607977    38.041120    51.722846
+H     56.297460    38.703622    52.419100
+H     56.804146    37.086082    51.986513
+N     56.048501    38.528304    53.903749
+H     56.244670    37.573266    54.167416
+H     56.162849    38.820840    52.943828
+N     56.715721    36.398276    53.334105
+H     56.830070    36.690811    52.374184
+H     56.405204    37.060778    54.030359
+C     64.140400    34.071800    56.804900
+O     65.324225    34.133576    56.408363
+O     63.429116    33.044417    56.837459
+H     63.682421    35.007650    57.157661
+C     55.337900    33.734700    59.831800
+N     55.488477    34.119920    58.567746
+H     55.177960    34.782422    59.264000
+H     55.684646    33.164882    58.831413
+N     54.929001    34.607104    60.748649
+H     55.125170    33.652066    61.012316
+H     55.043349    34.899640    59.788728
+N     55.596221    32.477076    60.179005
+H     55.710570    32.769611    59.219084
+H     55.285704    33.139578    60.875259
+C     59.644300    31.497300    60.261900
+N     59.794877    31.882520    58.997846
+H     59.484360    32.545022    59.694100
+H     59.991046    30.927482    59.261513
+N     59.235401    32.369704    61.178749
+H     59.431570    31.414666    61.442416
+H     59.349749    32.662240    60.218828
+N     59.902621    30.239676    60.609105
+H     60.016970    30.532211    59.649184
+H     59.592104    30.902178    61.305359
+C     56.241400    28.331500    54.948600
+N     56.391977    28.716720    53.684546
+H     56.081460    29.379222    54.380800
+H     56.588146    27.761682    53.948213
+N     55.832501    29.203904    55.865449
+H     56.028670    28.248866    56.129116
+H     55.946849    29.496440    54.905528
+N     56.499721    27.073876    55.295805
+H     56.614070    27.366411    54.335884
+H     56.189204    27.736378    55.992059
+C     57.316700    38.755500    59.119500
+O     58.500525    38.817276    58.722963
+O     56.605416    37.728117    59.152059
+H     56.858721    39.691350    59.472261
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 100
+Formula: H48C20N18O14
+Label: CHHCCOOOCHCHCCHCHCHOHCOOCOOHCOOHCNHHNHHNHHCNHHNHHNHHCNHHNHHNHHCOOHCNHHNHHNHHCNHHNHHNHHCNHHNHHNHHCOOH
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+>> K10_apot: 100 atoms (24 QM + 76 MM), MM net +2.00, QM -2
+
+
+                     #####################################                      
+                     #                                   #                      
+                     #     ORCATheory initialization     #                      
+                     #                                   #                      
+                     #####################################                      
+Checking for ORCA location
+ Using orcadir path provided: /home/apps2/ORCA/6.0.1 
+Checking if ORCA binary works... yes 
+ORCA parallel job requested with numcores: 8 . Make sure that the correct OpenMPI version (for the ORCA version) is available in your environment
+OpenMPI binary directory found: /apps/openmpi/4.1.1/bin
+Testing that mpirun is executable... yes 
+OpenMPI version (mpirun -V): mpirun (Open MPI) 4.1.1
+
+Report bugs to http://www.open-mpi.org/community/help/
+
+bind_to_core_option: True
+
+Creating ORCA object
+ORCA dir: /home/apps2/ORCA/6.0.1
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+
+ORCATheory object created!
+
+
+                           #########################                            
+                           #                       #                            
+                           #     OpenMM Theory     #                            
+                           #                       #                            
+                           #########################                            
+OpenMM CPU threads set to: 1
+Imported OpenMM library version: 8.5.2
+
+--------------------------------------------------------------------------------
+                             Defining OpenMM object                             
+--------------------------------------------------------------------------------
+
+Printlevel: 2
+No automatic constraints
+AutoConstraint setting: None
+Rigidwater constraints: False
+Hydrogenmass option: 1.5 Da
+Using platform: CPU
+
+--------------------------------------------------------------------------------
+                            Setting up force fields.                            
+--------------------------------------------------------------------------------
+
+Note: OpenMM will fail in this step if parameters are missing in topology and
+      parameter files (e.g. nonbonded entries).
+
+Defining new basic single-chain, multi-residue topology
+Inside write_xmlfile_nonbonded
+Wrote XML-file: dummy.xml
+residueTemplates: {}
+System is non-periodic.
+nonbonded noPBC Method is: NoCutoff
+Nonbonded cutoff : 20 Angstrom
+
+----------------------
+OpenMM system created.
+----------------------
+OpenMM Forces defined: [<openmm.openmm.NonbondedForce; proxy of <Swig Object of type 'OpenMM::NonbondedForce *' at 0x1500be3b7c70> >, <openmm.openmm.CMMotionRemover; proxy of <Swig Object of type 'OpenMM::CMMotionRemover *' at 0x1500be3b77f0> >]
+
+Setting charges
+Number of atoms in OpenMM system: 100
+
+System constraints defined upon system creation: 0
+Use printlevel =>3 to see list of all constraints
+
+----------------------------------------------------------------------------
+Time to calculate step (OpenMM object creation): 0.186 seconds, 0.0 minutes.
+----------------------------------------------------------------------------
+>> QM-MM LJ pairs: 1824
+
+
+                            ########################                            
+                            #                      #                            
+                            #     QM/MM Theory     #                            
+                            #                      #                            
+                            ########################                            
+QM-theory: ORCATheory
+MM-theory: OpenMMTheory
+All atoms in fragment: 100
+QM region (24 atoms): [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+MM region (76 atoms)
+QM/MM object selected to use 8 cores
+Embedding: elstat
+Reading in charges
+Updating charges in OpenMM object.
+Updating simulation object for modified Nonbonded force.
+
+--------------------------------------------------------------------
+Time to calculate step (update_charges): 0.001 seconds, 0.0 minutes.
+--------------------------------------------------------------------
+QM-region coordinates (before linkatoms):
+   0    C  60.11193800   34.38396900   57.21013200
+   1    H  60.60719900   33.42993900   57.38460900
+   2    H  60.72469300   35.27181800   57.05919300
+   3    C  58.78057700   34.50353200   57.15195800
+   4    C  58.09218200   35.83426100   56.89335400
+   5    O  58.81246700   36.81821800   56.57878900
+   6    O  56.83954900   35.84891700   57.00961700
+   7    O  57.93461500   33.42640300   57.34599800
+   8    C  57.67693600   32.53773200   56.20080600
+   9    H  57.01901700   31.76376900   56.62407200
+  10    C  58.98648700   31.96184000   55.79317200
+  11    H  59.46393000   31.24298300   56.46049600
+  12    C  59.68310500   32.48267100   54.76815100
+  13    C  59.06432100   33.48370900   53.89317900
+  14    H  59.70236100   33.90454400   53.11096900
+  15    C  57.78125300   33.86565900   54.03153300
+  16    H  57.33218100   34.60235400   53.35662900
+  17    C  56.88979900   33.27109300   55.08618200
+  18    H  56.34719000   34.09064800   55.58588000
+  19    O  55.96286300   32.39770700   54.43466800
+  20    H  55.31084500   32.10952700   55.09277000
+  21    C  61.12320000   32.06212600   54.53420800
+  22    O  61.78496200   31.70232800   55.54338100
+  23    O  61.54107100   32.10651300   53.35273800
+
+Determining QM-MM/HL-LL boundary
+Parameters determing connectivity:
+Scaling factor: 1.0
+Tolerance: 0.30000000000000004
+QM atoms: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+QM atoms to be excluded from boundary creation (excludeboundaryatomlist):  []
+QM-MM boundary dictionary: {}
+
+------------------------------------------------------------------------
+Time to calculate step (get_boundary_atoms): 0.001 seconds, 0.0 minutes.
+------------------------------------------------------------------------
+No covalent QM-MM boundary. Linkatoms and dipole_correction options set to False
+Removing constraints in OpenMM object for atoms: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+Removing bonded terms for QM-region in MMtheory
+Modifying bonded forces.
+
+
+Number of bonded terms removed:
+Harmonic Bond terms: 0
+Harmonic Angle terms: 0
+Periodic Torsion terms: 0
+Custom Torsion terms: 0
+CMAP Torsion terms: 0
+CustomBond terms 0
+
+
+--------------------------------------------------------------------------
+Time to calculate step (modify_bonded_forces): 0.002 seconds, 0.0 minutes.
+--------------------------------------------------------------------------
+Removing nonbonded terms for QM-region in MMtheory (QM-QM interactions)
+Add exceptions/exclusions. Removing i-j interactions for list: 24 atoms
+Case Nonbondedforce. Adding Exception for ij pair.
+Number of exceptions (Nonbondedforce) added: 276
+Number of exclusions (CustomNonbondedforce) added: 0
+
+--------------------------------------------------------------------
+Time to calculate step (add exceptions): 0.001 seconds, 0.0 minutes.
+--------------------------------------------------------------------
+Charges of QM atoms set to 0 (since Electrostatic Embedding):
+Setting QM charges to Zero
+
+-------------------------------------------------------------------
+Time to calculate step (ZeroQMCharges): 0.000 seconds, 0.0 minutes.
+-------------------------------------------------------------------
+Updating charges in OpenMM object.
+Updating simulation object for modified Nonbonded force.
+
+--------------------------------------------------------------------
+Time to calculate step (update_charges): 0.000 seconds, 0.0 minutes.
+--------------------------------------------------------------------
+Deleting Coulombexceptions for atomlist: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+
+-----------------------------------------------------------------------
+Time to calculate step (delete_exceptions): 0.003 seconds, 0.0 minutes.
+-----------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------
+Time to calculate step (QM/MM object creation): 0.032 seconds, 0.0 minutes.
+---------------------------------------------------------------------------
+
+
+                 #############################################                  
+                 #                                           #                  
+                 #     geomeTRICOptimizer initialization     #                  
+                 #                                           #                  
+                 #############################################                  
+Creating optimizer object
+User-defined convergence criteria:
+Theory is not periodic
+Printlevel: 2
+Coordinate system:  hdlc
+Max iterations:  400
+Frozen atoms: [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99]
+Active Region: False
+TS Optimization: False
+Hessian Option: None
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+
+--------------------------------------------------------------------------------
+                            Running geomeTRIC object                            
+--------------------------------------------------------------------------------
+
+ 
+Doing geometry optimization on fragment. Formula: H48C20N18O14 Label: CHHCCOOOCHCHCCHCHCHOHCOOCOOHCOOHCNHHNHHNHHCNHHNHHNHHCNHHNHHNHHCOOHCNHHNHHNHHCNHHNHHNHHCNHHNHHNHHCOOH  
+No constraints provided to run method.
+Testing if constraints present in optimizer object
+No constraints in optimizer object.
+Now testing if constraints in fragment object 
+No constraints in fragment object.
+
+Constraints:  None
+constrainvalue:  False
+Inside define_constraints
+Constraints: None
+Inside write_constraintsfile
+Writing frozen atom constraints
+Wrote XYZ file:  initialxyzfiletric.xyz
+No Hessian option provided.
+self.constraintsfile: constraints.txt
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+Hessian option: None
+Coordinate system: hdlc
+Starting optimization
+
+-------------------------------------------------------------------------------------
+Time to calculate step (Time spent before run_optimizer): 3.209 seconds, 0.1 minutes.
+-------------------------------------------------------------------------------------
+geometric called detect_dft option option for ASHengineclass.
+
+Convergence criteria: {'convergence_energy': 1e-05, 'convergence_grms': 0.003, 'convergence_gmax': 0.006, 'convergence_drms': 0.01, 'convergence_dmax': 0.015, 'convergence_cmax': 0.01}
+
+Replacing coordinates in fragment.
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 100
+Formula: H48C20N18O14
+Label: CHHCCOOOCHCHCCHCHCHOHCOOCOOHCOOHCNHHNHHNHHCNHHNHHNHHCNHHNHHNHHCOOHCNHHNHHNHHCNHHNHHNHHCNHHNHHNHHCOOH
+Charge: -2 Mult: 1
+
+--------------------------------------------------------------------------------
+Wrote XYZ file:  Fragment-currentgeo.xyz
+Current geometry (Å) in step 0 (print_atoms_list region)
+---------------------------------------------------
+        C  60.11193800   34.38396900   57.21013200
+        H  60.60719900   33.42993900   57.38460900
+        H  60.72469300   35.27181800   57.05919300
+        C  58.78057700   34.50353200   57.15195800
+        C  58.09218200   35.83426100   56.89335400
+        O  58.81246700   36.81821800   56.57878900
+        O  56.83954900   35.84891700   57.00961700
+        O  57.93461500   33.42640300   57.34599800
+        C  57.67693600   32.53773200   56.20080600
+        H  57.01901700   31.76376900   56.62407200
+        C  58.98648700   31.96184000   55.79317200
+        H  59.46393000   31.24298300   56.46049600
+        C  59.68310500   32.48267100   54.76815100
+        C  59.06432100   33.48370900   53.89317900
+        H  59.70236100   33.90454400   53.11096900
+        C  57.78125300   33.86565900   54.03153300
+        H  57.33218100   34.60235400   53.35662900
+        C  56.88979900   33.27109300   55.08618200
+        H  56.34719000   34.09064800   55.58588000
+        O  55.96286300   32.39770700   54.43466800
+        H  55.31084500   32.10952700   55.09277000
+        C  61.12320000   32.06212600   54.53420800
+        O  61.78496200   31.70232800   55.54338100
+        O  61.54107100   32.10651300   53.35273800
+        C  63.81050000   29.09560000   54.34790000
+        O  64.99432500   29.15737600   53.95136300
+        O  63.09921600   28.06821700   54.38045900
+        H  63.35252100   30.03145000   54.70066100
+        C  62.71590000   31.47760000   50.09950000
+        O  63.89972500   31.53937600   49.70296300
+        O  62.00461600   30.45021700   50.13205900
+        H  62.25792100   32.41345000   50.45226100
+        C  54.33450000   28.69850000   60.13480000
+        N  54.48507700   29.08372000   58.87074600
+        H  54.17456000   29.74622200   59.56700000
+        H  54.68124600   28.12868200   59.13441300
+        N  53.92560100   29.57090400   61.05164900
+        H  54.12177000   28.61586600   61.31531600
+        H  54.03994900   29.86344000   60.09172800
+        N  54.59282100   27.44087600   60.48200500
+        H  54.70717000   27.73341100   59.52208400
+        H  54.28230400   28.10337800   61.17825900
+        C  53.18540000   33.55520000   52.03810000
+        N  53.33597700   33.94042000   50.77404600
+        H  53.02546000   34.60292200   51.47030000
+        H  53.53214600   32.98538200   51.03771300
+        N  52.77650100   34.42760400   52.95494900
+        H  52.97267000   33.47256600   53.21861600
+        H  52.89084900   34.72014000   51.99502800
+        N  53.44372100   32.29757600   52.38530500
+        H  53.55807000   32.59011100   51.42538400
+        H  53.13320400   32.96007800   53.08155900
+        C  56.45740000   37.65590000   52.98690000
+        N  56.60797700   38.04112000   51.72284600
+        H  56.29746000   38.70362200   52.41910000
+        H  56.80414600   37.08608200   51.98651300
+        N  56.04850100   38.52830400   53.90374900
+        H  56.24467000   37.57326600   54.16741600
+        H  56.16284900   38.82084000   52.94382800
+        N  56.71572100   36.39827600   53.33410500
+        H  56.83007000   36.69081100   52.37418400
+        H  56.40520400   37.06077800   54.03035900
+        C  64.14040000   34.07180000   56.80490000
+        O  65.32422500   34.13357600   56.40836300
+        O  63.42911600   33.04441700   56.83745900
+        H  63.68242100   35.00765000   57.15766100
+        C  55.33790000   33.73470000   59.83180000
+        N  55.48847700   34.11992000   58.56774600
+        H  55.17796000   34.78242200   59.26400000
+        H  55.68464600   33.16488200   58.83141300
+        N  54.92900100   34.60710400   60.74864900
+        H  55.12517000   33.65206600   61.01231600
+        H  55.04334900   34.89964000   59.78872800
+        N  55.59622100   32.47707600   60.17900500
+        H  55.71057000   32.76961100   59.21908400
+        H  55.28570400   33.13957800   60.87525900
+        C  59.64430000   31.49730000   60.26190000
+        N  59.79487700   31.88252000   58.99784600
+        H  59.48436000   32.54502200   59.69410000
+        H  59.99104600   30.92748200   59.26151300
+        N  59.23540100   32.36970400   61.17874900
+        H  59.43157000   31.41466600   61.44241600
+        H  59.34974900   32.66224000   60.21882800
+        N  59.90262100   30.23967600   60.60910500
+        H  60.01697000   30.53221100   59.64918400
+        H  59.59210400   30.90217800   61.30535900
+        C  56.24140000   28.33150000   54.94860000
+        N  56.39197700   28.71672000   53.68454600
+        H  56.08146000   29.37922200   54.38080000
+        H  56.58814600   27.76168200   53.94821300
+        N  55.83250100   29.20390400   55.86544900
+        H  56.02867000   28.24886600   56.12911600
+        H  55.94684900   29.49644000   54.90552800
+        N  56.49972100   27.07387600   55.29580500
+        H  56.61407000   27.36641100   54.33588400
+        H  56.18920400   27.73637800   55.99205900
+        C  57.31670000   38.75550000   59.11950000
+        O  58.50052500   38.81727600   58.72296300
+        O  56.60541600   37.72811700   59.15205900
+        H  56.85872100   39.69135000   59.47226100
+
+Note: printed only print_atoms_list (this is not necessarily all atoms) 
+  ------------RUNNING QM/MM MODULE------------- 
+QM Module: ORCATheory
+MM Module: OpenMMTheory
+Charge provided from QMMMTheory object:  -2
+Mult provided from QMMMTheory object:  1
+QM-region Charge: -2 Mult: 1
+Embedding: Electrostatic
+First QMMMTheory run. Running runprep
+Inside QMMMTheory runprep
+
+-------------------------------------------------------------
+Time to calculate step (runprep): 0.000 seconds, 0.0 minutes.
+-------------------------------------------------------------
+Number of pointcharges (to QM program): 76
+Number of charge coordinates: 76
+Running QM/MM object with 8 cores available
+
+-------------------------------------------------------------------
+Time to calculate step (before-QMstep): 0.000 seconds, 0.0 minutes.
+-------------------------------------------------------------------
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 8 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: -2  Mult: 1
+Pointcharge embedding is on!
+ ORCA Calculation starting. 
+Found possible error messages in ORCA outputfile:
+ORCA finished by error termination in Startup
+ ORCA finished by error termination in LEANSCF
+ [file orca_tools/Tool-Numint/qcgrid.cpp, line 4645, Process 7]: Error: the number of points read from the grid does not match the expectation
+ [file orca_tools/Tool-Numint/qcgrid.cpp, line 4645, Process 4]: Error: the number of points read from the grid does not match the expectation
+ [file orca_tools/Tool-Numint/qcgrid.cpp, line 4645, Process 2]: Error: the number of points read from the grid does not match the expectation
+ [file orca_tools/Tool-Numint/qcgrid.cpp, line 4645, Process 6]: Error: the number of points read from the grid does not match the expectation
+ [file orca_tools/Tool-Numint/qcgrid.cpp, line 4645, Process 1]: Error: the number of points read from the grid does not match the expectation
+ [file orca_tools/Tool-Numint/qcgrid.cpp, line 4645, Process 5]: Error: the number of points read from the grid does not match the expectation
+ [file orca_tools/Tool-Numint/qcgrid.cpp, line 4645, Process 0]: Error: the number of points read from the grid does not match the expectation
+ [file orca_tools/Tool-Numint/qcgrid.cpp, line 4645, Process 3]: Error: the number of points read from the grid does not match the expectation
+ !!!                        FATAL ERROR ENCOUNTERED               !!!
+   .... aborting the run
+
+Found warning messages in ORCA outputfile:
+WARNING: The chosen methods will break translational/rotational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ WARNING: The chosen methods will break translational symmetry
+
+ ORCA Calculation done. 
+ Problem with ORCA run 
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 11.669 seconds, 0.2 minutes.
+---------------------------------------------------------------
+ ASH exiting with code: 1 
+
+
+--------------------------------------------------------------------------------
+                          Total timings of all modules                          
+--------------------------------------------------------------------------------
+
+To turn off timing output add to settings file: ~/ash_user_settings.ini
+print_full_timings = False   
+
+Modulename                                   Time (sec) Percentage of total     Times called
+----------------------------------------------------------------------------------------------------
+Theory-run modules
+------------------------------
+Time spent before run_optimizer                    3.21      14.2                   1
+before-QMstep                                      0.00       0.0                   1
+ORCA run                                          11.67      51.5                   1
+
+Object creation
+------------------------------
+OpenMM object creation                             0.19       0.8                   1
+QM/MM object creation                              0.03       0.1                   1
+runprep                                            0.00       0.0                   1
+
+Other modules
+------------------------------
+update_charges                                     0.00       0.0                   2
+get_boundary_atoms                                 0.00       0.0                   1
+modify_bonded_forces                               0.00       0.0                   1
+add exceptions                                     0.00       0.0                   1
+ZeroQMCharges                                      0.00       0.0                   1
+delete_exceptions                                  0.00       0.0                   1
+
+
+Sum of all moduletimes (flawed)                   15.10
+Total walltime                                    22.64     100.0
+
+ ------------------------------------------------------------------- 
+ ASH Total Walltime: 22.6 seconds, 0.4 minutes. 
+ ------------------------------------------------------------------- 
