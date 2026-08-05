@@ -27,3 +27,6 @@ oracle integrity checks, not the optimiser.
 
 ## Status
 Scaffold only. solver/ (convex_solve.py + cutplane_loop.py) to be written next.
+
+## Oracle patch
+gocat_screen.py carries one fix over the 05d original: the post-convergence RMSG block reads the gradient from the ash run() return value (energy, gradient) instead of a non-existent qmmm.grad attribute. Geometry optimisation and energies are unchanged; only RMSG reporting was affected.
