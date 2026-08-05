@@ -1,0 +1,9 @@
+runs/
+*.gbw
+*.out
+*.hess
+*.densities
+*.cpcm
+*.tmp
+__pycache__/
+*.pyc
