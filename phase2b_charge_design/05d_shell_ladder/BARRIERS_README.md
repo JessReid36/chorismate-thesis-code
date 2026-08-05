@@ -1,3 +1,14 @@
+> **SUPERSEDED — do not use this protocol.** The method below computes the barrier as a difference of two
+> *independently* field-relaxed endpoint energies (E(TS under field) − E(reactant under field)). That
+> endpoint-difference barrier is **invalid** under a fixed external field: it is dominated by the
+> substrate's displacement through the fixed potential and does not cancel, giving unreliable/impossible
+> values. The retained barrier method is the **NEB-under-field on a connected path** between screened
+> endpoints — see `../SHELL_LADDER_NEB_RESULT.md` and `../SHELL_LADDER_NEB_CORRECTION.md`. Any
+> endpoint-difference number produced by this script (including the "+35.51 at 8A" quoted below) is not
+> reportable and is retained only for historical context. [archived]
+
+---
+
 # ALL-layer barriers: 2-15A coarse + 7.0-9.0 fine (0.1A). Exhaustive discrete-charge barrier scan.
 
 ## What

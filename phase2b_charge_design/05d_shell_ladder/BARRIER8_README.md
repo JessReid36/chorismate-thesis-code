@@ -1,3 +1,13 @@
+> **SUPERSEDED — do not use this protocol.** The "B2" protocol described here (barrier = E(TS under field)
+> − E(reactant under field), the two endpoints relaxed *independently*) is the endpoint-difference method,
+> which is **invalid** under a fixed external field — see `BARRIERS_README.md` and
+> `../SHELL_LADDER_NEB_RESULT.md`. The "+35.51" figure below is an endpoint-difference number and is not
+> reportable. The retained method is NEB-under-field on a connected path between screened endpoints; the
+> 8A-region designs on that method (e.g. 8p1) give an anti-catalytic barrier of ~+78 kcal/mol, not +35.51.
+> [archived]
+
+---
+
 # 8A barrier: is the best intact discrete design actually catalytic? (tests if window metric hides catalysis)
 
 ## Protocol (B2: both endpoints under the SAME field, per-design reference)
