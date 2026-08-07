@@ -1,0 +1,3 @@
+BARRIER (single-point, committed geoms): 17.47 kcal/mol  (ref 17.47)  PASS
+BARE REACTANT RELAX: O3-C4 1.472 -> 1.448, C1-C6 3.538  PASS (intact)
+L0 PASS -- foundation trusted
