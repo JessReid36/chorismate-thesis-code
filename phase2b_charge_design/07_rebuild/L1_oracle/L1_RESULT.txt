@@ -1,0 +1,6 @@
+L1 GATE (zero-charge evaluate vs L0):
+  integrity = VALID   PASS
+  O3-C4 = 1.447 (L0: 1.448)   PASS
+  C1-C6 = 3.538 (L0: 3.538)
+  energy = -836.373857 Eh
+L1 PASS -- oracle trusted
