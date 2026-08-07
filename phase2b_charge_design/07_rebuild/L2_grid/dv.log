@@ -1,0 +1,33 @@
+------------------------------------------------------------------------------
+                      ORCA ELECTROSTATIC POTENTIAL GENERATION
+------------------------------------------------------------------------------
+
+GBW file                           ... dv_react.gbw
+File with points to evaluate V(r)  ... points.xyz
+Output file                        ... dv_react.vout
+
+Reading the GBW file               ... done
+Reading the positions              ... done (17028 positions)
+Warning: Re-creating the pre-screening matrix because it was not found on disk
+Electrostatic potential evaluated in     8.402 sec
+
+Maximum memory used throughout the entire VPOT-calculation: 8.8 MB
+------------------------------------------------------------------------------
+                      ORCA ELECTROSTATIC POTENTIAL GENERATION
+------------------------------------------------------------------------------
+
+GBW file                           ... dv_ts.gbw
+File with points to evaluate V(r)  ... points.xyz
+Output file                        ... dv_ts.vout
+
+Reading the GBW file               ... done
+Reading the positions              ... done (17028 positions)
+Warning: Re-creating the pre-screening matrix because it was not found on disk
+Electrostatic potential evaluated in     8.487 sec
+
+Maximum memory used throughout the entire VPOT-calculation: 8.8 MB
+SCF + vpot: reactant ...
+SCF + vpot: TS ...
+dV: min -0.00960 max 0.00879 | |dV|max 0.00960 (a.u.), 17028 sites
+sign check: nearest site to ether-O (3.58 A) Dv=-0.009286 -> +1 q*Dv=-0.009286 STABILISING (correct)
+rewrote grid_final.tsv with V_R, V_TS, Dv
