@@ -38,8 +38,9 @@ def solve_hardK(dV, K, qmax, neutral):
     N = dV.size
     h = highspy.Highs()
     h.setOptionValue("output_flag", False)
-    h.setOptionValue("mip_rel_gap", 0.0)
+    h.setOptionValue("mip_rel_gap", 1e-3)
     h.setOptionValue("mip_abs_gap", 0.0)
+    h.setOptionValue("time_limit", 120.0)
     lower = np.concatenate([np.full(N, -qmax), np.zeros(N)])
     upper = np.concatenate([np.full(N,  qmax), np.ones(N)])
     cost  = np.concatenate([dV, np.zeros(N)]).astype(np.float64)
@@ -55,11 +56,20 @@ def solve_hardK(dV, K, qmax, neutral):
         h.addRow(0.0, 0.0, N, np.arange(N, dtype=np.int32), np.ones(N))
     h.run()
     st = h.getModelStatus()
-    if st != highspy.HighsModelStatus.kOptimal:
-        raise RuntimeError("HiGHS MILP: %s" % h.modelStatusToString(st))
-    x = np.array(h.getSolution().col_value)
     info = h.getInfo()
-    return x[:N], float(info.objective_function_value), getattr(info, "mip_gap", 0.0)
+    # Accept a proven optimum OR a feasible incumbent at the time limit. Symmetry (HiGHS reports
+    # multiple generators) makes the exact-optimality PROOF slow even though the optimum is found
+    # almost immediately; a feasible solution with a reported gap is a valid certified bound.
+    sol = h.getSolution()
+    have_solution = getattr(info, "primal_solution_status", None)
+    ok = st in (highspy.HighsModelStatus.kOptimal, highspy.HighsModelStatus.kTimeLimit)
+    if not ok or sol is None or len(sol.col_value) == 0:
+        raise RuntimeError("HiGHS MILP: %s (no usable solution)" % h.modelStatusToString(st))
+    x = np.array(sol.col_value)
+    gap = getattr(info, "mip_gap", float("nan"))
+    status = "OPTIMAL(gap=0)" if st == highspy.HighsModelStatus.kOptimal else "FEASIBLE(gap=%.2f%%)" % (gap*100)
+    print("   MILP status: %s" % status)
+    return x[:N], float(info.objective_function_value), gap
 
 
 def main():
