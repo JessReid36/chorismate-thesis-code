@@ -1,0 +1,4 @@
+energy_Eh=-836.20925037
+integrity=DISTORTED
+broke=[(15, 17)]
+formed=[(8, 15)]
