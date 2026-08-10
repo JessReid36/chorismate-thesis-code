@@ -15,3 +15,5 @@
 # OS / editor noise
 .DS_Store
 *.swp
+phase2b_charge_design/06_convex_cutplane/solver/
+phase2b_charge_design/06_convex_cutplane/inputs/substrate_charges*.txt
