@@ -1,0 +1,444 @@
+ashpath: /home/18660916/envs/ash/lib/python3.11/site-packages/ash
+Sys path: ['/home/18660916/envs/ash/lib/python3.11/site-packages/ash', '/home/18660916/07_rebuild/L1_oracle', '/home/18660916/envs/ash/lib/python311.zip', '/home/18660916/envs/ash/lib/python3.11', '/home/18660916/envs/ash/lib/python3.11/lib-dynload', '/home/18660916/.local/lib/python3.11/site-packages', '/home/18660916/envs/ash/lib/python3.11/site-packages']
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+                                           ASH                                            
+                              A MULTISCALE MODELLING PROGRAM                              
+                                        Version: 0.9dev                                        
+                               Git commit version: Unknown                                
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+ASH path: /home/18660916/envs/ash/lib/python3.11/site-packages/ash
+Python version: 3.11.15
+Python interpreter: /home/18660916/envs/ash/bin/python3
+
+ASH Settings after reading defaults and ~/ash_user_settings.ini : 
+See https://ash.readthedocs.io/en/latest/basics.html#ash-settings on how to change settings.
+	 debugflag :  False
+	 load_julia :  False
+	 julia_library :  pythoncall
+	 use_ANSI_color :  False
+	 print_logo :  False
+	 print_input :  True
+	 scale :  1.0
+	 tol :  0.1
+	 conndepth :  10
+	 connectivity_code :  julia
+	 nonbondedMM_code :  julia
+	 print_exit_footer :  True
+	 print_full_timings :  True
+
+Note: ASH can use ANSI escape sequences for displaying color. Use e.g. less -R to display
+To turn on/off escape sequences, set: 'use_ANSI_color = False' in
+~/ash_user_settings.ini
+
+Input script: /home/18660916/07_rebuild/L1_oracle/wall_check.py
+================================================================================
+   > #!/usr/bin/env python3
+   > """Does the LJ wall reach the QM substrate atom's gradient in the oracle's QM/MM setup?"""
+   > import numpy as np
+   > from ash import Fragment, ORCATheory, OpenMMTheory, QMMMTheory
+   > import openmm
+   > 
+   > ORCADIR="/home/apps2/ORCA/6.0.1"
+   > SIMPLE="! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF"
+   > BLOCKS="%cpcm epsilon 4.0 end\n%scf MaxIter 300 Guess PModel end"
+   > LJ={"C":(3.40,0.086)}
+   > 
+   > d=2.0
+   > coords=f"C 0.0 0.0 0.0\nC {d} 0.0 0.0"
+   > frag=Fragment(coordsstring=coords, charge=0, mult=1, conncalc=False)
+   > mmcharges=[0.0, 1.0]
+   > 
+   > orca=ORCATheory(orcadir=ORCADIR, orcasimpleinput=SIMPLE, orcablocks=BLOCKS, numcores=4, autostart=False)
+   > mm=OpenMMTheory(fragment=frag, dummysystem=True, platform="CPU", numcores=1, autoconstraints=None, rigidwater=False)
+   > lj=openmm.CustomBondForce("4*eps*((sig/r)^12 - (sig/r)^6)")
+   > lj.addPerBondParameter("sig"); lj.addPerBondParameter("eps"); lj.setUsesPeriodicBoundaryConditions(False)
+   > ang=openmm.unit.angstrom; kcal=openmm.unit.kilocalorie_per_mole
+   > si,ei=LJ["C"]
+   > sig=((si+si)/2*ang).value_in_unit(openmm.unit.nanometer)
+   > eps=(((ei*ei)**0.5)*kcal).value_in_unit(openmm.unit.kilojoule_per_mole)
+   > lj.addBond(0,1,[sig,eps]); lj.setForceGroup(11); mm.system.addForce(lj)
+   > 
+   > qmmm=QMMMTheory(qm_theory=orca, mm_theory=mm, fragment=frag, qmatoms=[0],
+   >                 charges=mmcharges, embedding="elstat", qm_charge=0, qm_mult=1, numcores=4)
+   > res=qmmm.run(current_coords=frag.coords, Grad=True, charge=0, mult=1)
+   > try:
+   >     E,G=res
+   > except (TypeError,ValueError):
+   >     E=qmmm.energy; G=qmmm.grad
+   > G=np.array(G)
+   > fx=-G[0][0]
+   > print("QM atom x=0, MM +1 site x=%.1f A (LJ min %.2f A)"%(d, 2**(1/6)*si))
+   > print("force on QM atom along x = %+.4f Eh/Bohr"%fx)
+   > print("  fx<0 => pushed AWAY: wall reaches QM (good)")
+   > print("  fx>0 => pulled TOWARD: no wall on QM (collapse bug confirmed)")
+================================================================================ 
+
+
+--------------------------------------------------------------------------------
+                                New ASH fragment                                
+--------------------------------------------------------------------------------
+
+ASH Fragment creation
+Getting coordinates from string: C 0.0 0.0 0.0
+C 2.0 0.0 0.0
+Creating/Updating fragment attributes...
+Number of Atoms in fragment: 2
+Formula: C2
+Label: CC
+Charge: 0 Mult: 1
+
+--------------------------------------------------------------------------------
+
+
+                     #####################################                      
+                     #                                   #                      
+                     #     ORCATheory initialization     #                      
+                     #                                   #                      
+                     #####################################                      
+Checking for ORCA location
+ Using orcadir path provided: /home/apps2/ORCA/6.0.1 
+Checking if ORCA binary works... yes 
+ORCA parallel job requested with numcores: 4 . Make sure that the correct OpenMPI version (for the ORCA version) is available in your environment
+OpenMPI binary directory found: /apps/openmpi/4.1.1/bin
+Testing that mpirun is executable... yes 
+OpenMPI version (mpirun -V): mpirun (Open MPI) 4.1.1
+
+Report bugs to http://www.open-mpi.org/community/help/
+
+bind_to_core_option: True
+
+Creating ORCA object
+ORCA dir: /home/apps2/ORCA/6.0.1
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+
+ORCATheory object created!
+
+
+                           #########################                            
+                           #                       #                            
+                           #     OpenMM Theory     #                            
+                           #                       #                            
+                           #########################                            
+OpenMM CPU threads set to: 1
+Imported OpenMM library version: 8.5.2
+
+--------------------------------------------------------------------------------
+                             Defining OpenMM object                             
+--------------------------------------------------------------------------------
+
+Printlevel: 2
+No automatic constraints
+AutoConstraint setting: None
+Rigidwater constraints: False
+Hydrogenmass option: 1.5 Da
+Using platform: CPU
+
+--------------------------------------------------------------------------------
+                            Setting up force fields.                            
+--------------------------------------------------------------------------------
+
+Note: OpenMM will fail in this step if parameters are missing in topology and
+      parameter files (e.g. nonbonded entries).
+
+Defining new basic single-chain, multi-residue topology
+Inside write_xmlfile_nonbonded
+Wrote XML-file: dummy.xml
+residueTemplates: {}
+System is non-periodic.
+nonbonded noPBC Method is: NoCutoff
+Nonbonded cutoff : 20 Angstrom
+
+----------------------
+OpenMM system created.
+----------------------
+OpenMM Forces defined: [<openmm.openmm.NonbondedForce; proxy of <Swig Object of type 'OpenMM::NonbondedForce *' at 0x7f238f35bb70> >, <openmm.openmm.CMMotionRemover; proxy of <Swig Object of type 'OpenMM::CMMotionRemover *' at 0x7f238f35d230> >]
+
+Setting charges
+Number of atoms in OpenMM system: 2
+
+System constraints defined upon system creation: 0
+Use printlevel =>3 to see list of all constraints
+
+----------------------------------------------------------------------------
+Time to calculate step (OpenMM object creation): 0.354 seconds, 0.0 minutes.
+----------------------------------------------------------------------------
+
+
+                            ########################                            
+                            #                      #                            
+                            #     QM/MM Theory     #                            
+                            #                      #                            
+                            ########################                            
+QM-theory: ORCATheory
+MM-theory: OpenMMTheory
+All atoms in fragment: 2
+QM region (1 atoms): [0]
+MM region (1 atoms)
+QM/MM object selected to use 4 cores
+Embedding: elstat
+Reading in charges
+Updating charges in OpenMM object.
+Updating simulation object for modified Nonbonded force.
+
+--------------------------------------------------------------------
+Time to calculate step (update_charges): 0.000 seconds, 0.0 minutes.
+--------------------------------------------------------------------
+QM-region coordinates (before linkatoms):
+   0    C   0.00000000    0.00000000    0.00000000
+
+Determining QM-MM/HL-LL boundary
+Parameters determing connectivity:
+Scaling factor: 1.0
+Tolerance: 0.30000000000000004
+QM atoms: [0]
+QM atoms to be excluded from boundary creation (excludeboundaryatomlist):  []
+QM-MM boundary dictionary: {}
+
+------------------------------------------------------------------------
+Time to calculate step (get_boundary_atoms): 0.000 seconds, 0.0 minutes.
+------------------------------------------------------------------------
+No covalent QM-MM boundary. Linkatoms and dipole_correction options set to False
+Removing constraints in OpenMM object for atoms: [0]
+Removing bonded terms for QM-region in MMtheory
+Modifying bonded forces.
+
+
+Number of bonded terms removed:
+Harmonic Bond terms: 0
+Harmonic Angle terms: 0
+Periodic Torsion terms: 0
+Custom Torsion terms: 0
+CMAP Torsion terms: 0
+CustomBond terms 0
+
+
+--------------------------------------------------------------------------
+Time to calculate step (modify_bonded_forces): 0.000 seconds, 0.0 minutes.
+--------------------------------------------------------------------------
+Removing nonbonded terms for QM-region in MMtheory (QM-QM interactions)
+Add exceptions/exclusions. Removing i-j interactions for list: 1 atoms
+Case Nonbondedforce. Adding Exception for ij pair.
+Number of exceptions (Nonbondedforce) added: 0
+Number of exclusions (CustomNonbondedforce) added: 0
+
+--------------------------------------------------------------------
+Time to calculate step (add exceptions): 0.000 seconds, 0.0 minutes.
+--------------------------------------------------------------------
+Charges of QM atoms set to 0 (since Electrostatic Embedding):
+Setting QM charges to Zero
+
+-------------------------------------------------------------------
+Time to calculate step (ZeroQMCharges): 0.000 seconds, 0.0 minutes.
+-------------------------------------------------------------------
+Updating charges in OpenMM object.
+Updating simulation object for modified Nonbonded force.
+
+--------------------------------------------------------------------
+Time to calculate step (update_charges): 0.000 seconds, 0.0 minutes.
+--------------------------------------------------------------------
+Deleting Coulombexceptions for atomlist: [0]
+
+-----------------------------------------------------------------------
+Time to calculate step (delete_exceptions): 0.000 seconds, 0.0 minutes.
+-----------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------
+Time to calculate step (QM/MM object creation): 0.002 seconds, 0.0 minutes.
+---------------------------------------------------------------------------
+  ------------RUNNING QM/MM MODULE------------- 
+QM Module: ORCATheory
+MM Module: OpenMMTheory
+Charge provided from QMMMTheory object:  0
+Mult provided from QMMMTheory object:  1
+QM-region Charge: 0 Mult: 1
+Embedding: Electrostatic
+First QMMMTheory run. Running runprep
+Inside QMMMTheory runprep
+
+-------------------------------------------------------------
+Time to calculate step (runprep): 0.000 seconds, 0.0 minutes.
+-------------------------------------------------------------
+Number of pointcharges (to QM program): 1
+Number of charge coordinates: 1
+Running QM/MM object with 4 cores available
+
+-------------------------------------------------------------------
+Time to calculate step (before-QMstep): 0.000 seconds, 0.0 minutes.
+-------------------------------------------------------------------
+  ------------RUNNING ORCA INTERFACE------------- 
+Object-label: ORCA
+Run-label: None
+Running ORCA with 4 cores available
+Moreadfile option not active
+A GBW-file with same basename : orca.gbw is present
+Autostart is False. ORCA will ignore any file present
+Creating inputfile: orca.inp
+ORCA input:
+! B3LYP D3BJ def2-SVP def2/J RIJCOSX CPCM TightSCF
+
+! Noautostart
+
+
+%cpcm epsilon 4.0 end
+%scf MaxIter 300 Guess PModel end
+Charge: 0  Mult: 1
+Pointcharge embedding is on!
+ ORCA Calculation starting. 
+Found warning messages in ORCA outputfile:
+WARNING: The chosen methods will break translational/rotational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ WARNING: The chosen methods will break translational symmetry
+ Warning: op=0 Small HOMO/LUMO gap (   0.097) - skipping pre-diagonalization
+ Warning: MO coefficients are modified such that the real solid harmonic m components
+
+ ORCA Calculation done. 
+ORCA converged in 7 iterations
+ORCA energy: -37.788807907526
+  ------------ENDING ORCA-INTERFACE------------- 
+
+---------------------------------------------------------------
+Time to calculate step (ORCA run): 23.888 seconds, 0.4 minutes.
+---------------------------------------------------------------
+
+--------------------------------------------------------------
+Time to calculate step (QM step): 23.888 seconds, 0.4 minutes.
+--------------------------------------------------------------
+
+----------------------------------------------------------------------
+Time to calculate step (QMpcgrad prepare): 0.000 seconds, 0.0 minutes.
+----------------------------------------------------------------------
+
+--------------------------------------------------------------------------
+Time to calculate step (linkatomgrad prepare): 0.000 seconds, 0.0 minutes.
+--------------------------------------------------------------------------
+
+----------------------------------------------------------------------------
+Time to calculate step (QM/MM gradient prepare): 0.000 seconds, 0.0 minutes.
+----------------------------------------------------------------------------
+Using OpenMM theory as part of QM/MM.
+Using MM on full system. Charges for QM region [0] have been set to zero 
+
+--------------------------------------------------------------------------------
+                   Creating/updating OpenMM simulation object                   
+--------------------------------------------------------------------------------
+
+Integrator name: VerletIntegrator
+Timestep: 0.001
+Temperature: 300
+Coupling frequency: 1
+Properties: {'Threads': '1'}
+Topology: <Topology; 1 chains, 1 residues, 2 atoms, 0 bonds>
+
+----------------------------------------------------------------------------------
+Time to calculate step (creating/updating simulation): 0.003 seconds, 0.0 minutes.
+----------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+                     Running Single-point OpenMM Interface                      
+--------------------------------------------------------------------------------
+
+Number of OpenMM system constraints defined: 0
+
+-----------------------------------------------------------------------------------
+Time to calculate step (OpenMMTheory.run: const-check): 0.003 seconds, 0.0 minutes.
+-----------------------------------------------------------------------------------
+Updating coordinates.
+
+------------------------------------------------------------------------
+Time to calculate step (Creating pos array): 0.000 seconds, 0.0 minutes.
+------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+Time to calculate step (Updating MM positions): 0.000 seconds, 0.0 minutes.
+---------------------------------------------------------------------------
+Calling OpenMM getState.
+
+---------------------------------------------------------------------
+Time to calculate step (OpenMM getState): 0.001 seconds, 0.0 minutes.
+---------------------------------------------------------------------
+OpenMM Energy: 0.3061606777457713 Eh
+OpenMM Energy: 192.11872587105123 kcal/mol
+
+-----------------------
+Ending OpenMM interface
+-----------------------
+
+----------------------------------------------------------------
+Time to calculate step (OpenMM run): 0.004 seconds, 0.0 minutes.
+----------------------------------------------------------------
+
+-------------------------------------------------------------
+Time to calculate step (MM step): 0.004 seconds, 0.0 minutes.
+-------------------------------------------------------------
+
+Note: You are using electrostatic embedding. This means that the QM-energy is actually the polarized QM-energy
+Note: MM energy also contains the QM-MM Lennard-Jones interaction
+
+QM energy:               -37.788807907526 
+MM energy:                 0.306160677746
+QM/MM energy:            -37.482647229780 
+
+  ------------ENDING QM/MM MODULE------------- 
+
+----------------------------------------------------------------
+Time to calculate step (QM/MM run): 23.893 seconds, 0.4 minutes.
+----------------------------------------------------------------
+QM atom x=0, MM +1 site x=2.0 A (LJ min 3.82 A)
+force on QM atom along x = -0.9530 Eh/Bohr
+  fx<0 => pushed AWAY: wall reaches QM (good)
+  fx>0 => pulled TOWARD: no wall on QM (collapse bug confirmed)
+
+
+--------------------------------------------------------------------------------
+                          Total timings of all modules                          
+--------------------------------------------------------------------------------
+
+To turn off timing output add to settings file: ~/ash_user_settings.ini
+print_full_timings = False   
+
+Modulename                                   Time (sec) Percentage of total     Times called
+----------------------------------------------------------------------------------------------------
+Theory-run modules
+------------------------------
+before-QMstep                                      0.00       0.0                   1
+ORCA run                                          23.89      92.7                   1
+QM step                                           23.89      92.7                   1
+linkatomgrad prepare                               0.00       0.0                   1
+QM/MM gradient prepare                             0.00       0.0                   1
+OpenMM run                                         0.00       0.0                   1
+MM step                                            0.00       0.0                   1
+QM/MM run                                         23.89      92.7                   1
+
+Object creation
+------------------------------
+OpenMM object creation                             0.35       1.4                   1
+QM/MM object creation                              0.00       0.0                   1
+runprep                                            0.00       0.0                   1
+QMpcgrad prepare                                   0.00       0.0                   1
+
+Other modules
+------------------------------
+update_charges                                     0.00       0.0                   2
+get_boundary_atoms                                 0.00       0.0                   1
+modify_bonded_forces                               0.00       0.0                   1
+add exceptions                                     0.00       0.0                   1
+ZeroQMCharges                                      0.00       0.0                   1
+delete_exceptions                                  0.00       0.0                   1
+creating/updating simulation                       0.00       0.0                   1
+OpenMMTheory.run: const-check                      0.00       0.0                   1
+Creating pos array                                 0.00       0.0                   1
+Updating MM positions                              0.00       0.0                   1
+OpenMM getState                                    0.00       0.0                   1
+
+
+Sum of all moduletimes (flawed)                   72.04
+Total walltime                                    25.76     100.0
+
+ ------------------------------------------------------------------- 
+ ASH Total Walltime: 25.8 seconds, 0.4 minutes. 
+ ------------------------------------------------------------------- 

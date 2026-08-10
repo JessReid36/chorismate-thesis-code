@@ -53,7 +53,7 @@ def evaluate(name, endpoint, workdir=".", inputs_dir="../inputs"):
     coords = "\n".join([l.rstrip() for l in sub_lines] + [l.rstrip() for l in site_body])
     mmcharges = [float(x) for x in open("%s_charges.txt" % name).read().split(",")]
 
-    frag = Fragment(coordsstring=coords, charge=-2, mult=1)
+    frag = Fragment(coordsstring=coords, charge=-2, mult=1, conncalc=False)  # skip bond-graph gen (unused in elstat QM/MM; hangs on dense charge clusters)
     els = [a.split()[0] for a in coords.strip().split("\n")]
     assert len(mmcharges) == frag.numatoms, \
         "charges (%d) != fragment atoms (%d)" % (len(mmcharges), frag.numatoms)
@@ -77,7 +77,15 @@ def evaluate(name, endpoint, workdir=".", inputs_dir="../inputs"):
     qmmm = QMMMTheory(qm_theory=orca, mm_theory=mm, fragment=frag, qmatoms=list(range(24)),
                       charges=mmcharges, embedding="elstat", qm_charge=-2, qm_mult=1, numcores=NCORES)
     FROZEN = list(range(24, frag.numatoms))
-    Optimizer(theory=qmmm, fragment=frag, coordsystem="hdlc", frozenatoms=FROZEN,
+    # geomeTRIC builds internal coords only over the 24 substrate atoms (active region); the
+    # frozen charge sites are a fixed environment. Physics-neutral (forces/energy/embedding
+    # unchanged); prevents geomeTRIC hanging on dense charge clusters. Verified: L1 gate re-passes.
+    # ActiveRegion=True + actatoms=range(24): geomeTRIC only sees the 24 substrate atoms; the 20
+    # charge sites are frozen simply by being outside the active region (do NOT also pass
+    # frozenatoms -- that double-specifies and geomeTRIC then references atom indices >= its
+    # 24-atom view, raising "Constraints refer to higher atom indices than the number of atoms").
+    Optimizer(theory=qmmm, fragment=frag, coordsystem="hdlc",
+              ActiveRegion=True, actatoms=list(range(24)),
               maxiter=400, conv_criteria=CONV, charge=-2, mult=1)
 
     R_now = [list(frag.coords[i]) for i in range(24)]
