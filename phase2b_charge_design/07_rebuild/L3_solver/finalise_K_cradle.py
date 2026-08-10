@@ -9,8 +9,8 @@ GRID   = os.path.join(HERE, "..", "L2_grid", "grid_final.tsv")
 INP    = os.path.join(HERE, "..", "inputs")
 REACT  = "reactant.xyz"
 CRADLE = os.path.join(HERE, "design_cradle2_coords.xyz")
-QMAX   = 1.0
 K      = int(sys.argv[1]) if len(sys.argv) > 1 else 6
+QMAX   = float(sys.argv[2]) if len(sys.argv) > 2 else 1.0
 PRESELECT = 2000
 CLEAR_OF_CRADLE = 2.0
 
@@ -69,7 +69,7 @@ def main():
     print("certified MILP: obj=%.6e | gap=%.2e | catalytic active=%d (K=%d) | net_q_cat=%+.2e"
           % (obj, gap, len(act), K, q.sum()))
     sub_lines = open(os.path.join(INP, REACT)).read().splitlines()[2:26]
-    tag = "cradleK%d" % K
+    tag = "cradleK%dq%s" % (K, ("%.2f" % QMAX).replace(".", "p"))
     ncat = len(act)
     with open(os.path.join(HERE, "design_%s_coords.xyz" % tag), "w") as f:
         f.write("%d\ncradle(2x+1) + %d catalytic (certified, gap %.1e)\n" % (24 + 2 + ncat, ncat, gap))

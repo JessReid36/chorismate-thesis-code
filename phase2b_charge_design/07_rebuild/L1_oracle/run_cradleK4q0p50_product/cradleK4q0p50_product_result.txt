@@ -1,0 +1,4 @@
+energy_Eh=-836.67124523
+integrity=VALID
+broke=[]
+formed=[]
