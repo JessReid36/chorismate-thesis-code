@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Chorismate R / P - atom numbering</title>
+<style>
+ body{margin:0;font-family:system-ui,sans-serif;background:#0e0e12;color:#ddd;overflow:hidden}
+ #bar{position:fixed;top:0;left:0;right:0;padding:8px 12px;background:#16161c;z-index:10;
+      display:flex;gap:14px;align-items:center;box-shadow:0 1px 6px #0008;flex-wrap:wrap}
+ button{background:#26262f;color:#ddd;border:1px solid #3a3a46;border-radius:6px;padding:6px 12px;cursor:pointer}
+ button.active{background:#3a5;border-color:#3a5;color:#fff}
+ label{font-size:13px;user-select:none}.hint{font-size:12px;color:#888}
+ canvas{display:block}#reacting{color:#ff6}
+</style></head><body>
+<div id="bar">
+ <button id="btnR" class="active">Reactant</button>
+ <button id="btnP">Product</button>
+ <label><input type="checkbox" id="idx" checked> atom #</label>
+ <label><input type="checkbox" id="elem" checked> element</label>
+ <label><input type="checkbox" id="bonds" checked> bonds</label>
+ <span class="hint">drag=rotate | scroll=zoom | <span id="reacting">O3-C4 (7-8) &amp; C1-C6 (0-12) yellow</span></span>
+</div>
+<canvas id="c"></canvas>
+<script>
+const GEO={"reactant": [["C", 60.111938, 34.383969, 57.210132], ["H", 60.607199, 33.429939, 57.384609], ["H", 60.724693, 35.271818, 57.059193], ["C", 58.780577, 34.503532, 57.151958], ["C", 58.092182, 35.834261, 56.893354], ["O", 58.812467, 36.818218, 56.578789], ["O", 56.839549, 35.848917, 57.009617], ["O", 57.934615, 33.426403, 57.345998], ["C", 57.676936, 32.537732, 56.200806], ["H", 57.019017, 31.763769, 56.624072], ["C", 58.986487, 31.96184, 55.793172], ["H", 59.46393, 31.242983, 56.460496], ["C", 59.683105, 32.482671, 54.768151], ["C", 59.064321, 33.483709, 53.893179], ["H", 59.702361, 33.904544, 53.110969], ["C", 57.781253, 33.865659, 54.031533], ["H", 57.332181, 34.602354, 53.356629], ["C", 56.889799, 33.271093, 55.086182], ["H", 56.34719, 34.090648, 55.58588], ["O", 55.962863, 32.397707, 54.434668], ["H", 55.310845, 32.109527, 55.09277], ["C", 61.1232, 32.062126, 54.534208], ["O", 61.784962, 31.702328, 55.543381], ["O", 61.541071, 32.106513, 53.352738]], "product": [["C", 60.092356, 34.056984, 56.354594], ["H", 60.757862, 33.54493, 57.062775], ["H", 60.607676, 34.925793, 55.921397], ["C", 58.844721, 34.465867, 57.095841], ["C", 58.158936, 35.830179, 56.839235], ["O", 58.893519, 36.799815, 56.528907], ["O", 56.9172, 35.847731, 56.99285], ["O", 58.307613, 33.702214, 57.875302], ["C", 57.548698, 31.938147, 55.699735], ["H", 56.940391, 31.18373, 56.203549], ["C", 58.878432, 31.920015, 55.800043], ["H", 59.399305, 31.165241, 56.389488], ["C", 59.744487, 33.008977, 55.219846], ["C", 59.02855, 33.707589, 54.087981], ["H", 59.670812, 34.192743, 53.346365], ["C", 57.695381, 33.716804, 53.97181], ["H", 57.195032, 34.246401, 53.154887], ["C", 56.810468, 33.03513, 54.981426], ["H", 56.513401, 33.810335, 55.714955], ["O", 55.640479, 32.543634, 54.338392], ["H", 55.032504, 32.220885, 55.020192], ["C", 61.077105, 32.332661, 54.739361], ["O", 61.765259, 31.766738, 55.625475], ["O", 61.336808, 32.358221, 53.517478]]};
+const COLORS={C:'#909090',H:'#e8e8e8',O:'#ff4030',N:'#3050f0'};
+const RCOV={C:0.77,H:0.31,O:0.66,N:0.70};
+const REACTING=new Set(['7-8','0-12']);
+let cur='reactant',rotX=0.4,rotY=0.6,zoom=1,dragging=false,lx=0,ly=0;
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+function resize(){cv.width=innerWidth;cv.height=innerHeight;}resize();onresize=()=>{resize();draw();};
+function center(a){let c=[0,0,0];a.forEach(x=>{c[0]+=x[1];c[1]+=x[2];c[2]+=x[3]});c=c.map(v=>v/a.length);
+ return a.map(x=>[x[0],x[1]-c[0],x[2]-c[1],x[3]-c[2]]);}
+function rot(p){let[x,y,z]=p;let cyv=Math.cos(rotY),syv=Math.sin(rotY);[x,z]=[x*cyv-z*syv,x*syv+z*cyv];
+ let cxv=Math.cos(rotX),sxv=Math.sin(rotX);[y,z]=[y*cxv-z*sxv,y*sxv+z*cxv];return[x,y,z];}
+function draw(){
+ ctx.clearRect(0,0,cv.width,cv.height);
+ const atoms=center(GEO[cur]);
+ const showIdx=document.getElementById('idx').checked,showEl=document.getElementById('elem').checked,showB=document.getElementById('bonds').checked;
+ const S=48*zoom,cx=cv.width/2,cy=cv.height/2+20;
+ const proj=atoms.map(a=>{const r=rot([a[1],a[2],a[3]]);return{el:a[0],x:cx+r[0]*S,y:cy-r[1]*S,z:r[2]};});
+ if(showB){for(let i=0;i<atoms.length;i++)for(let j=i+1;j<atoms.length;j++){
+   const a=atoms[i],b=atoms[j],d=Math.hypot(a[1]-b[1],a[2]-b[2],a[3]-b[3]),cut=1.3*((RCOV[a[0]]||.7)+(RCOV[b[0]]||.7));
+   if(d<cut){const key=i+'-'+j;ctx.strokeStyle=REACTING.has(key)?'#ff6':'#555';ctx.lineWidth=REACTING.has(key)?3:1.5;
+    ctx.beginPath();ctx.moveTo(proj[i].x,proj[i].y);ctx.lineTo(proj[j].x,proj[j].y);ctx.stroke();}}}
+ const order=[...proj.keys()].sort((p,q)=>proj[p].z-proj[q].z);
+ for(const i of order){const p=proj[i],rad=(p.el==='H'?7:11)*Math.sqrt(zoom);
+  ctx.beginPath();ctx.arc(p.x,p.y,rad,0,7);ctx.fillStyle=COLORS[p.el]||'#c0f';ctx.fill();
+  ctx.lineWidth=1;ctx.strokeStyle='#000';ctx.stroke();
+  if(showIdx||showEl){ctx.fillStyle='#fff';ctx.font='bold 12px system-ui';ctx.textAlign='left';
+   let lbl=(showEl?p.el:'')+(showIdx?i:'');ctx.fillText(lbl,p.x+rad+1,p.y-2);}}
+ ctx.fillStyle='#888';ctx.font='12px system-ui';ctx.textAlign='left';
+ ctx.fillText(cur.toUpperCase()+'  ('+atoms.length+' atoms) - label = element+index (0-based)',12,cv.height-14);
+}
+document.getElementById('btnR').onclick=()=>{cur='reactant';btnR.classList.add('active');btnP.classList.remove('active');draw();};
+document.getElementById('btnP').onclick=()=>{cur='product';btnP.classList.add('active');btnR.classList.remove('active');draw();};
+['idx','elem','bonds'].forEach(id=>document.getElementById(id).onchange=draw);
+cv.onmousedown=e=>{dragging=true;lx=e.clientX;ly=e.clientY;};
+onmouseup=()=>dragging=false;
+onmousemove=e=>{if(dragging){rotY+=(e.clientX-lx)*0.01;rotX+=(e.clientY-ly)*0.01;lx=e.clientX;ly=e.clientY;draw();}};
+cv.onwheel=e=>{e.preventDefault();zoom*=e.deltaY<0?1.1:0.9;zoom=Math.max(0.3,Math.min(6,zoom));draw();};
+draw();
+</script></body></html>
