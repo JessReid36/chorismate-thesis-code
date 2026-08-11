@@ -1,0 +1,4 @@
+b0_kcal=17.47
+best_drop_kcal=-10.63
+best_axis=('z', -0.02)
+F_achievable=0.020
