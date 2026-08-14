@@ -1,0 +1,7 @@
+design=oeefs_q0p50_fb0p020_m0p010
+method=relaxed_scan_O3C4
+peak_rc_A=2.05
+scan_barrier_kcal=21.32
+bare_reference_kcal=17.47
+delta_vs_bare_kcal=3.85
+profile_kcal(rc:dE)=1.45:0.0000 1.50:0.4084 1.55:1.7587 1.65:6.1204 1.75:11.3218 1.85:16.1401 1.95:19.8330 2.05:21.3207 2.15:20.8981 2.25:-36.8041 2.35:-41.6616 2.45:-45.4207 2.55:-48.3614 2.60:-49.5743

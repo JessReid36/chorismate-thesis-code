@@ -1,0 +1,7 @@
+design=cap_f0p020_n5
+method=relaxed_scan_O3C4
+peak_rc_A=1.95
+scan_barrier_kcal=15.78
+bare_reference_kcal=17.47
+delta_vs_bare_kcal=-1.69
+profile_kcal(rc:dE)=1.45:0.0000 1.55:1.6939 1.65:5.8569 1.75:10.5907 1.85:14.1790 1.95:15.7798 2.05:-23.1274 2.15:-29.0003 2.25:-33.5813 2.35:-37.0136 2.45:-39.4666 2.55:-41.1345 2.60:-41.7208
