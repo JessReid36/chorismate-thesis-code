@@ -1,0 +1,121 @@
+#!/bin/bash
+#PBS -N cm_p2b_signchk
+#PBS -l select=1:ncpus=8:mem=24gb
+#PBS -l walltime=168:00:00
+#PBS -m ae
+#PBS -M 18660916@sun.ac.za
+#PBS -j oe
+#PBS -o /home/18660916/system_development/phase2b_charge_design/03_dvpot/signcheck.pbs.out
+#
+# Sign-convention check for the difference potential Dv = V_TS - V_R.
+#
+# Confirms on the geometry of record that a +1 cation beyond the ether oxygen
+# is stabilising and that the sign inverts in the forming-bond region.
+#
+# Guards, any of which stops the job rather than producing a plausible-looking
+# wrong answer:
+#   1. reacting-bond lengths of BOTH endpoints, against 01_geometry/provenance.tsv
+#   2. reactant and TS share a coordinate frame (centroid + rigid-body test)
+#   3. single-point energies match the canonical values to 1e-6 Eh
+#
+# Self-healing: if the .gbw / .densities from 02_singlepoints are absent they
+# are regenerated from the committed .inp files, then energy-checked.
+
+set -uo pipefail
+
+ORCA=/home/apps2/ORCA/6.0.1
+ROOT=/home/18660916/system_development/phase2b_charge_design
+SP="$ROOT/02_singlepoints"
+STAGE="$ROOT/03_dvpot"
+GEOM_DIR="$ROOT/01_geometry"
+PROVENANCE="$GEOM_DIR/provenance.tsv"
+
+# OpenMPI bin must be on PATH, not merely LD_LIBRARY_PATH, or ORCA parallel
+# runs die with "sh: mpirun: command not found".
+export PATH="/apps/openmpi/4.1.1/bin:$PATH"
+export LD_LIBRARY_PATH="$ORCA/lib:/apps/openmpi/4.1.1/lib:/apps/mambaforge/envs/medaka/lib:${LD_LIBRARY_PATH:-}"
+# Required before numpy is touched on this system.
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
+
+mkdir -p "$STAGE"
+cd "$STAGE" || exit 1
+
+echo "host=$(hostname)  start=$(date)"
+echo "stage=$STAGE"
+echo
+
+# Canonical single-point energies. A regenerated density that fails to
+# reproduce these is a different calculation, and the job stops.
+E_REACTANT_REF=-836.367257939969
+E_TS_REF=-836.339411092751
+
+for f in "$PROVENANCE" "$GEOM_DIR/reactant.xyz" "$GEOM_DIR/ts.xyz" "$STAGE/s1_signcheck.py"; do
+  [[ -s "$f" ]] || { echo "FAIL: required file missing: $f"; exit 1; }
+done
+
+# ---------------------------------------------------------------- densities
+for b in sp_reactant sp_ts; do
+  if [[ -s "$SP/${b}.gbw" && -s "$SP/${b}.densities" ]]; then
+    echo "[found]   $SP/${b}.gbw + .densities"
+  else
+    echo "[missing] $SP/${b} density container - regenerating from ${b}.inp"
+    [[ -s "$SP/${b}.inp" ]] || { echo "FAIL: $SP/${b}.inp absent; restore from the code repo"; exit 1; }
+    ( cd "$SP" && "$ORCA/orca" "${b}.inp" > "${b}.regen.out" 2>&1 )
+    if ! grep -q "ORCA TERMINATED NORMALLY" "$SP/${b}.regen.out"; then
+      echo "FAIL: regeneration of ${b} did not terminate normally"
+      tail -30 "$SP/${b}.regen.out"
+      exit 1
+    fi
+    echo "[regen]   ${b} complete"
+  fi
+done
+echo
+
+# ------------------------------------------------------- verify the energies
+echo "=== single-point energies vs canonical values ==="
+for pair in "sp_reactant $E_REACTANT_REF" "sp_ts $E_TS_REF"; do
+  set -- $pair
+  b=$1; ref=$2
+  src="$SP/${b}.out"
+  [[ -s "$SP/${b}.regen.out" ]] && src="$SP/${b}.regen.out"
+  got=$(grep "FINAL SINGLE POINT ENERGY" "$src" | tail -1 | awk '{print $NF}')
+  [[ -n "$got" ]] || { echo "FAIL: no FINAL SINGLE POINT ENERGY in $src"; exit 1; }
+  ok=$(python3 -c "print(1 if abs($got - ($ref)) < 1e-6 else 0)")
+  printf "  %-12s got %s   ref %s   %s\n" "$b" "$got" "$ref" \
+         "$([[ $ok == 1 ]] && echo MATCH || echo MISMATCH)"
+  [[ $ok == 1 ]] && continue
+  echo "FAIL: energy differs from the canonical value by more than 1e-6 Eh."
+  echo "      This density is not the one the committed results were built on."
+  exit 1
+done
+echo
+
+# ------------------------------------- geometry guards, frame check, probes
+python3 "$STAGE/s1_signcheck.py" points \
+        "$GEOM_DIR" "$PROVENANCE" signcheck_points_bohr.xyz signcheck_labels.tsv || exit 1
+echo
+
+# ------------------------------------------------------------- run orca_vpot
+# Argument order: GBW  density-member  points(Bohr)  output  container-basename
+echo "=== orca_vpot at the reactant density ==="
+"$ORCA/orca_vpot" "$SP/sp_reactant.gbw" sp_reactant.scfp \
+                  signcheck_points_bohr.xyz signcheck_vR.out "$SP/sp_reactant" || exit 1
+
+echo "=== orca_vpot at the TS density ==="
+"$ORCA/orca_vpot" "$SP/sp_ts.gbw" sp_ts.scfp \
+                  signcheck_points_bohr.xyz signcheck_vTS.out "$SP/sp_ts" || exit 1
+echo
+
+# ------------------------------------------------------------------ assemble
+echo "=== Dv = V_TS - V_R ==="
+python3 "$STAGE/s1_signcheck.py" assemble \
+        signcheck_labels.tsv signcheck_vR.out signcheck_vTS.out \
+        signcheck_table.tsv
+rc=$?
+
+echo
+echo "outputs written to $STAGE:"
+ls -la signcheck_* 2>/dev/null
+echo
+echo "end=$(date)  exit=$rc"
+exit $rc
