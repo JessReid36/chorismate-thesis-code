@@ -130,6 +130,9 @@ PY
     echo '#PBS -m ae'; echo "#PBS -M $EMAIL"; echo '#PBS -j oe'
     echo "#PBS -o $scan/scan.pbs.out"
     echo "cd $scan"
+    echo '# RUNLOCK: mkdir is atomic - a second job in this directory exits'
+    echo 'if ! mkdir .running 2>/dev/null; then echo "FAIL: another job holds .running here"; exit 1; fi'
+    echo 'trap "rmdir .running 2>/dev/null" EXIT'
     echo "export PATH=\"$MPI/bin:\$PATH\""
     echo "export LD_LIBRARY_PATH=\"$ORCA/lib:$MPI/lib:$BLAS:\$LD_LIBRARY_PATH\""
     echo 'export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1'
@@ -138,7 +141,7 @@ PY
     echo 'RC=$?'
     echo 'echo "end=$(date) rc=$RC"'
     echo '# the scan is only useful if it reached the final window'
-    echo "[ -s win_$(printf '%02d' $NWIN).pdb ] && echo SCAN_PASS || echo SCAN_INCOMPLETE"
+    echo "if [ -s win_$(printf '%02d' $NWIN).pdb ]; then echo SCAN_PASS; else echo SCAN_INCOMPLETE; exit 1; fi"
     echo 'tail -3 scan_progress.tsv 2>/dev/null'
   } > "$work/scan.pbs"
 
