@@ -1,0 +1,122 @@
+#!/bin/bash
+#PBS -N cm_dv_grid_v2
+#PBS -l select=1:ncpus=8:mem=24gb
+#PBS -l walltime=168:00:00
+#PBS -m ae
+#PBS -M 18660916@sun.ac.za
+#PBS -j oe
+#PBS -o /home/18660916/system_development/phase2b_charge_design/03_dvpot_v2/dv_grid_v2.pbs.out
+#
+# Evaluate Dv = V_TS - V_R at every site of the candidate grid.
+#
+# No new SCF anywhere: the reactant and TS densities are the committed single
+# points, and orca_vpot only evaluates their potentials at new positions. The
+# resulting map is therefore directly comparable to the barrier those same
+# densities define.
+#
+# Guards, any of which stops the job:
+#   1. the grid file and the worker script are present
+#   2. the single-point energies match the canonical values to 1e-6 Eh, so the
+#      potentials cannot come from a density other than the one the reported
+#      barrier rests on
+#   3. orca_vpot returns exactly one value per site, in the recorded row order
+#
+# Before submitting, copy the grid up from your workstation:
+#   scp ~/gridbuild/grid_poisson_sites.tsv \
+#       18660916@hpc1.sun.ac.za:~/system_development/phase2b_charge_design/03_dvpot_v2/
+#   scp ~/Downloads/s3_dv_on_grid_v2.py \
+#       18660916@hpc1.sun.ac.za:~/system_development/phase2b_charge_design/03_dvpot_v2/
+
+set -uo pipefail
+
+ORCA=/home/apps2/ORCA/6.0.1
+ROOT=/home/18660916/system_development/phase2b_charge_design
+SP="$ROOT/02_singlepoints"
+STAGE="$ROOT/03_dvpot_v2"
+GRID="$STAGE/grid_poisson_sites.tsv"
+OLD_DV="$ROOT/03_dvpot/dv_grid.tsv"     # optional, for the shell-change comparison
+
+export PATH="/apps/openmpi/4.1.1/bin:$PATH"
+export LD_LIBRARY_PATH="$ORCA/lib:/apps/openmpi/4.1.1/lib:/apps/mambaforge/envs/medaka/lib:${LD_LIBRARY_PATH:-}"
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
+
+mkdir -p "$STAGE"
+cd "$STAGE" || exit 1
+
+echo "host=$(hostname)  start=$(date)"
+echo "stage=$STAGE"
+echo
+
+E_REACTANT_REF=-836.367257939969
+E_TS_REF=-836.339411092751
+
+for f in "$GRID" "$STAGE/s3_dv_on_grid_v2.py"; do
+  [[ -s "$f" ]] || { echo "FAIL: required file missing: $f"; exit 1; }
+done
+
+# ---------------------------------------------------------------- densities
+for b in sp_reactant sp_ts; do
+  if [[ -s "$SP/${b}.gbw" && -s "$SP/${b}.densities" ]]; then
+    echo "[found]   $SP/${b}.gbw + .densities"
+  else
+    echo "[missing] $SP/${b} density container - regenerating from ${b}.inp"
+    [[ -s "$SP/${b}.inp" ]] || { echo "FAIL: $SP/${b}.inp absent"; exit 1; }
+    ( cd "$SP" && "$ORCA/orca" "${b}.inp" > "${b}.regen.out" 2>&1 )
+    grep -q "ORCA TERMINATED NORMALLY" "$SP/${b}.regen.out" || {
+      echo "FAIL: regeneration of ${b} did not terminate normally"
+      tail -30 "$SP/${b}.regen.out"; exit 1; }
+    echo "[regen]   ${b} complete"
+  fi
+done
+echo
+
+# ------------------------------------------------------- verify the energies
+echo "=== single-point energies vs canonical values ==="
+for pair in "sp_reactant $E_REACTANT_REF" "sp_ts $E_TS_REF"; do
+  set -- $pair
+  b=$1; ref=$2
+  src="$SP/${b}.out"
+  [[ -s "$SP/${b}.regen.out" ]] && src="$SP/${b}.regen.out"
+  got=$(grep "FINAL SINGLE POINT ENERGY" "$src" | tail -1 | awk '{print $NF}')
+  [[ -n "$got" ]] || { echo "FAIL: no FINAL SINGLE POINT ENERGY in $src"; exit 1; }
+  ok=$(python3 -c "print(1 if abs($got - ($ref)) < 1e-6 else 0)")
+  printf "  %-12s got %s   ref %s   %s\n" "$b" "$got" "$ref" \
+         "$([[ $ok == 1 ]] && echo MATCH || echo MISMATCH)"
+  [[ $ok == 1 ]] && continue
+  echo "FAIL: energy differs from the canonical value by more than 1e-6 Eh."
+  exit 1
+done
+echo
+
+# ------------------------------------------------- convert the grid to Bohr
+echo "=== preparing grid points ==="
+python3 "$STAGE/s3_dv_on_grid_v2.py" prepare \
+        "$GRID" grid_points_bohr.xyz grid_row_order.tsv || exit 1
+NSITES=$(head -1 grid_points_bohr.xyz)
+echo
+
+# ------------------------------------------------------------- run orca_vpot
+# Argument order: GBW  density-member  points(Bohr)  output  container-basename
+echo "=== orca_vpot at the reactant density ($NSITES sites) ==="
+"$ORCA/orca_vpot" "$SP/sp_reactant.gbw" sp_reactant.scfp \
+                  grid_points_bohr.xyz vR_grid.out "$SP/sp_reactant" || exit 1
+
+echo "=== orca_vpot at the TS density ($NSITES sites) ==="
+"$ORCA/orca_vpot" "$SP/sp_ts.gbw" sp_ts.scfp \
+                  grid_points_bohr.xyz vTS_grid.out "$SP/sp_ts" || exit 1
+echo
+
+# ------------------------------------------------------------------ assemble
+echo "=== Dv = V_TS - V_R ==="
+CMP=""
+[[ -s "$OLD_DV" ]] && CMP="--compare $OLD_DV"
+python3 "$STAGE/s3_dv_on_grid_v2.py" assemble \
+        grid_row_order.tsv vR_grid.out vTS_grid.out dv_grid_v2.tsv $CMP
+rc=$?
+
+echo
+echo "outputs written to $STAGE:"
+ls -la grid_points_bohr.xyz grid_row_order.tsv vR_grid.out vTS_grid.out dv_grid_v2.tsv 2>/dev/null
+echo
+echo "end=$(date)  exit=$rc"
+exit $rc

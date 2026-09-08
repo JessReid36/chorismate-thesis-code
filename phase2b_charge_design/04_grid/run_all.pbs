@@ -1,0 +1,38 @@
+#!/bin/bash
+#PBS -N cm_gridbuild
+#PBS -l select=1:ncpus=8:mem=24gb
+#PBS -l walltime=168:00:00
+#PBS -m ae
+#PBS -M 18660916@sun.ac.za
+#PBS -j oe
+#PBS -o grid_build.pbs.out
+#
+# Build both candidate grids and compare them. Pure geometry - no ORCA, no SCF.
+# Submit from the directory holding the scripts and the three .xyz geometries.
+
+set -uo pipefail
+cd "$PBS_O_WORKDIR" || exit 1
+
+# numpy needs these on this system
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
+
+echo "host=$(hostname)  start=$(date)"
+echo "workdir=$PWD"
+echo
+
+for f in reactant.xyz ts.xyz product.xyz 01_build_sdf.py 02_grid_poisson.py \
+         03_grid_cvt.py 04_compare_grids.py; do
+  [[ -s "$f" ]] || { echo "FAIL: required file missing: $f"; exit 1; }
+done
+
+python3 -c "import numpy, scipy, skimage, trimesh" 2>/dev/null || {
+  echo "FAIL: need numpy, scipy, scikit-image, trimesh"
+  echo "      conda activate ash   (or) pip install --user scikit-image trimesh"
+  exit 1; }
+
+bash run_all.sh
+rc=$?
+
+echo
+echo "end=$(date)  exit=$rc"
+exit $rc
