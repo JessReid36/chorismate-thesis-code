@@ -1,0 +1,201 @@
+#!/bin/bash
+#PBS -N cm_ref_diag
+#PBS -l select=1:ncpus=8:mem=24gb
+#PBS -l walltime=24:00:00
+#PBS -m ae
+#PBS -M 18660916@sun.ac.za
+#PBS -j oe
+#PBS -o /home/18660916/system_development/phase2b_charge_design/02_singlepoints/refstate_diagnostic.pbs.out
+#
+# Diagnostic on the bare reference state (+17.47 kcal/mol).
+#
+# TWO QUESTIONS
+# -------------
+# 1. How much of the bare barrier is the CPCM continuum responsible for? The
+#    reference is not a "no environment" state - it is the enzyme-preorganised
+#    substrate in a uniform dielectric of 4. A vacuum calculation bounds what
+#    the continuum contributes.
+#
+# 2. Is the def2-SVP result trustworthy for a dianion? In vacuum the isolated
+#    -2 species is not electronically bound (HOMO +0.078 Eh at def2-SVP), and a
+#    basis without diffuse functions artificially confines the excess charge. If
+#    the vacuum barrier moves substantially between def2-SVP and def2-SVPD while
+#    the CPCM barrier does not, that demonstrates the continuum is doing
+#    necessary physical work and that a vacuum reference would be unreliable.
+#
+# DESIGN
+# ------
+# 2 environments x 2 basis sets x 2 geometries = 8 single points, seconds each.
+# Geometries are the committed reactant and TS, used without re-optimisation, so
+# every number is directly comparable to the +17.47 and +16.00 barriers.
+#
+# The def2-SVP/CPCM pair reproduces the canonical single points and is checked
+# against them; if that check fails, nothing else in the table can be trusted.
+#
+# RUN
+#   qsub refstate_diagnostic.pbs
+
+set -uo pipefail
+
+ORCA=/home/apps2/ORCA/6.0.1
+ROOT=/home/18660916/system_development/phase2b_charge_design
+GEOM="$ROOT/01_geometry"
+WORK="$ROOT/02_singlepoints/refstate_diagnostic"
+
+export PATH="/apps/openmpi/4.1.1/bin:$PATH"
+export LD_LIBRARY_PATH="$ORCA/lib:/apps/openmpi/4.1.1/lib:/apps/mambaforge/envs/medaka/lib:${LD_LIBRARY_PATH:-}"
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
+
+E_REACTANT_REF=-836.367257939969
+E_TS_REF=-836.339411092751
+
+mkdir -p "$WORK"; cd "$WORK" || exit 1
+if ! mkdir .running 2>/dev/null; then
+  echo "FAIL: another job holds .running here"; exit 1
+fi
+trap 'rmdir .running 2>/dev/null' EXIT
+
+echo "host=$(hostname)  start=$(date)"
+echo
+
+for g in reactant ts; do
+  [[ -s "$GEOM/$g.xyz" ]] || { echo "FAIL missing $GEOM/$g.xyz"; exit 1; }
+  cp "$GEOM/$g.xyz" .
+done
+
+# ------------------------------------------------------------ build and run
+# Serial (no %pal): these are 24-atom single points, and running serial avoids
+# the MPI startup path entirely.
+for basis in def2-SVP def2-SVPD; do
+  for env in vac cpcm; do
+    for g in reactant ts; do
+      tag="${g}_${basis}_${env}"
+      {
+        if [[ "$env" == "cpcm" ]]; then
+          echo "! B3LYP D3BJ $basis def2/J RIJCOSX CPCM TightSCF"
+          echo "%cpcm epsilon 4.0 end"
+        else
+          echo "! B3LYP D3BJ $basis def2/J RIJCOSX TightSCF"
+        fi
+        echo "%scf MaxIter 300 end"
+        echo "%maxcore 3000"
+        echo "* xyzfile -2 1 ${g}.xyz"
+      } > "${tag}.inp"
+
+      echo "=== $tag"
+      "$ORCA/orca" "${tag}.inp" > "${tag}.out" 2>&1
+      if grep -q "ORCA TERMINATED NORMALLY" "${tag}.out"; then
+        e=$(grep "FINAL SINGLE POINT ENERGY" "${tag}.out" | tail -1 | awk '{print $NF}')
+        echo "    E = $e Eh"
+      else
+        echo "    DID NOT TERMINATE NORMALLY"
+        tail -5 "${tag}.out"
+      fi
+    done
+  done
+done
+echo
+
+# ------------------------------------------------------------------ report
+python3 << 'PY'
+import re, glob, os
+H = 627.5094740631
+
+def energy(path):
+    if not os.path.exists(path): return None
+    t = open(path, errors="replace").read()
+    if "ORCA TERMINATED NORMALLY" not in t: return None
+    m = re.findall(r"FINAL SINGLE POINT ENERGY\s+(-?\d+\.\d+)", t)
+    return float(m[-1]) if m else None
+
+def homo(path):
+    """Highest orbital with occupation ~2. A positive value means the extra
+    charge is not bound and the density is not physically meaningful."""
+    if not os.path.exists(path): return None
+    lines = open(path, errors="replace").read().splitlines()
+    last = None
+    for i, l in enumerate(lines):
+        if "ORBITAL ENERGIES" in l:
+            last = i
+    if last is None: return None
+    e_h = None
+    for l in lines[last:last+400]:
+        f = l.split()
+        if len(f) >= 4:
+            try:
+                occ = float(f[1]); eh = float(f[2])
+            except ValueError:
+                continue
+            if occ > 1.5:
+                e_h = eh
+            elif e_h is not None:
+                break
+    return e_h
+
+print("BARE REFERENCE STATE DIAGNOSTIC")
+print("geometries: committed reactant and TS, no re-optimisation\n")
+print(f"{'basis':<12}{'environment':<14}{'E(R) Eh':>18}{'E(TS) Eh':>18}"
+      f"{'barrier kcal/mol':>19}{'HOMO(R) Eh':>13}{'bound?':>9}")
+print("-" * 103)
+
+rows = {}
+for basis in ("def2-SVP", "def2-SVPD"):
+    for env, lbl in (("vac", "vacuum"), ("cpcm", "CPCM eps=4")):
+        er = energy(f"reactant_{basis}_{env}.out")
+        et = energy(f"ts_{basis}_{env}.out")
+        hr = homo(f"reactant_{basis}_{env}.out")
+        if er is None or et is None:
+            print(f"{basis:<12}{lbl:<14}{'FAILED':>18}")
+            continue
+        b = (et - er) * H
+        rows[(basis, env)] = b
+        bound = "yes" if (hr is not None and hr < 0) else "NO"
+        print(f"{basis:<12}{lbl:<14}{er:>18.9f}{et:>18.9f}{b:>19.3f}"
+              f"{hr if hr is not None else float('nan'):>13.6f}{bound:>9}")
+
+print()
+# canonical check
+ref_r, ref_t = -836.367257939969, -836.339411092751
+er = energy("reactant_def2-SVP_cpcm.out")
+et = energy("ts_def2-SVP_cpcm.out")
+if er is not None and et is not None:
+    ok = abs(er - ref_r) < 1e-5 and abs(et - ref_t) < 1e-5
+    print(f"canonical check (def2-SVP / CPCM vs the committed single points): "
+          f"{'MATCH' if ok else 'MISMATCH'}")
+    if not ok:
+        print(f"  got  R {er:.9f}  TS {et:.9f}")
+        print(f"  ref  R {ref_r:.9f}  TS {ref_t:.9f}")
+        print("  Note TightSCF is used here; the committed points may differ")
+        print("  slightly in convergence settings. A difference of <0.01 kcal/mol")
+        print("  is acceptable, more is not.")
+
+print()
+if len(rows) == 4:
+    print("INTERPRETATION")
+    dv = rows[("def2-SVPD", "vac")] - rows[("def2-SVP", "vac")]
+    dc = rows[("def2-SVPD", "cpcm")] - rows[("def2-SVP", "cpcm")]
+    print(f"  basis sensitivity in vacuum      : {dv:+.3f} kcal/mol")
+    print(f"  basis sensitivity under CPCM     : {dc:+.3f} kcal/mol")
+    cont = rows[("def2-SVP", "cpcm")] - rows[("def2-SVP", "vac")]
+    print(f"  continuum contribution (def2-SVP): {cont:+.3f} kcal/mol")
+    print()
+    if abs(dv) > 2 * max(abs(dc), 0.1):
+        print("  The vacuum barrier is markedly more basis-sensitive than the")
+        print("  CPCM barrier. That is the expected signature of an unbound")
+        print("  dianion being artificially confined by a basis without diffuse")
+        print("  functions: the vacuum number is a basis artefact, the continuum")
+        print("  is doing necessary physical work, and a vacuum reference state")
+        print("  would not be defensible.")
+    else:
+        print("  The two environments show comparable basis sensitivity, so the")
+        print("  vacuum result is not obviously a diffuse-function artefact.")
+        print("  The continuum contribution above can then be read as a genuine")
+        print("  decomposition rather than a comparison against an artefact.")
+    print()
+    print("  Either way, report the CPCM barrier as the reference and state the")
+    print("  continuum contribution explicitly, so that +17.47 is not mistaken")
+    print("  for a 'no environment' state.")
+PY
+
+echo
+echo "end=$(date)"
