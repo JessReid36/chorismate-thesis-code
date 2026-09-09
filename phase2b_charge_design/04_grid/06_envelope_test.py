@@ -134,18 +134,18 @@ def main():
     print("   For each envelope, the standoff of its own sites measured against")
     print("   the geometries it did not include.\n")
     print(f"{'envelope':<18}{'sites':>7}{'min standoff':>15}{'below floor':>16}"
-          f"{'note':>18}")
-    print("-" * 74)
+          f"{'worst':>9}")
+    print("-" * 66)
     for label, (P, keys) in grids.items():
         others = [k for k in NAMES if k not in keys]
         if not others:
             print(f"{label:<18}{len(P):>7}{'-':>15}"
-                  f"{'0':>16}{'by construction':>18}")
+                  f"{'0 (by construction)':>16}{'-':>9}")
             continue
         mins = np.min([standoff(P, G[k][1], G[k][0]) for k in others], axis=0)
         bad = int((mins < floor - 1e-6).sum())
         print(f"{label:<18}{len(P):>7}{mins.min():>15.3f}"
-              f"{f'{bad} ({100*bad/len(P):.1f}%)':>16}{'':>18}")
+              f"{f'{bad} ({100*bad/len(P):.1f}%)':>16}{mins.min():>9.3f}")
 
     print("\n2. WHICH GEOMETRY SETS THE ENVELOPE")
     print("   At each site of the union grid, which geometry is closest. If one")
@@ -171,15 +171,29 @@ def main():
           f"{100*(nu-nr)/nr:+.1f}% in site count")
     Pr, _ = grids["reactant only"]
     mins = np.min([standoff(Pr, G[k][1], G[k][0]) for k in ("ts", "product")], axis=0)
-    print(f"   reactant-only admits {int((mins < floor - 1e-6).sum())} sites that "
+    nbreach = int((mins < floor - 1e-6).sum())
+    print(f"   reactant-only admits {nbreach} sites ({100*nbreach/nr:.1f}%) that "
           f"breach the {floor:.1f} A floor later on the path")
-    delta = 100*(nu-nr)/nr
-    if delta >= 0:
-        print("\n   The union costs nothing in candidate positions at these settings")
-        print("   and guarantees path-wide clearance. There is no trade-off to weigh.")
-    else:
-        print("\n   The union is the cheaper of the two errors: a small loss of")
-        print("   candidate positions against a guarantee of path-wide clearance.")
+
+    # Sites present on the reactant-only grid but absent from the union grid.
+    # This is a different and larger quantity than the count above: a site is
+    # lost either because the union field excludes it, or because the union
+    # grid's stochastic thinning did not select that position. Both are
+    # reported so the write-up can quote the measure it means.
+    from scipy.spatial import cKDTree
+    Pu = grids["union R+TS+P"][0]
+    tol = 1e-3
+    dmatch, _ = cKDTree(Pu).query(Pr, k=1)
+    nlost = int((dmatch > tol).sum())
+    print(f"   reactant-only sites with no counterpart on the union grid "
+          f"(within {tol} A): {nlost} ({100*nlost/nr:.1f}%)")
+    if nlost:
+        so_r = standoff(Pr, G["reactant"][1], G["reactant"][0])
+        lost = so_r[dmatch > tol]
+        print(f"   those sites stand {lost.min():.3f} to {lost.max():.3f} A from "
+              f"the reactant surface")
+    print("\n   The union is the cheaper of the two errors: a small loss of")
+    print("   candidate positions against a guarantee of path-wide clearance.")
 
 
 if __name__ == "__main__":

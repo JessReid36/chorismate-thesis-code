@@ -61,7 +61,16 @@ def reference_set(shells, n_per_shell=8000, seed=7):
 def dv_gradient(path):
     rows = [l.split("\t") for l in open(path).read().splitlines()[1:]]
     P = np.array([[float(r[1]), float(r[2]), float(r[3])] for r in rows])
-    dv = np.array([float(r[7]) for r in rows]) * HARTREE2KCAL
+    # Column layout differs between the two Dv files: the 331-site dv_grid.tsv
+    # carries Dv in column 7, while the production dv_grid_v2.tsv carries
+    # V_TS there and Dv in column 8. Select by header name, not by position.
+    hdr = [h.strip() for h in open(path).readline().rstrip("\n").split("\t")]
+    for cand in ("dv_Eh", "Dv", "dv"):
+        if cand in hdr:
+            col = hdr.index(cand); break
+    else:
+        raise SystemExit(f"no Dv column found in {path}; header is {hdr}")
+    dv = np.array([float(r[col]) for r in rows]) * HARTREE2KCAL
     d, j = cKDTree(P).query(P, k=2)
     g = np.abs(dv - dv[j[:, 1]]) / d[:, 1]
     return float(g.mean()), float(np.percentile(g, 95))
