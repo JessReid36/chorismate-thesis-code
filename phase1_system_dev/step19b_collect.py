@@ -78,12 +78,31 @@ def neb_barrier(out_path):
     txt = out_path.read_text(errors="replace")
 
     if "ORCA TERMINATED NORMALLY" not in txt:
+        # An unfinished job has no termination line either, so distinguish the
+        # two rather than calling a running job a failure.
+        if re.search(r"OPTIMIZATION CYCLE|LBFGS", txt):
+            return None, "still running"
         return None, "did not terminate normally"
     if not re.search(r"THE NEB OPTIMIZATION HAS CONVERGED", txt, re.I):
         return None, "band not converged"
 
     # last block of image energies: lines ending in '@' carry the HEI column
-    hits = re.findall(r"^\s*\d+\s+\S+\s+([-\d.]+)\s+.*@\s*$", txt, re.M)
+    # ORCA 6.0.1 marks the climbing image with "<= CI" at the end of its row in
+    # the PATH SUMMARY table, whose columns are:
+    #   Image  Dist.(Ang.)  E(Eh)  dE(kcal/mol)  max(|Fp|)  RMS(Fp)
+    # The barrier is the dE of the CI row. Older ORCA marked that row with "@",
+    # which is what this pattern used to look for and which 6.0.1 never writes.
+    hits = re.findall(r"^\s*\d+\s+[-\d.]+\s+[-\d.]+\s+([-\d.]+)\s+\S+\s+\S+\s*<=\s*CI\s*$",
+                      txt, re.M)
+    if not hits:
+        # fall back to the maximum dE in the PATH SUMMARY table, which is the
+        # same number whenever the climbing image sits at the peak
+        blk = re.search(r"PATH SUMMARY.*?(?=Straight line distance)", txt, re.S)
+        if blk:
+            rows = re.findall(r"^\s*\d+\s+[-\d.]+\s+[-\d.]+\s+([-\d.]+)\s",
+                              blk.group(0), re.M)
+            if rows:
+                hits = [max(rows, key=float)]
     if hits:
         try:
             return float(hits[-1]), "ok"
@@ -96,6 +115,33 @@ def neb_barrier(out_path):
         return float(m[-1]), "ok"
 
     return None, "converged but no barrier found in output"
+
+
+def read_harvest(path):
+    """Optimised reactant geometry per frame, from step19d_harvest.py.
+
+    These are the distances in the structure each barrier was actually computed
+    from, as distinct from the manifest values, which describe the molecular
+    dynamics snapshot the optimisation started from.
+    """
+    out = {}
+    p = Path(path)
+    if not p.exists():
+        return out
+    lines = [l.split("\t") for l in p.read_text().splitlines() if l.strip()]
+    hdr = [h.strip() for h in lines[0]]
+    try:
+        i_f = hdr.index("frame")
+        i_b = hdr.index("break_O3_C4")
+        i_m = hdr.index("form_C1_C6")
+    except ValueError:
+        return out
+    for r in lines[1:]:
+        try:
+            out[int(r[i_f])] = {"opt_break": float(r[i_b]), "opt_form": float(r[i_m])}
+        except (ValueError, IndexError):
+            continue
+    return out
 
 
 def stats(vals):
@@ -129,10 +175,15 @@ def main():
     ap.add_argument("--manifest",
                     default=f"{home}/system_development/05_qmmm/12_frame_selection/"
                             f"selection_manifest.tsv")
+    ap.add_argument("--harvest",
+                    default=f"{home}/system_development/05_qmmm/19_ensemble_harvest/"
+                            f"reactant_summary.tsv",
+                    help="optimised reactant geometries, from step19d_harvest.py")
     ap.add_argument("--out", default="ensemble_barriers.tsv")
     args = ap.parse_args()
 
     man = read_manifest(args.manifest)
+    harv = read_harvest(args.harvest)
     ensdir = Path(args.ensdir)
 
     results, skipped = [], []
@@ -156,15 +207,20 @@ def main():
 
     results.sort()
 
-    print(f"{'frame':>7}{'ps':>9}{'barrier':>10}{'Arg90-O13':>12}"
-          f"{'form C6-C1':>12}{'r':>9}")
-    print("-" * 59)
+    print("  as selected: distances measured on the molecular dynamics snapshot")
+    print("  as optimised: distances in the reactant the barrier was computed from")
+    print()
+    print(f"{'frame':>7}{'barrier':>9}{'Arg90 sel':>11}{'form sel':>10}"
+          f"{'break opt':>11}{'form opt':>10}")
+    print("-" * 58)
     for fr, val, m in results:
+        h = harv.get(fr, {})
         tag = "  <- fully characterised" if fr == REFERENCE_FRAME else ""
-        print(f"{fr:>7}{m.get('ps', float('nan')):>9.0f}{val:>10.2f}"
-              f"{m.get('arg90', float('nan')):>12.3f}"
-              f"{m.get('form', float('nan')):>12.3f}"
-              f"{m.get('r', float('nan')):>9.3f}{tag}")
+        print(f"{fr:>7}{val:>9.2f}"
+              f"{m.get('arg90', float('nan')):>11.3f}"
+              f"{m.get('form', float('nan')):>10.3f}"
+              f"{h.get('opt_break', float('nan')):>11.3f}"
+              f"{h.get('opt_form', float('nan')):>10.3f}{tag}")
 
     if skipped:
         print("\nnot included:")
@@ -172,8 +228,16 @@ def main():
             print(f"  frame {fr}: {why}")
 
     vals = [v for _, v, _ in results]
-    if len(vals) < 2:
-        print("\nonly one barrier available - no distribution to report yet")
+    MIN_FOR_STATS = 6
+    if len(vals) < MIN_FOR_STATS:
+        print(f"\n{len(vals)} barrier(s) available. Summary statistics are withheld")
+        print(f"below {MIN_FOR_STATS} frames: a mean, standard deviation and standard")
+        print("error computed from a handful of frames invite being read as the")
+        print("ensemble result, and the frames that finish first are not a random")
+        print("sample of the ensemble.")
+        if len(vals) >= 2:
+            print(f"\n  observed so far: {min(vals):.2f} to {max(vals):.2f} kcal/mol, "
+                  f"spread {max(vals)-min(vals):.2f}")
         sys.exit(0)
 
     mean, sd, sem = stats(vals)
@@ -198,17 +262,37 @@ def main():
     print(f"    (a potential-energy barrier is not dH‡; zero-point and thermal")
     print(f"     corrections are needed before this is a like-for-like comparison)")
 
-    have = [(v, m) for _, v, m in results if m]
-    if len(have) >= 3:
-        b = [v for v, _ in have]
+    MIN_FOR_CORR = 8
+    have = [(fr, v, m) for fr, v, m in results if m]
+    if len(have) < MIN_FOR_CORR:
+        print(f"\n  Correlations are withheld below {MIN_FOR_CORR} frames.")
+    else:
+        b = [v for _, v, _ in have]
         print("\n  CORRELATIONS across the ensemble")
+        print("  Measured on the OPTIMISED reactant, the structure each barrier was")
+        print("  computed from. This is the mechanistic question.")
+        for key, label, expect in [
+            ("opt_form", "forming C1-C6", "positive: further from attack, higher barrier"),
+            ("opt_break", "breaking O3-C4", "no expectation; this bond is nearly invariant"),
+        ]:
+            pairs = [(harv[fr][key], v) for fr, v, _ in have
+                     if fr in harv and key in harv[fr]]
+            if len(pairs) >= MIN_FOR_CORR:
+                r = pearson([a for a, _ in pairs], [c for _, c in pairs])
+                print(f"    barrier vs {label:<18} r = {r:+.3f}  (n = {len(pairs)})"
+                      f"   {expect}")
+            else:
+                print(f"    barrier vs {label:<18} only {len(pairs)} frames harvested")
+        print("\n  Measured AS SELECTED, on the molecular dynamics snapshot. This asks")
+        print("  whether the sampled conformation predicts the barrier, which bears on")
+        print("  whether the frame-selection criteria were informative.")
         for key, label, expect in [
             ("arg90", "Arg90-O13 contact", "positive: looser contact, higher barrier"),
             ("form", "near-attack C6-C1", "positive: further from attack, higher barrier"),
         ]:
-            x = [m[key] for _, m in have]
+            x = [m[key] for _, _, m in have]
             r = pearson(x, b)
-            print(f"    barrier vs {label:<20} r = {r:+.3f}   (expected {expect})")
+            print(f"    barrier vs {label:<18} r = {r:+.3f}  (n = {len(x)})   {expect}")
         print("\n    A clear positive correlation with the Arg90 contact would say the")
         print("    frame-to-frame spread is electrostatic in origin, consistent with the")
         print("    literature attribution of TS stabilisation to that residue. Absence of")
