@@ -1,0 +1,162 @@
+#!/bin/bash
+#PBS -N cm_spring
+#PBS -l select=1:ncpus=8:mem=24gb
+#PBS -l walltime=24:00:00
+#PBS -m ae
+#PBS -M 18660916@sun.ac.za
+#PBS -j oe
+#PBS -o /home/18660916/system_development/05_qmmm/21_spring_test/s_spring2.pbs.out
+#
+# s_spring_test2.pbs - how stiff must the restraint be to hold the scan at the
+# barrier?
+#
+# WHAT WAS OBSERVED
+#   The restrained scan does not pass through the transition state. In every
+#   frame examined the achieved distances sit 0.18 to 0.35 A on the reactant side
+#   of their targets while approaching the barrier, then flip to 0.26 to 0.28 A
+#   on the product side once past it, so the reaction coordinate jumps by more
+#   than an angstrom between two adjacent windows whose other steps are 0.07 to
+#   0.15 A. No window sits at the top, and the scan maximum is the last point
+#   before the system slips over.
+#
+# METHOD
+#   This runs the production scan driver itself, run_scan.sh, unmodified apart
+#   from the spring constant. Nothing about the input is rewritten: the same MD
+#   block with Minimize LBFGS, the same colvar definitions, the same quantum and
+#   active regions, the same convergence criteria. An earlier attempt wrote a
+#   fresh input from a grepped fragment and failed on a keyword, which is the
+#   reason for doing it this way.
+#
+#   Five windows spanning the barrier are run, starting from the structure the
+#   production scan used for the first of them, at four spring constants. The
+#   driver chains each window from the previous one, as in production.
+#
+# WHAT THE ANSWER DECIDES
+#   The scan serves two purposes. It produces the product-side starting
+#   structure, which is unaffected: every product optimisation converged to a
+#   genuine product. And it produces the transition-state guess for the band,
+#   which is affected, since the guess is not near the saddle.
+#
+#   Thirteen of fourteen bands recovered from a poor guess and converged to
+#   saddle positions within 0.077 A of one another. One did not. Before thirty
+#   further frames are run at roughly forty-four hours each it is worth knowing
+#   whether a stiffer restraint removes the problem at source.
+#
+#   Note that a stiffer restraint distorts the structure it holds, so the energy
+#   at a tightly restrained window is not a relaxed point on the path. The
+#   purpose is a better guess for the band, not a better energy profile.
+
+set -uo pipefail
+ROOT=/home/18660916/system_development/05_qmmm
+FRAME=08170
+SRC="$ROOT/19_ensemble/frame_${FRAME}/scan"
+WORK="$ROOT/21_spring_test"
+FIRST=10          # first window of the barrier region
+LAST=14
+
+# the same environment the production scan job exports; without these the QM
+# module cannot load its libraries and the energy evaluation fails with empty
+# scf and int logs
+export PATH="/apps/openmpi/4.1.1/bin:$PATH"
+export LD_LIBRARY_PATH="/home/apps2/ORCA/6.0.1/lib:/apps/openmpi/4.1.1/lib:/apps/mambaforge/envs/medaka/lib:${LD_LIBRARY_PATH:-}"
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
+
+mkdir -p "$WORK"; cd "$WORK" || exit 1
+if ! mkdir .running2 2>/dev/null; then echo "FAIL: another job holds .running2"; exit 1; fi
+trap 'rmdir .running2 2>/dev/null' EXIT
+echo "host=$(hostname) start=$(date)"; echo
+
+for f in "$SRC/run_scan.sh" "$SRC/active.txt" "$SRC/targets.txt" \
+         "$SRC/complex_solvated.ORCAFF.prms"; do
+  [[ -s "$f" ]] || { echo "FAIL missing $f"; exit 1; }
+done
+prevwin=$(printf "%02d" $((FIRST - 1)))
+[[ -s "$SRC/win_${prevwin}.pdb" ]] || { echo "FAIL missing $SRC/win_${prevwin}.pdb"; exit 1; }
+
+echo "frame $FRAME, windows $FIRST to $LAST, starting from win_${prevwin}.pdb"
+echo "driver: $SRC/run_scan.sh, unmodified apart from SPRING"
+echo
+
+for SPRING in 400.0 1000.0 2500.0 6000.0; do
+  d="k${SPRING%%.*}"
+  if [[ -s "$d/scan_progress.tsv" ]] && \
+     [[ $(grep -c . "$d/scan_progress.tsv") -ge $((LAST - FIRST + 1)) ]]; then
+    echo "  spring $SPRING already complete"
+    continue
+  fi
+  rm -rf "$d"; mkdir -p "$d"; cd "$d" || exit 1
+
+  # everything the driver needs, taken from the production scan directory
+  cp "$SRC/run_scan.sh" .
+  cp "$SRC/active.txt" .
+  cp "$SRC/complex_solvated.ORCAFF.prms" .
+  # the driver chains from win_00.pdb, so the barrier region's entry structure
+  # is staged under that name
+  cp "$SRC/win_${prevwin}.pdb" win_00.pdb
+  # only the windows spanning the barrier
+  sed -n "${FIRST},${LAST}p" "$SRC/targets.txt" > targets.txt
+
+  # the one change: the spring constant
+  sed -i "s/^SPRING=.*/SPRING=${SPRING}/" run_scan.sh
+  grep -q "^SPRING=${SPRING}$" run_scan.sh || { echo "FAIL could not set SPRING"; exit 1; }
+
+  echo "=== spring $SPRING ==="
+  bash run_scan.sh 2>&1 | grep -E "achieved|window|NO TRAJ" || true
+  cd "$WORK" || exit 1
+  echo
+done
+
+echo
+python3 - "$SRC/targets.txt" "$FIRST" "$LAST" <<'PY'
+import os, sys
+
+targets = [l.split() for l in open(sys.argv[1]).read().splitlines() if l.strip()]
+first, last = int(sys.argv[2]), int(sys.argv[3])
+springs = ["400", "1000", "2500", "6000"]
+
+print("=" * 88)
+print("How closely does each spring constant hold the target through the barrier?")
+print("=" * 88)
+print("%-8s%-6s%18s%18s%18s" % ("spring", "win", "target b / f",
+                                "achieved b / f", "deviation b / f"))
+print("-" * 88)
+
+worst = {}
+for s in springs:
+    f = "k%s/scan_progress.tsv" % s
+    if not os.path.exists(f):
+        print("%-8s  no output" % s); print("-" * 88); continue
+    rows = [l.split("\t") for l in open(f).read().splitlines() if l.strip()]
+    for k, r in enumerate(rows):
+        w = first + k
+        if w > last or w > len(targets):
+            break
+        tb, tf = float(targets[w-1][0]), float(targets[w-1][1])
+        b, fm = float(r[1]), float(r[2])
+        db, df = b - tb, fm - tf
+        worst[s] = max(worst.get(s, 0.0), abs(db), abs(df))
+        print("%-8s%-6d%9.3f %8.3f%9.3f %8.3f%9.3f %+8.3f"
+              % (s, w, tb, tf, b, fm, db, df))
+    print("-" * 88)
+
+if worst:
+    print("\nlargest deviation from target, by spring constant:")
+    for s in springs:
+        if s in worst:
+            print("  %5s kcal/mol/A^2   %.3f A" % (s, worst[s]))
+    print()
+    print("  Production used 400. A spring holding the target to within the")
+    print("  window spacing, roughly 0.05 to 0.10 A, keeps the path on the")
+    print("  intended coordinate through the barrier and gives a guess near the")
+    print("  saddle. One that does not leaves the path jumping over the top.")
+    ok = [s for s in springs if worst.get(s, 9) < 0.10]
+    if ok:
+        print("\n  Holds to within 0.10 A: %s" % ", ".join(ok))
+    else:
+        print("\n  None of these holds to within 0.10 A. A two-distance harmonic")
+        print("  restraint may not be able to follow this reaction through the")
+        print("  barrier, in which case the guess must come from elsewhere: an")
+        print("  interpolation between the optimised endpoints, or the converged")
+        print("  transition state of another frame.")
+PY
+echo; echo "end=$(date)"

@@ -1,0 +1,11 @@
+#!/bin/bash
+#PBS -N cm11c_rxnfull
+#PBS -l select=1:ncpus=4:mem=16gb
+#PBS -l walltime=12:00:00
+#PBS -j oe
+#PBS -o /home/18660916/system_development/05_qmmm/11c_rxn_full.pbs.out
+set -uo pipefail
+cd /home/18660916/system_development/05_qmmm || exit 1
+echo "host=$(hostname) start=$(date)"
+bash step11c_rxn_coord_full.sh
+echo "exit=$? end=$(date)"

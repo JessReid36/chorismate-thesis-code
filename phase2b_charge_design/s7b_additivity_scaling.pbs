@@ -1,0 +1,168 @@
+#!/usr/bin/env bash
+#PBS -N cm_addvq
+#PBS -l select=1:ncpus=8:mem=24gb
+#PBS -l walltime=8:00:00
+#PBS -m ae
+#PBS -M 18660916@sun.ac.za
+#PBS -j oe
+#PBS -o /home/18660916/system_development/phase2b_charge_design/07_additivity/s7b_scaling.pbs.out
+#
+# s7b_additivity_scaling.pbs - does the non-additive term scale as the product of
+# the two charges?
+#
+# WHY THIS MATTERS
+#   Test B5 measured the failure of additivity at unit charge and found it
+#   reaches 1.124 kcal/mol, above the resolution limit of roughly 0.6 kcal/mol
+#   that the single-charge test established for the objective. On that evidence a
+#   design of several charges cannot be scored by summing single-charge values.
+#
+#   But no design uses unit charges. Dittner and Hartke (2018) report converged
+#   values of about -0.11 e and +0.09 e for their globally optimised catalytic
+#   fields. If the non-additive term is cross-polarisation, it is bilinear in the
+#   two charges and should fall as q_A*q_B, so reducing both charges tenfold
+#   should reduce it a hundredfold, from 1.124 kcal/mol to about 0.011. That
+#   would make it negligible at the magnitudes a design actually uses, and would
+#   change the conclusion of B5 entirely.
+#
+#   The sign behaviour observed in B5 already identifies the term as
+#   cross-polarisation: the like-sign combinations agreed with one another and
+#   the opposite-sign combination reversed, at every separation tested. What was
+#   not measured is the magnitude scaling, and that is what this tests.
+#
+# WHAT IS COMPUTED
+#   The pair that showed the largest non-additivity, at 3.0 A separation, is
+#   recomputed at 0.75, 0.50 and 0.25 e as well as the 1.00 e already available.
+#   For each magnitude: charge A alone, charge B alone, and both together, at the
+#   reactant and transition-state geometries, with both charges of the same sign.
+#
+#   The quantity examined is the non-additive term divided by q_A*q_B. If the
+#   term is bilinear, that ratio is constant across the four magnitudes.
+#
+# WHY ONLY THE WORST PAIR
+#   If the scaling holds where the term is largest, it holds where it is smaller.
+#   If it does not hold there, the assumption fails and the remaining pairs would
+#   not rescue it.
+
+set -uo pipefail
+ORCA=/home/apps2/ORCA/6.0.1
+ROOT=/home/18660916/system_development/phase2b_charge_design
+GEOM="$ROOT/01_geometry"
+WORK="$ROOT/07_additivity"
+
+export PATH="/apps/openmpi/4.1.1/bin:$PATH"
+export LD_LIBRARY_PATH="$ORCA/lib:/apps/openmpi/4.1.1/lib:/apps/mambaforge/envs/medaka/lib:${LD_LIBRARY_PATH:-}"
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
+
+cd "$WORK" || exit 1
+if ! mkdir .running_s7b 2>/dev/null; then echo "FAIL: another job holds .running_s7b"; exit 1; fi
+trap 'rmdir .running_s7b 2>/dev/null' EXIT
+echo "host=$(hostname) start=$(date)"; echo
+
+[[ -s pairs.tsv ]] || { echo "FAIL missing pairs.tsv"; exit 1; }
+for g in reactant ts; do
+  [[ -s "${g}.xyz" ]] || cp "$GEOM/${g}.xyz" . || { echo "FAIL missing ${g}.xyz"; exit 1; }
+done
+
+# the 3.0 A pair, which gave the largest non-additive term in B5
+read -r TAG iA xA yA zA dvA iB xB yB zB dvB SEP < <(awk -F'\t' '$1=="sep3.0"' pairs.tsv)
+echo "pair $TAG: site $iA (Dv $dvA) and site $iB (Dv $dvB), separation $SEP A"
+echo
+
+run_sp () {
+  local g=$1 tag=$2 pc=$3
+  local base="sp_${g}_${tag}"
+  [[ -f "${base}.out" ]] && grep -q "TERMINATED NORMALLY" "${base}.out" && return 0
+  {
+    echo "! B3LYP D3BJ def2-SVPD def2/J RIJCOSX CPCM TightSCF"
+    echo "%maxcore 3000"
+    echo "%pal nprocs 8 end"
+    echo "%cpcm epsilon 4.0 end"
+    echo "%scf MaxIter 300 end"
+    [[ "$pc" != "none" ]] && echo "%pointcharges \"$pc\""
+    echo "* xyzfile -2 1 ${g}.xyz"
+  } > "${base}.inp"
+  "$ORCA/orca" "${base}.inp" > "${base}.out" 2>&1 </dev/null
+  grep -q "TERMINATED NORMALLY" "${base}.out"
+}
+
+for g in reactant ts; do run_sp $g q0 none || { echo "FAIL control"; exit 1; }; done
+
+for q in 0.75 0.50 0.25; do
+  t="q${q/./p}"
+  printf "1\n%s  %s %s %s\n" "$q" "$xA" "$yA" "$zA" > "pcs_${t}_A.pc"
+  printf "1\n%s  %s %s %s\n" "$q" "$xB" "$yB" "$zB" > "pcs_${t}_B.pc"
+  printf "2\n%s  %s %s %s\n%s  %s %s %s\n" \
+         "$q" "$xA" "$yA" "$zA" "$q" "$xB" "$yB" "$zB" > "pcs_${t}_AB.pc"
+  for part in A B AB; do
+    for g in reactant ts; do
+      run_sp $g "s_${t}_${part}" "pcs_${t}_${part}.pc" || echo "  WARN $g $t $part"
+    done
+  done
+  echo "  q = $q done"
+done
+echo
+
+python3 - <<'PY'
+import re, os
+H = 627.5094740631
+def E(p):
+    if not os.path.exists(p): return None
+    t = open(p, errors="replace").read()
+    if "TERMINATED NORMALLY" not in t: return None
+    m = re.findall(r"FINAL SINGLE POINT ENERGY\s+(-?\d+\.\d+)", t)
+    return float(m[-1]) if m else None
+
+B0 = (E("sp_ts_q0.out") - E("sp_reactant_q0.out")) * H
+print("=" * 88)
+print(f"Does the non-additive term scale as q_A*q_B?  Reference barrier {B0:.4f} kcal/mol")
+print("=" * 88)
+print(f"{'q':>6}{'DDE(A)':>10}{'DDE(B)':>10}{'sum':>10}{'DDE(A,B)':>11}"
+      f"{'non-add':>10}{'/qA*qB':>10}")
+print("-" * 88)
+
+rows = []
+# the 1.00 e results already exist from the first additivity run
+sets = [("1.00", "sep3.0_pp_%s"), ("0.75", "s_q0p75_%s"),
+        ("0.50", "s_q0p50_%s"), ("0.25", "s_q0p25_%s")]
+for q, pat in sets:
+    v = {}
+    for part in ("A", "B", "AB"):
+        r = E("sp_reactant_%s.out" % (pat % part))
+        t = E("sp_ts_%s.out" % (pat % part))
+        v[part] = None if (r is None or t is None) else (t - r) * H - B0
+    if any(x is None for x in v.values()):
+        print(f"{q:>6}   incomplete"); continue
+    s = v["A"] + v["B"]
+    na = v["AB"] - s
+    qq = float(q) ** 2
+    rows.append((float(q), na, na / qq))
+    print(f"{q:>6}{v['A']:>10.3f}{v['B']:>10.3f}{s:>10.3f}{v['AB']:>11.3f}"
+          f"{na:>10.3f}{na/qq:>10.3f}")
+
+if len(rows) >= 3:
+    r = [x[2] for x in rows]
+    spread = (max(r) - min(r)) / abs(sum(r) / len(r)) * 100
+    print(f"\n  spread of the normalised column: {spread:.1f}%")
+    print()
+    if spread < 15:
+        print("  The non-additive term is bilinear in the two charges to within")
+        print("  this spread, so it is cross-polarisation and nothing further.")
+        print()
+        for q in (0.11, 0.09):
+            print(f"    at q = {q} e, both charges: predicted non-additivity "
+                  f"{abs(sum(r)/len(r)) * q * q:.4f} kcal/mol")
+        print()
+        print("  Dittner and Hartke (2018) report converged charges of about")
+        print("  -0.11 e and +0.09 e. At those magnitudes the term is far below")
+        print("  the resolution limit of roughly 0.6 kcal/mol that the")
+        print("  single-charge test established, so contributions may be summed.")
+        print("  The failure of additivity measured at unit charge does not")
+        print("  transfer to the magnitudes a design would use.")
+    else:
+        print("  The normalised column is NOT constant, so the term is not simply")
+        print("  bilinear and cannot be extrapolated to smaller charges by")
+        print("  assuming it scales as the product. The conclusion of B5 stands at")
+        print("  every magnitude tested and candidate arrangements must be")
+        print("  verified explicitly.")
+PY
+echo; echo "end=$(date)"

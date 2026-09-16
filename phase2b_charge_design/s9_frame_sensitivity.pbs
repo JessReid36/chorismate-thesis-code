@@ -1,0 +1,323 @@
+#!/usr/bin/env bash
+#PBS -N cm_b6
+#PBS -l select=1:ncpus=8:mem=24gb
+#PBS -l walltime=24:00:00
+#PBS -m ae
+#PBS -M 18660916@sun.ac.za
+#PBS -j oe
+#PBS -o /home/18660916/system_development/phase2b_charge_design/08_frame_sensitivity/s9_frame_sensitivity.pbs.out
+#
+# s9_frame_sensitivity.pbs - test B6: does the difference potential depend on
+# which frame of the ensemble it is computed from?
+#
+# WHY THIS TEST EXISTS
+#   The candidate grid and the difference-potential map are built from one
+#   frame's reactant and transition-state geometries. The barrier ensemble shows
+#   that frames differ: the QM/MM barrier varies across the reported set, and the
+#   in vacuo barrier varies too, so the substrate geometries are not identical.
+#   If the map's site ranking depends on which frame it is computed from, the
+#   design target is a property of that frame rather than of the enzyme, and the
+#   choice of frame must be justified.
+#
+#   The literature offers no guidance on selecting a representative structure for
+#   this purpose. Claeyssens et al. (2005) report all sixteen of their paths and
+#   average them; Senn and Thiel (2009) report ten snapshots as a mean with its
+#   spread; Ryde (2016) describes the common practice as computing "QM/MM
+#   structures for several (3-10) snapshots" to show "possible variations of the
+#   energies", and states plainly that "it is not obvious how the results should
+#   be averaged to give reliable activation barriers". None of them selects one
+#   structure. The design work needs one, so the choice must be tested rather
+#   than assumed.
+#
+# WHAT IS COMPUTED
+#   For each test frame, its optimised reactant and its converged climbing-image
+#   transition state are superposed onto the reference reactant using the 24
+#   substrate atoms, by the Kabsch algorithm. The SAME transformation is applied
+#   to both, so that the displacement from reactant to transition state is
+#   preserved exactly; superposing them separately would destroy it.
+#
+#   Single points are then run at the production level, def2-SVPD with CPCM,
+#   and the difference potential is evaluated on the SAME 1448-site grid used for
+#   the production map. The two maps are compared by the same measures used for
+#   the basis-set test: the Spearman rank correlation, the overlap of the ten
+#   most stabilising sites, and whether the single best site changes.
+#
+# WHICH FRAMES
+#   All ten frames of the reported near-attack ensemble. An earlier run on three
+#   frames found the ranking is NOT preserved: Spearman correlations of 0.877 to
+#   0.921 against the production map, with one frame retaining only three of the
+#   ten most stabilising sites and changing the single best site, and per-site
+#   differences up to 3.2 kcal/mol against a map whose full range is 8.25. For
+#   comparison the basis-set test, which was judged sufficient to change the
+#   production basis, gave 0.994 and eight of ten.
+#
+#   The map built from one frame is therefore not a property of the enzyme, and
+#   this run establishes what should replace it. Each frame is compared against
+#   every other, and against the ensemble mean map, so that two questions can be
+#   answered: how much the choice of frame matters across the whole set, and
+#   whether an ensemble-averaged map is better represented by any single frame
+#   than the frames are by each other.
+#
+# WHAT THIS DOES NOT TEST
+#   The exclusion envelope, and therefore the grid itself, is also built from one
+#   frame's three geometries. This test holds the grid fixed and varies only the
+#   potential evaluated on it. Whether a different frame's envelope would admit
+#   materially different sites is a separate question.
+
+set -uo pipefail
+ORCA=/home/apps2/ORCA/6.0.1
+ROOT=/home/18660916/system_development/phase2b_charge_design
+GEOM="$ROOT/01_geometry"
+DVP="$ROOT/03_dvpot"
+GRIDDIR="$ROOT/04_grid"
+VAC=/home/18660916/system_development/05_qmmm/20_invacuo
+WORK="$ROOT/08_frame_sensitivity"
+
+export PATH="/apps/openmpi/4.1.1/bin:$PATH"
+export LD_LIBRARY_PATH="$ORCA/lib:/apps/openmpi/4.1.1/lib:/apps/mambaforge/envs/medaka/lib:${LD_LIBRARY_PATH:-}"
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
+
+FRAMES="02450 04085 09025 09900 10775 11630 12485 14155 17505 19185"
+
+mkdir -p "$WORK"; cd "$WORK" || exit 1
+if ! mkdir .running 2>/dev/null; then echo "FAIL: another job holds .running"; exit 1; fi
+trap 'rmdir .running 2>/dev/null' EXIT
+echo "host=$(hostname) start=$(date)"; echo
+
+for f in "$GEOM/reactant.xyz" "$GEOM/ts.xyz" "$DVP/dv_grid_svpd.tsv" \
+         "$DVP/s3_dv_on_grid_v2.py" "$GRIDDIR/grid_poisson_sites.tsv"; do
+  [[ -s "$f" ]] || { echo "FAIL missing $f"; exit 1; }
+done
+
+# The point list is generated the same way the production map generated it, from
+# the same sites file and by the same script, so that the row order is identical
+# and the comparison below is site for site rather than position for position.
+echo "=== preparing the point list from the production grid"
+python3 "$DVP/s3_dv_on_grid_v2.py" prepare \
+    "$GRIDDIR/grid_poisson_sites.tsv" points_bohr.xyz row_order.tsv || exit 1
+n=$(head -1 points_bohr.xyz)
+[[ "$n" == "1448" ]] || { echo "FAIL expected 1448 points, got $n"; exit 1; }
+echo "  $n points"
+echo
+
+# ------------------------------------------------- superpose onto the reference
+echo "=== superposing each test frame onto the reference reactant"
+python3 - "$GEOM/reactant.xyz" "$VAC" "$FRAMES" <<'PY'
+import sys, math, os
+import numpy as np
+ref_path, vacdir, frames = sys.argv[1], sys.argv[2], sys.argv[3].split()
+
+def rdxyz(p):
+    L = open(p).read().splitlines()
+    n = int(L[0].split()[0])
+    el = [l.split()[0] for l in L[2:2+n]]
+    xyz = [[float(x) for x in l.split()[1:4]] for l in L[2:2+n]]
+    return el, xyz
+
+def kabsch(P, Q):
+    """Rotation and translation carrying P onto Q, by singular value
+    decomposition of the covariance matrix. This is the standard rigid-body
+    superposition; the reflection is removed by the sign of the determinant."""
+    P = np.asarray(P, float); Q = np.asarray(Q, float)
+    cp, cq = P.mean(0), Q.mean(0)
+    H = (P - cp).T @ (Q - cq)
+    U, S, Vt = np.linalg.svd(H)
+    d = np.sign(np.linalg.det(Vt.T @ U.T))
+    R = Vt.T @ np.diag([1.0, 1.0, d]) @ U.T
+    return R, cp, cq
+
+
+def apply(R, cp, cq, X):
+    return ((np.asarray(X, float) - cp) @ R.T + cq).tolist()
+
+def wr(p, el, xyz, c):
+    with open(p, "w") as fh:
+        fh.write("%d\n%s\n" % (len(el), c))
+        for e, x in zip(el, xyz):
+            fh.write("%-2s %14.8f %14.8f %14.8f\n" % (e, x[0], x[1], x[2]))
+
+rel, rxyz = rdxyz(ref_path)
+for f in frames:
+    pr = "%s/%s_R.xyz" % (vacdir, f)
+    pt = "%s/%s_TS.xyz" % (vacdir, f)
+    if not (os.path.exists(pr) and os.path.exists(pt)):
+        print("  %s: geometry missing, skipped" % f); continue
+    el, R = rdxyz(pr)
+    _, T = rdxyz(pt)
+    rot, cp, cq = kabsch(R, rxyz)
+    Rn, Tn = apply(rot, cp, cq, R), apply(rot, cp, cq, T)
+    rms = math.sqrt(sum(sum((Rn[k][i]-rxyz[k][i])**2 for i in range(3))
+                        for k in range(len(R)))/len(R))
+    wr("%s_R_sup.xyz" % f, el, Rn, "frame %s reactant, superposed" % f)
+    wr("%s_TS_sup.xyz" % f, el, Tn, "frame %s TS, same transform" % f)
+    print("  %s: reactant RMSD to reference after superposition %.3f A" % (f, rms))
+PY
+echo
+
+# ------------------------------------------------------------ single points
+run_sp () {
+  local b=$1 g=$2
+  [[ -f "${b}.out" ]] && grep -q "TERMINATED NORMALLY" "${b}.out" && return 0
+  {
+    echo "! B3LYP D3BJ def2-SVPD def2/J RIJCOSX CPCM TightSCF"
+    echo "%maxcore 3000"
+    echo "%pal nprocs 8 end"
+    echo "%cpcm epsilon 4.0 end"
+    echo "%scf MaxIter 300 end"
+    echo "* xyzfile -2 1 ${g}"
+  } > "${b}.inp"
+  "$ORCA/orca" "${b}.inp" > "${b}.out" 2>&1 </dev/null
+  grep -q "TERMINATED NORMALLY" "${b}.out"
+}
+
+echo "=== single points at the production level, def2-SVPD with CPCM"
+for f in $FRAMES; do
+  [[ -s "${f}_R_sup.xyz" ]] || continue
+  run_sp "sp_${f}_R" "${f}_R_sup.xyz"   || echo "  WARN ${f} R"
+  run_sp "sp_${f}_TS" "${f}_TS_sup.xyz" || echo "  WARN ${f} TS"
+  echo "  $f done"
+done
+echo
+
+# ------------------------------------------------- the potential on the grid
+echo "=== evaluating the difference potential on the production grid"
+for f in $FRAMES; do
+  for s in R TS; do
+    [[ -f "vpot_${f}_${s}.out" ]] && continue
+    [[ -f "sp_${f}_${s}.gbw" ]] || continue
+    "$ORCA/orca_vpot" "sp_${f}_${s}.gbw" "sp_${f}_${s}.scfp" \
+        points_bohr.xyz "vpot_${f}_${s}.out" "sp_${f}_${s}" >/dev/null 2>&1
+  done
+done
+
+python3 - "$DVP/dv_grid_svpd.tsv" "$FRAMES" <<'PY'
+import sys, math, os
+H = 627.5094740631
+prod_path, frames = sys.argv[1], sys.argv[2].split()
+
+L = [l.split("\t") for l in open(prod_path).read().splitlines()
+     if l.strip() and not l.startswith("#")]
+h = [x.strip() for x in L[0]]
+i_idx, i_dv = h.index("idx"), h.index("dv_Eh")
+prod = [(int(r[i_idx]), float(r[i_dv])*H) for r in L[1:]]
+pmap = {k: v for k, v in prod}
+
+def read_vpot(p):
+    if not os.path.exists(p): return None
+    out = []
+    for l in open(p):
+        s = l.split()
+        if len(s) == 1:
+            continue
+        try: out.append(float(s[-1]))
+        except ValueError: continue
+    return out
+
+def spearman(a, b):
+    def rank(v):
+        o = sorted(range(len(v)), key=lambda i: v[i]); q = [0]*len(v)
+        for p, i in enumerate(o): q[i] = p
+        return q
+    ra, rb = rank(a), rank(b)
+    n = len(ra); ma = sum(ra)/n; mb = sum(rb)/n
+    sa = math.sqrt(sum((x-ma)**2 for x in ra))
+    sb = math.sqrt(sum((x-mb)**2 for x in rb))
+    return sum((x-ma)*(y-mb) for x, y in zip(ra, rb))/(sa*sb)
+
+maps = {}
+for f in frames:
+    vr, vt = read_vpot("vpot_%s_R.out" % f), read_vpot("vpot_%s_TS.out" % f)
+    if vr and vt and len(vr) == len(pv):
+        maps[f] = [(vt[i]-vr[i])*H for i in range(len(pv))]
+    else:
+        print("  %s: incomplete, excluded" % f)
+
+if not maps:
+    raise SystemExit("no frames produced a map")
+
+# the ensemble mean map, site by site
+ens = [sum(maps[f][i] for f in maps)/len(maps) for i in range(len(pv))]
+
+def top10(v):
+    return set(sorted(range(len(v)), key=lambda i: v[i])[:10])
+def best(v):
+    return min(range(len(v)), key=lambda i: v[i])
+
+print("=" * 78)
+print("Each frame against the ENSEMBLE MEAN map, n = %d frames" % len(maps))
+print("=" * 78)
+print("%-8s%12s%14s%16s%14s" % ("frame", "Spearman", "top-10 kept",
+                                "best site same", "max |diff|"))
+print("-" * 66)
+et, eb = top10(ens), best(ens)
+scored = []
+for f in sorted(maps):
+    v = maps[f]
+    s = spearman(ens, v)
+    k = len(et & top10(v))
+    md = max(abs(v[i]-ens[i]) for i in range(len(v)))
+    scored.append((f, s, k, best(v) == eb, md))
+    print("%-8s%12.4f%14s%16s%14.3f" % (f, s, "%d/10" % k,
+          "yes" if best(v) == eb else "NO", md))
+
+print()
+print("=" * 78)
+print("Each frame against the PRODUCTION map, the reference frame's")
+print("=" * 78)
+print("%-8s%12s%14s%16s%14s" % ("frame", "Spearman", "top-10 kept",
+                                "best site same", "max |diff|"))
+print("-" * 66)
+pt, pb = top10(pv), best(pv)
+for f in sorted(maps):
+    v = maps[f]
+    print("%-8s%12.4f%14s%16s%14.3f" % (f, spearman(pv, v),
+          "%d/10" % len(pt & top10(v)),
+          "yes" if best(v) == pb else "NO",
+          max(abs(v[i]-pv[i]) for i in range(len(v)))))
+
+print()
+print("=" * 78)
+print("Spread across the ensemble, site by site")
+print("=" * 78)
+sd = []
+for i in range(len(ens)):
+    vals = [maps[f][i] for f in maps]
+    m = sum(vals)/len(vals)
+    sd.append(math.sqrt(sum((x-m)**2 for x in vals)/(len(vals)-1)))
+order = sorted(range(len(ens)), key=lambda i: ens[i])
+print("  mean site-wise standard deviation      %6.3f kcal/mol" % (sum(sd)/len(sd)))
+print("  largest site-wise standard deviation   %6.3f" % max(sd))
+print("  range of the ensemble mean map         %6.3f to %6.3f" % (min(ens), max(ens)))
+print("  standard deviation at the ten most stabilising sites of the mean map:")
+print("    " + "  ".join("%.2f" % sd[i] for i in order[:10]))
+print()
+print("  A design selects from the most stabilising sites. If the spread there is")
+print("  comparable to the separation between candidates, no single frame's map")
+print("  can rank them and the ensemble mean is the quantity to design against.")
+
+print()
+print("=" * 78)
+print("Which single frame best represents the ensemble?")
+print("=" * 78)
+scored.sort(key=lambda r: -r[1])
+print("  ranked by Spearman correlation against the ensemble mean map:")
+for f, s, k, b, md in scored:
+    print("    %-8s r = %.4f   top-10 %d/10   best site %s   max |diff| %.3f"
+          % (f, s, k, "same" if b else "differs", md))
+print()
+print("  The best-correlating frame is the defensible choice IF a single frame")
+print("  must be used. Whether one must is a separate question: the ensemble mean")
+print("  map costs nothing further to compute, since every frame's potential has")
+print("  now been evaluated on the same grid.")
+
+# write the ensemble mean map for downstream use
+with open("dv_grid_ensemble_mean.tsv", "w") as fh:
+    fh.write("# ensemble mean difference potential, %d frames at def2-SVPD\n" % len(maps))
+    fh.write("# frames: %s\n" % " ".join(sorted(maps)))
+    fh.write("# dv_kcal: mean over frames. sd_kcal: standard deviation over frames.\n")
+    fh.write("idx\tdv_kcal\tsd_kcal\n")
+    for i in range(len(ens)):
+        fh.write("%d\t%.6f\t%.6f\n" % (prod[i][0], ens[i], sd[i]))
+print("\nwrote dv_grid_ensemble_mean.tsv")
+PY
+echo; echo "end=$(date)"

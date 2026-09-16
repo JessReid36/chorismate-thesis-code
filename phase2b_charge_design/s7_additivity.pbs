@@ -1,0 +1,236 @@
+#!/usr/bin/env bash
+#PBS -N cm_addv
+#PBS -l select=1:ncpus=8:mem=24gb
+#PBS -l walltime=24:00:00
+#PBS -m ae
+#PBS -M 18660916@sun.ac.za
+#PBS -j oe
+#PBS -o /home/18660916/system_development/phase2b_charge_design/07_additivity/s7_additivity.pbs.out
+#
+# s7_additivity.pbs - test B5, whether contributions from several charges add.
+#
+# WHAT IS ASSUMED, AND BY WHOM
+#   The design objective is DDE = sum_i q_i * Dv(r_i). Summing over positions
+#   treats the charges as independent. Each one polarises the substrate, so the
+#   second charge interacts with a density the first has already distorted, and
+#   that cross term is absent from the sum.
+#
+#   Sokalski (1985) lists the induction contribution as one of the terms his
+#   decomposition retains and the electrostatic objective discards, and notes its
+#   magnitude is "related to polarizabilities of interacting molecules". Test B4
+#   measured it for a single charge in this system: up to 0.52 kcal/mol, or 12.8%
+#   of the effect at the most stabilising site. What that test could not say is
+#   whether two charges together produce the sum of their separate polarisation
+#   terms or something else.
+#
+# WHAT THE NON-ADDITIVE TERM IS, AND IS NOT
+#   The direct Coulomb interaction between the two charges is NOT part of it. The
+#   charges are fixed, so that interaction is identical at the reactant and the
+#   transition state and cancels exactly in the barrier difference. It never
+#   enters DDE at all.
+#
+#   What remains is cross-polarisation: the substrate distorted by charge A
+#   interacting with charge B, and vice versa. To leading order this is bilinear
+#   in the two charges, going as q_A * q_B, where each charge's own polarisation
+#   term goes as q^2. The test below checks that scaling as well as the size.
+#
+# THE MEASUREMENT
+#   For each pair of sites, six single points: charge A alone, charge B alone,
+#   and both together, at the reactant and transition-state geometries. Then
+#       non-additivity = DDE(A and B) - DDE(A) - DDE(B)
+#   with every DDE measured against the barrier with no charge present.
+#
+# DESIGN OF THE PAIR SET
+#   Separations are chosen to span the range the selection problem actually uses.
+#   Table X.3.4 gives 3.5 A for a carboxylate and 4.5 A for a guanidinium, so
+#   pairs are placed at roughly 3, 3.5, 4.5, 6 and 8 A. Sign combinations are
+#   varied because the cross term should change sign with q_A * q_B while each
+#   charge's own polarisation term, going as q^2, does not.
+#
+# BASIS
+#   def2-SVPD, matching the production map, for the reason established in test B2.
+
+set -uo pipefail
+ORCA=/home/apps2/ORCA/6.0.1
+ROOT=/home/18660916/system_development/phase2b_charge_design
+GEOM="$ROOT/01_geometry"
+DV="$ROOT/03_dvpot/dv_grid_svpd.tsv"
+WORK="$ROOT/07_additivity"
+
+export PATH="/apps/openmpi/4.1.1/bin:$PATH"
+export LD_LIBRARY_PATH="$ORCA/lib:/apps/openmpi/4.1.1/lib:/apps/mambaforge/envs/medaka/lib:${LD_LIBRARY_PATH:-}"
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
+
+E_R=-836.474068323159
+E_TS=-836.446124914590
+
+mkdir -p "$WORK"; cd "$WORK" || exit 1
+if ! mkdir .running 2>/dev/null; then echo "FAIL: another job holds .running"; exit 1; fi
+trap 'rmdir .running 2>/dev/null' EXIT
+echo "host=$(hostname)  start=$(date)"; echo
+
+for f in "$GEOM/reactant.xyz" "$GEOM/ts.xyz" "$DV"; do
+  [[ -s "$f" ]] || { echo "FAIL missing $f"; exit 1; }
+done
+cp "$GEOM/reactant.xyz" "$GEOM/ts.xyz" .
+
+# ------------------------------------------------------------- choose the pairs
+python3 - "$DV" > pairs.tsv <<'PY'
+import sys, math, itertools
+H = 627.5094740631
+L = [l.split("\t") for l in open(sys.argv[1]).read().splitlines() if l.strip()]
+h = [x.strip() for x in L[0]]
+ix, ic = h.index("idx"), h.index("dv_Eh")
+xs, ys, zs, sh = h.index("x"), h.index("y"), h.index("z"), h.index("shell")
+rows = [(int(r[ix]), float(r[xs]), float(r[ys]), float(r[zs]),
+         float(r[sh]), float(r[ic]) * H) for r in L[1:]]
+
+# Work from the strongly stabilising sites, since a real design draws from there
+# and the cross term should be largest where the polarisation terms are largest.
+stab = sorted([r for r in rows if r[4] == 3.0], key=lambda r: r[5])[:60]
+
+def d(a, b):
+    return math.sqrt(sum((a[i+1]-b[i+1])**2 for i in range(3)))
+
+targets = [3.0, 3.5, 4.5, 6.0, 8.0]
+chosen, used = [], set()
+for t in targets:
+    best = None
+    for a, b in itertools.combinations(stab, 2):
+        if a[0] in used or b[0] in used: continue
+        e = abs(d(a, b) - t)
+        if best is None or e < best[0]:
+            best = (e, a, b)
+    if best and best[0] < 0.6:
+        _, a, b = best
+        used.add(a[0]); used.add(b[0])
+        chosen.append((a, b, d(a, b)))
+
+print("tag\tidxA\txA\tyA\tzA\tdvA\tidxB\txB\tyB\tzB\tdvB\tsep")
+for a, b, s in chosen:
+    print(f"sep{s:.1f}\t{a[0]}\t{a[1]:.6f}\t{a[2]:.6f}\t{a[3]:.6f}\t{a[5]:.4f}"
+          f"\t{b[0]}\t{b[1]:.6f}\t{b[2]:.6f}\t{b[3]:.6f}\t{b[5]:.4f}\t{s:.3f}")
+PY
+echo "pairs selected:"; cat pairs.tsv | column -t -s$'\t' 2>/dev/null || cat pairs.tsv
+echo
+
+run_sp () {
+  local g=$1
+  local tag=$2
+  local pc=$3
+  local base="sp_${g}_${tag}"
+  [[ -f "${base}.out" ]] && grep -q "TERMINATED NORMALLY" "${base}.out" && return 0
+  {
+    echo "! B3LYP D3BJ def2-SVPD def2/J RIJCOSX CPCM TightSCF"
+    echo "%maxcore 3000"
+    echo "%pal nprocs 8 end"
+    echo "%cpcm epsilon 4.0 end"
+    echo "%scf MaxIter 300 end"
+    [[ "$pc" != "none" ]] && echo "%pointcharges \"$pc\""
+    echo "* xyzfile -2 1 ${g}.xyz"
+  } > "${base}.inp"
+  "$ORCA/orca" "${base}.inp" > "${base}.out" 2>&1 </dev/null
+  grep -q "TERMINATED NORMALLY" "${base}.out"
+}
+
+echo "=== control: no charge"
+for g in reactant ts; do run_sp $g q0 none || { echo "FAIL q0 $g"; exit 1; }; done
+echo
+
+echo "=== A alone, B alone, and A with B, for each pair and sign combination"
+tail -n +2 pairs.tsv | while IFS=$'\t' read -r tag iA xA yA zA dvA iB xB yB zB dvB sep; do
+  for combo in "pp +1.0 +1.0" "mm -1.0 -1.0" "pm +1.0 -1.0"; do
+    set -- $combo; c=$1; qa=$2; qb=$3
+    printf "1\n%s  %s %s %s\n" "$qa" "$xA" "$yA" "$zA" > "pc_${tag}_${c}_A.pc"
+    printf "1\n%s  %s %s %s\n" "$qb" "$xB" "$yB" "$zB" > "pc_${tag}_${c}_B.pc"
+    printf "2\n%s  %s %s %s\n%s  %s %s %s\n" \
+           "$qa" "$xA" "$yA" "$zA" "$qb" "$xB" "$yB" "$zB" > "pc_${tag}_${c}_AB.pc"
+    for part in A B AB; do
+      for g in reactant ts; do
+        run_sp $g "${tag}_${c}_${part}" "pc_${tag}_${c}_${part}.pc" \
+          || echo "  WARN $g ${tag}_${c}_${part}"
+      done
+    done
+    echo "  done $tag $c"
+  done
+done
+echo
+
+python3 - <<'PY'
+import re, os
+H = 627.5094740631
+def E(p):
+    if not os.path.exists(p): return None
+    t = open(p, errors="replace").read()
+    if "TERMINATED NORMALLY" not in t: return None
+    m = re.findall(r"FINAL SINGLE POINT ENERGY\s+(-?\d+\.\d+)", t)
+    return float(m[-1]) if m else None
+
+B0 = (E("sp_ts_q0.out") - E("sp_reactant_q0.out")) * H
+print("=" * 104)
+print(f"Additivity of the barrier change. Reference barrier {B0:.4f} kcal/mol.")
+print("=" * 104)
+print(f"{'pair':<9}{'sep/A':>7}{'qA,qB':>8}{'DDE(A)':>9}{'DDE(B)':>9}"
+      f"{'sum':>9}{'DDE(A,B)':>11}{'non-add':>10}{'% of sum':>10}")
+print("-" * 104)
+
+rows = [l.split("\t") for l in open("pairs.tsv").read().splitlines()[1:] if l.strip()]
+out = []
+for c in rows:
+    tag, sep = c[0], float(c[11])
+    for combo, lab in (("pp", "+1,+1"), ("mm", "-1,-1"), ("pm", "+1,-1")):
+        vals = {}
+        for part in ("A", "B", "AB"):
+            r = E(f"sp_reactant_{tag}_{combo}_{part}.out")
+            t = E(f"sp_ts_{tag}_{combo}_{part}.out")
+            vals[part] = None if (r is None or t is None) else (t - r) * H - B0
+        if any(v is None for v in vals.values()):
+            print(f"{tag:<9}{sep:>7.2f}{lab:>8}   incomplete"); continue
+        s = vals["A"] + vals["B"]
+        na = vals["AB"] - s
+        pct = 100 * na / s if abs(s) > 1e-6 else float("nan")
+        out.append((sep, combo, vals["A"], vals["B"], vals["AB"], na))
+        print(f"{tag:<9}{sep:>7.2f}{lab:>8}{vals['A']:>9.3f}{vals['B']:>9.3f}"
+              f"{s:>9.3f}{vals['AB']:>11.3f}{na:>10.3f}{pct:>10.1f}")
+
+if out:
+    print("\n" + "=" * 104)
+    na = [o[5] for o in out]
+    mx = max(abs(v) for v in na)
+    print(f"largest non-additive term: {mx:.3f} kcal/mol")
+    print()
+    print("Does it change sign with the product of the charges, as a cross-")
+    print("polarisation term should?")
+    for combo, lab in (("pp", "+1,+1"), ("mm", "-1,-1"), ("pm", "+1,-1")):
+        v = [o[5] for o in out if o[1] == combo]
+        if v:
+            print(f"  {lab}: {' '.join(f'{x:+.3f}' for x in v)}")
+    print()
+    print("  The like-sign combinations share the sign of q_A*q_B and should")
+    print("  agree with one another; the opposite-sign combination should")
+    print("  reverse. A term that does not behave this way is not simple")
+    print("  cross-polarisation and needs a different explanation.")
+    print()
+    print("Does it fall off with separation?")
+    for sep in sorted(set(o[0] for o in out)):
+        v = [abs(o[5]) for o in out if o[0] == sep]
+        print(f"  {sep:>5.2f} A: mean |non-additivity| {sum(v)/len(v):.3f} kcal/mol")
+    print()
+    print("WHAT THIS MEANS FOR THE OBJECTIVE")
+    if mx < 0.05:
+        print("  Contributions add to within a few hundredths of a kcal/mol at the")
+        print("  separations the selection problem uses. The linear objective may be")
+        print("  summed over positions without correction.")
+    elif mx < 0.2:
+        print("  Contributions are additive to within a couple of tenths of a")
+        print("  kcal/mol. Against a resolution limit already bounded at about")
+        print("  0.6 kcal/mol by the single-charge test, this does not degrade the")
+        print("  screen further, but it should be reported rather than assumed.")
+    else:
+        print("  Contributions are NOT additive at the separations used. The error")
+        print("  compounds with the number of charges placed, so a design of several")
+        print("  charges cannot be scored by summing single-charge values, and the")
+        print("  objective needs either a correction term or explicit verification")
+        print("  of every candidate arrangement.")
+PY
+echo; echo "end=$(date)"

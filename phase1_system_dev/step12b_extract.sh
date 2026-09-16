@@ -8,16 +8,21 @@ export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_TH
 root="$HOME/system_development"
 prmtop="$root/03_amber/tleap_build/complex_solvated.prmtop"
 traj="$root/04_amber_md/10c_production/prod.nc"
+# the production run was extended; the two files are one trajectory
+traj2="$root/04_amber_md/10d_production_extend/prod_ext.nc"
 seldir="$root/05_qmmm/12_frame_selection"
 manifest="$seldir/selection_manifest.tsv"
 outdir="$seldir/frames"; mkdir -p "$outdir"
 for f in "$prmtop" "$traj" "$manifest"; do [[ -s "$f" ]] || { echo "FAIL missing $f"; exit 1; }; done
+[[ -s "$traj2" ]] || { echo "note: no extension trajectory at $traj2; "\
+  "only frames of the first run can be extracted"; traj2=""; }
 
-python3 - "$prmtop" "$traj" "$manifest" "$outdir" <<'PY'
+python3 - "$prmtop" "$traj" "$manifest" "$outdir" "$traj2" <<'PY'
 import sys, os, re, struct
 import numpy as np
 os.environ.setdefault("OPENBLAS_NUM_THREADS","1")
 prmtop, traj, manifest, outdir = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+traj2 = sys.argv[5] if len(sys.argv) > 5 and sys.argv[5] else None
 def parse_prmtop(path):
     flags,fmts,cur={},{},None
     for ln in open(path,errors="replace"):
@@ -61,18 +66,48 @@ def nc_open(path):
     dimd={n:l for n,l in dims}; recsize=sum(v["vsize"] for v in rec)
     frames=numrecs if numrecs!=0xFFFFFFFF else (fsz-min(v["begin"] for v in rec))//recsize
     return {"frames":frames,"recsize":recsize,"rec":rec,"atom":dimd.get("atom")}
-H=nc_open(traj); assert H["atom"]==natom, "atom mismatch"
-cvar=next(v for v in H["rec"] if v["name"]=="coordinates")
-lvar=next((v for v in H["rec"] if v["name"]=="cell_lengths"),None)
-avar=next((v for v in H["rec"] if v["name"]=="cell_angles"),None)
+def open_traj(path):
+    """Header and the three record variables of one trajectory file."""
+    H=nc_open(path); assert H["atom"]==natom, "atom mismatch in %s"%path
+    return {"path":path, "H":H,
+            "c":next(v for v in H["rec"] if v["name"]=="coordinates"),
+            "l":next((v for v in H["rec"] if v["name"]=="cell_lengths"),None),
+            "a":next((v for v in H["rec"] if v["name"]=="cell_angles"),None)}
+
+T1=open_traj(traj)
+T2=open_traj(traj2) if traj2 else None
+N1=T1["H"]["frames"]
+print("trajectory 1: %s, %d frames"%(os.path.basename(traj),N1))
+if T2:
+    print("trajectory 2: %s, %d frames"%(os.path.basename(traj2),T2["H"]["frames"]))
+    print("frames 0 to %d are read from the first, %d and above from the second"
+          %(N1-1,N1))
+
 def frame(i):
-    o=cvar["begin"]+i*H["recsize"]
-    xyz=np.array(np.memmap(traj,dtype=">f4",mode="r",offset=o,shape=(natom,3)),float)
+    """Read production frame i, spanning the two files.
+
+    The two trajectories are one run: the extension restarted from the first
+    file's restart with velocities. Production frame i therefore lives in the
+    first file if i is below its length and in the second at i-N1 otherwise.
+    The boundary comes from the first file's header, not from an assumed
+    length."""
+    if i < N1 or T2 is None:
+        t, j = T1, i
+        if i >= N1:
+            sys.exit("FAIL frame %d is beyond %s (%d frames) and no extension "
+                     "trajectory was given"%(i,os.path.basename(traj),N1))
+    else:
+        t, j = T2, i - N1
+        if j >= t["H"]["frames"]:
+            sys.exit("FAIL frame %d is beyond the end of both trajectories"%i)
+    path, H, cvar, lvar, avar = t["path"], t["H"], t["c"], t["l"], t["a"]
+    o=cvar["begin"]+j*H["recsize"]
+    xyz=np.array(np.memmap(path,dtype=">f4",mode="r",offset=o,shape=(natom,3)),float)
     box=[0.0,0.0,0.0,90.0,90.0,90.0]
     if lvar is not None:
-        bo=lvar["begin"]+i*H["recsize"]; box[:3]=list(np.array(np.memmap(traj,dtype=">f8",mode="r",offset=bo,shape=(3,)),float))
+        bo=lvar["begin"]+j*H["recsize"]; box[:3]=list(np.array(np.memmap(path,dtype=">f8",mode="r",offset=bo,shape=(3,)),float))
     if avar is not None:
-        ao=avar["begin"]+i*H["recsize"]; box[3:]=list(np.array(np.memmap(traj,dtype=">f8",mode="r",offset=ao,shape=(3,)),float))
+        ao=avar["begin"]+j*H["recsize"]; box[3:]=list(np.array(np.memmap(path,dtype=">f8",mode="r",offset=ao,shape=(3,)),float))
     return xyz,box
 def write_rst7(path, xyz, box, title):
     with open(path,"w") as f:

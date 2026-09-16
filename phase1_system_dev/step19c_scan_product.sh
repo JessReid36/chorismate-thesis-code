@@ -91,6 +91,7 @@ for FR in "${FRAMES[@]}"; do
   cp "$rpdb" "$scan/win_00.pdb"
   cp "$bridge" "$scan/complex_solvated.ORCAFF.prms"
   cp "$ref/run_scan.sh" "$scan/run_scan.sh"
+  cp "$ref/stage_tsguess.sh" "$scan/stage_tsguess.sh"
   echo "$ACT" > "$scan/active.txt"
 
   # --- targets from THIS frame's optimised reactant
@@ -142,6 +143,7 @@ PY
     echo 'echo "end=$(date) rc=$RC"'
     echo '# the scan is only useful if it reached the final window'
     echo "if [ -s win_$(printf '%02d' $NWIN).pdb ]; then echo SCAN_PASS; else echo SCAN_INCOMPLETE; exit 1; fi"
+    echo 'bash stage_tsguess.sh || exit 1'
     echo 'tail -3 scan_progress.tsv 2>/dev/null'
   } > "$work/scan.pbs"
 

@@ -1,0 +1,118 @@
+#!/bin/bash
+#PBS -N cm11a_rmsdext
+#PBS -l select=1:ncpus=4:mem=16gb
+#PBS -l walltime=12:00:00
+#PBS -m ae
+#PBS -M 18660916@sun.ac.za
+#PBS -j oe
+#PBS -o /home/18660916/system_development/05_qmmm/11a_rmsd_ext.pbs.out
+#
+# 11a_rmsd_ext.pbs - backbone RMSD trace of the production extension.
+#
+# WHY
+#   The decision to run thirty QM/MM frames rests on how many independent
+#   protein configurations the trajectory contains. That number is about
+#   T/(2*tau), where tau is the correlation time of the protein's configuration.
+#
+#   The value used to size the extension, about 806 ps, was fitted to seven lags
+#   of an autocorrelation computed over only 9 ns of equilibrated trajectory. A
+#   correlation time estimated from a record eleven times its own length is not
+#   reliable, and if the true value is materially larger then thirty frames at
+#   1600 ps spacing are not thirty independent samples.
+#
+#   Each QM/MM frame costs roughly forty-four hours, so it is worth spending a
+#   few hours here before committing to that.
+#
+# WHAT IT DOES
+#   Runs the committed step11a analysis against the extension trajectory. The
+#   script is unchanged apart from the input and output paths.
+#
+# ON THE REFERENCE STRUCTURE
+#   step11a measures RMSD against frame 0 of whichever trajectory it is given, so
+#   this trace is referenced to the extension's own first frame rather than to
+#   production frame 0. The two traces are therefore not directly comparable in
+#   absolute value.
+#
+#   That does not affect the correlation time, which is computed from
+#   fluctuations about the mean and is unchanged by a constant offset in the
+#   reference. It does mean this trace cannot be used to compare the extension's
+#   absolute drift against the first run's; if that comparison is wanted later, a
+#   trace against a common reference is needed.
+
+set -uo pipefail
+cd /home/18660916/system_development/05_qmmm || exit 1
+echo "host=$(hostname) start=$(date)"
+echo
+
+[[ -s step11a_rmsd_ext.sh ]] || { echo "FAIL missing step11a_rmsd_ext.sh"; exit 1; }
+grep -q "prod_ext.nc" step11a_rmsd_ext.sh || { echo "FAIL script does not point at the extension"; exit 1; }
+grep -q "rmsd_vs_time_ext.dat" step11a_rmsd_ext.sh || { echo "FAIL script would overwrite the original trace"; exit 1; }
+
+bash step11a_rmsd_ext.sh
+rc=$?
+echo
+echo "step11a exit=$rc end=$(date)"
+[[ $rc -eq 0 ]] || exit 1
+
+out=/home/18660916/system_development/04_amber_md/11_analysis/rmsd_vs_time_ext.dat
+[[ -s "$out" ]] || { echo "FAIL no trace written"; exit 1; }
+echo "lines written: $(grep -vc '^#' "$out")"
+echo
+
+python3 - "$out" <<'PY'
+import sys, math
+rows = [l.split() for l in open(sys.argv[1]) if not l.startswith("#")]
+d = [float(r[2]) for r in rows]
+n = len(d)
+print("=" * 64)
+print("Backbone RMSD of the extension: %d frames" % n)
+print("=" * 64)
+print("\n2 ns blocks:")
+for lo in range(0, n, 2000):
+    b = d[lo:lo+2000]
+    if len(b) < 2: continue
+    m = sum(b)/len(b)
+    s = math.sqrt(sum((x-m)**2 for x in b)/(len(b)-1))
+    print("  %5d-%5d ps   mean %.3f   sd %.3f" % (lo, lo+len(b), m, s))
+
+m = sum(d)/n
+var = sum((x-m)**2 for x in d)/n
+print("\nautocorrelation about the mean:")
+lags = [15, 50, 100, 200, 300, 500, 800, 1000, 1500, 2000, 3000, 5000]
+obs = []
+for lag in lags:
+    if lag >= n: break
+    c = sum((d[i]-m)*(d[i+lag]-m) for i in range(n-lag))/((n-lag)*var)
+    obs.append((lag, c))
+    print("  lag %5d ps   C = %+.3f" % (lag, c))
+
+pos = [(t, c) for t, c in obs if c > 0.02]
+if len(pos) >= 3:
+    num = sum(t*(-math.log(c)) for t, c in pos)
+    den = sum((-math.log(c))**2 for t, c in pos)
+    tau_fit = num/den
+    print("\n  exponential fit over the lags with C > 0.02:  tau = %.0f ps" % tau_fit)
+else:
+    tau_fit = float("nan")
+
+# integrated correlation time, summed until the first crossing of zero
+tau_int = 0.0
+for lag in range(1, min(n//4, 20000)):
+    c = sum((d[i]-m)*(d[i+lag]-m) for i in range(n-lag))/((n-lag)*var)
+    if c <= 0: break
+    tau_int += c
+print("  integrated to the first zero crossing:        tau = %.0f ps" % tau_int)
+
+print("\n" + "=" * 64)
+for tau, lab in ((tau_fit, "fitted"), (tau_int, "integrated")):
+    if tau != tau and tau is not None: continue
+    for T, tlab in ((9000, "the original equilibrated portion"),
+                    (49000, "the combined equilibrated trajectory")):
+        print("  %-11s tau %5.0f ps  ->  %5.1f independent configurations in %s"
+              % (lab, tau, T/(2*tau), tlab))
+print()
+print("  The value used to size the extension was 806 ps, fitted to 9 ns.")
+print("  If the value here is materially larger, thirty frames are not thirty")
+print("  independent samples and the number of QM/MM frames should be revisited")
+print("  before committing roughly forty-four hours to each.")
+PY

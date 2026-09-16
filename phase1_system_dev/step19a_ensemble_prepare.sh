@@ -21,7 +21,7 @@
 # ---------------------------
 # Repeated per frame:   reactant optimisation (L-Opt, large active region)
 #                       product optimisation  (L-Opt, same region)
-#                       NEB-CI barrier
+#                       NEB-TS barrier, from the scan maximum as guess
 #
 # NOT repeated:         reduced-region TS optimisation with Hybrid Hessian
 #                       612-displacement endpoint frequencies
@@ -30,7 +30,7 @@
 # The omitted steps exist once, on frame 820, and establish that the saddle is a
 # genuine first-order transition state connecting the right basins. Their result
 # also licenses the shortcut: on frame 820 the converged NEB climbing image gave
-# 15.94 kcal/mol against the fully characterised 16.00, agreeing to 0.06. NEB-CI
+# 15.94 kcal/mol against the fully characterised 16.00, agreeing to 0.06. NEB-TS
 # is therefore a validated proxy FOR THIS SYSTEM, demonstrated rather than
 # assumed, and the ensemble is reported by that proxy.
 #
@@ -128,7 +128,7 @@ for FR in "${FRAMES[@]}"; do
     echo '#!/bin/bash'
     echo "#PBS -N cm19_r${PAD}"
     echo "#PBS -l select=1:ncpus=$NPROC:mem=120gb"
-    echo '#PBS -l walltime=168:00:00'
+    echo '#PBS -l walltime=176:00:00'
     echo '#PBS -m ae'; echo "#PBS -M $EMAIL"; echo '#PBS -j oe'
     echo "#PBS -o $work/reactant_opt.pbs.out"
     echo "cd $work"
@@ -144,12 +144,13 @@ for FR in "${FRAMES[@]}"; do
 
   # --- NEB, prepared but only runnable once the endpoints exist
   {
-    echo "! QMMM B3LYP D3BJ def2-SVP def2/J RIJCOSX NEB-CI SlowConv TightSCF"
+    echo "! QMMM B3LYP D3BJ def2-SVP def2/J RIJCOSX NEB-TS SlowConv TightSCF"
     echo "%maxcore 3000"
     echo "%pal nprocs $NPROC end"
     echo "%scf MaxIter 250 end"
     echo "%neb"
     echo '  Product_PDBFile "product.pdb"'
+    echo '  TS_PDBFile "tsguess.pdb"'
     echo "  NImages 8"
     echo "  Interpolation Linear"
     echo "  Prepare_Frags false"
@@ -166,7 +167,7 @@ for FR in "${FRAMES[@]}"; do
     echo '#!/bin/bash'
     echo "#PBS -N cm19_n${PAD}"
     echo "#PBS -l select=1:ncpus=$NPROC:mem=120gb"
-    echo '#PBS -l walltime=168:00:00'
+    echo '#PBS -l walltime=176:00:00'
     echo '#PBS -m ae'; echo "#PBS -M $EMAIL"; echo '#PBS -j oe'
     echo "#PBS -o $work/neb.pbs.out"
     echo "cd $work"

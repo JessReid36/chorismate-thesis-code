@@ -198,6 +198,14 @@ def main():
     ap.add_argument("--site", default="CHA#2")
     ap.add_argument("--n", type=int, default=3)
     ap.add_argument("--stride", type=int, default=5)
+    ap.add_argument("--min-ps", type=float, default=11000.0,
+                    dest="min_ps",
+                    help="exclude frames earlier than this time in the "
+                         "production trajectory. The backbone RMSD rises "
+                         "monotonically over the first ten nanoseconds and is "
+                         "stable thereafter, so earlier frames do not sample "
+                         "the equilibrated ensemble. The default carries a "
+                         "one-nanosecond margin beyond that point.")
     ap.add_argument("--contact-cut", type=float, default=3.2)
     args = ap.parse_args()
 
@@ -245,11 +253,19 @@ def main():
                       for l in open(args.manifest).read().splitlines()
                       if not l.startswith("#") and l.strip())
     print(f"already selected: {existing}\n")
-    print(f"scanning every {args.stride}th of {H['frames']} frames "
-          f"at {args.site} against the full NAC criterion ...")
+    print(f"scanning every {args.stride}th frame from {int(args.min_ps)} ps "
+          f"onward at {args.site} against the full NAC criterion ...")
 
     pool = []
-    for i in range(0, H["frames"], args.stride):
+    # One frame is written per picosecond, so the frame index and the time in
+    # picoseconds are the same number. Starting the scan at the first
+    # equilibrated frame is equivalent to filtering afterwards but avoids
+    # reading coordinates that would only be discarded.
+    i0 = int(args.min_ps)
+    if i0 > 0:
+        print(f"excluding the first {i0} frames as pre-equilibration; "
+              f"{H['frames'] - i0} remain")
+    for i in range(i0, H["frames"], args.stride):
         if i in existing:
             continue
         full, box = frame(i)
