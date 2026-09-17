@@ -125,7 +125,7 @@ PY
   {
     echo '#!/bin/bash'
     echo "#PBS -N cm19_s${PAD}"
-    echo "#PBS -l select=1:ncpus=$NPROC:mem=120gb"
+    echo "#PBS -l select=1:ncpus=$NPROC:mem=16gb"
     echo '#PBS -l walltime=176:00:00'
     echo '#PBS -m ae'; echo "#PBS -M $EMAIL"; echo '#PBS -j oe'
     echo "#PBS -o $scan/scan.pbs.out"
@@ -164,7 +164,7 @@ PY
   {
     echo '#!/bin/bash'
     echo "#PBS -N cm19_p${PAD}"
-    echo "#PBS -l select=1:ncpus=$NPROC:mem=120gb"
+    echo "#PBS -l select=1:ncpus=$NPROC:mem=16gb"
     echo '#PBS -l walltime=176:00:00'
     echo '#PBS -m ae'; echo "#PBS -M $EMAIL"; echo '#PBS -j oe'
     echo "#PBS -o $work/product_opt.pbs.out"

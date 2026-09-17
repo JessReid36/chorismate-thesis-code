@@ -127,7 +127,7 @@ for FR in "${FRAMES[@]}"; do
   {
     echo '#!/bin/bash'
     echo "#PBS -N cm19_r${PAD}"
-    echo "#PBS -l select=1:ncpus=$NPROC:mem=120gb"
+    echo "#PBS -l select=1:ncpus=$NPROC:mem=16gb"
     echo '#PBS -l walltime=176:00:00'
     echo '#PBS -m ae'; echo "#PBS -M $EMAIL"; echo '#PBS -j oe'
     echo "#PBS -o $work/reactant_opt.pbs.out"
@@ -166,7 +166,7 @@ for FR in "${FRAMES[@]}"; do
   {
     echo '#!/bin/bash'
     echo "#PBS -N cm19_n${PAD}"
-    echo "#PBS -l select=1:ncpus=$NPROC:mem=120gb"
+    echo "#PBS -l select=1:ncpus=$NPROC:mem=250gb"
     echo '#PBS -l walltime=176:00:00'
     echo '#PBS -m ae'; echo "#PBS -M $EMAIL"; echo '#PBS -j oe'
     echo "#PBS -o $work/neb.pbs.out"
