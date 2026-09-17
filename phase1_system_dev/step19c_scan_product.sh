@@ -54,7 +54,6 @@ bridge="$root/05_qmmm/13_bridge/complex_solvated.ORCAFF.prms"
 END_BRK=2.400
 END_FRM=1.540
 NWIN=20
-SPRING=400.0
 
 for f in "$active" "$bridge" "$ref/run_scan.sh"; do
   [[ -s "$f" ]] || { echo "FAIL missing $f"; exit 1; }

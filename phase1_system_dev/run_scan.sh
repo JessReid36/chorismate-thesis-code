@@ -4,7 +4,7 @@ ORCA=/home/apps2/ORCA/6.0.1
 export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
 cd "$PWD"
 ACT="$(cat active.txt)"
-SPRING=400.0
+SPRING=2500.0   # kJ/mol/A^2; the production value of 400 was about 96 kcal, five times weaker than the 500 kcal of Claeyssens et al. 2005
 prev="win_00.pdb"
 n=0
 : > scan_progress.tsv

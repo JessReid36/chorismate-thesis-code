@@ -180,6 +180,10 @@ for FR in "${FRAMES[@]}"; do
     echo "$ORCA/orca neb.inp > neb.out 2>&1"
     echo 'echo "orca_exit=$? end=$(date)"'
     echo 'grep -iE "THE NEB OPTIMIZATION HAS CONVERGED|ORCA TERMINATED NORMALLY" neb.out | tail -4'
+    echo '# the full-system trajectories are large and the quantum-region'
+    echo '# versions of the same paths are kept; the Hessian is kept because'
+    echo '# a restart of the transition-state optimisation would need it'
+    echo 'rm -f neb_MEP_ALL_trj.xyz neb_MEP_trj.xyz neb_initial_path_trj.xyz neb_MEP_ALL.activeRegion_trj.xyz neb*.tmp neb_im*.gbw 2>/dev/null'
   } > neb.pbs
 
   echo "  prepared frame $FR -> $work"
