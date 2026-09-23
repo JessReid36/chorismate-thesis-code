@@ -51,23 +51,7 @@ MAN="$ROOT/12_frame_selection/selection_manifest.tsv"
 cd "$ROOT" || exit 1
 
 frames_new() { awk -F'\t' 'NR>1 && $2>=20000 {printf "%05d\n",$2}' "$MAN"; }
-running()    { qstat -u "$USER" 2>/dev/null | grep -c "cm19_" ; }
-
-# Is a job for this frame and stage already in the queue? The queue is the only
-# reliable test: output files appear when a stage finishes, so a running job and
-# an unstarted one look identical on disk. Job names are cm19_<letter><frame>
-# and qstat truncates them, so match on the leading characters.
-in_queue() {  # in_queue <frame> <letter>
-  local want="cm19_$2${1#0}"
-  # qstat truncates the name to ten characters including a trailing asterisk,
-  # so the field it prints is a PREFIX of the real name, not the whole of it.
-  # Test that the expected name starts with the printed field, not the reverse.
-  local j
-  for j in $(qstat -u "$USER" 2>/dev/null | awk 'NR>5{print $4}' | sed 's/\*$//'); do
-    [[ -n "$j" && "$want" == "$j"* ]] && return 0
-  done
-  return 1
-}
+running()    { qstat -u "$USER" 2>/dev/null | grep -c "cm19_n" ; }
 
 have() {  # have <frame> <stage>
   local d="$ENS/frame_$1"
@@ -106,7 +90,7 @@ stage1)
   n=0
   for f in $(frames_new); do
     have "$f" reactant && continue
-    in_queue "$f" r && { echo "  $f already queued"; continue; }
+    qstat -u "$USER" 2>/dev/null | grep -q "cm19_r${f:1}" && continue
     [[ -s "$ENS/frame_$f/reactant_opt.pbs" ]] || { echo "  $f: no job script"; continue; }
     (cd "$ENS/frame_$f" && qsub reactant_opt.pbs >/dev/null) && { echo "  submitted $f"; n=$((n+1)); }
   done
@@ -119,7 +103,6 @@ stage2)
   for f in $(frames_new); do
     have "$f" scan && continue
     if ! have "$f" reactant; then w=$((w+1)); continue; fi
-    in_queue "$f" s && { echo "  $f already running a scan"; continue; }
     [[ -s "$ENS/frame_$f/scan.pbs" ]] || { echo "  $f: run step19c first"; continue; }
     (cd "$ENS/frame_$f" && qsub scan.pbs >/dev/null) && { echo "  submitted $f"; n=$((n+1)); }
   done
@@ -131,7 +114,6 @@ stage3)
   for f in $(frames_new); do
     have "$f" product && continue
     if ! have "$f" scan; then w=$((w+1)); continue; fi
-    in_queue "$f" p && { echo "  $f already running a product optimisation"; continue; }
     [[ -s "$ENS/frame_$f/product_opt.pbs" ]] || { echo "  $f: no job script"; continue; }
     (cd "$ENS/frame_$f" && qsub product_opt.pbs >/dev/null) && { echo "  submitted $f"; n=$((n+1)); }
   done
@@ -153,7 +135,6 @@ stage4)
     have "$f" band && continue
     have "$f" harvested && continue
     have "$f" product || continue
-    in_queue "$f" n && { echo "  $f already running a band"; continue; }
     [[ -s "$ENS/frame_$f/tsguess.pdb" ]] || { echo "  $f: no transition-state guess"; continue; }
     (cd "$ENS/frame_$f" && qsub neb.pbs >/dev/null) && { echo "  submitted $f"; n=$((n+1)); }
   done

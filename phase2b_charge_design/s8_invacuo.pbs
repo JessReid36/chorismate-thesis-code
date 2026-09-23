@@ -1,0 +1,272 @@
+#!/usr/bin/env bash
+#PBS -N cm_vac
+#PBS -l select=1:ncpus=8:mem=24gb
+#PBS -l walltime=24:00:00
+#PBS -m ae
+#PBS -M 18660916@sun.ac.za
+#PBS -j oe
+#PBS -o /home/18660916/system_development/05_qmmm/20_invacuo/s8_invacuo.pbs.out
+#
+# s8_invacuo.pbs - separate the intrinsic chemistry from the protein environment,
+# by the method of Claeyssens et al. (2005), Chem. Commun. 5068-5070,
+# doi:10.1039/b508181e.
+#
+# WHY
+#   The fourteen QM/MM barriers span 4.48 to 25.26 kcal/mol. Claeyssens and
+#   co-workers ran the same experiment on the same enzyme, sixteen reaction paths
+#   at B3LYP/6-31G(d)-CHARMM27, and obtained a mean of 12.0 with a standard
+#   deviation of 1.7. They describe their own range of 9 to 15 as "large" and
+#   attribute it to "differences in the protein environment", so a spread is
+#   expected; the present one is three to four times wider and needs accounting
+#   for.
+#
+# THE METHOD
+#   They separated the two contributions without decomposing the QM/MM energy:
+#
+#     "To examine the stabilization provided by the enzyme, single-point
+#      calculations on the isolated QM region were carried out at the QM/MM
+#      optimized geometries along the different reaction paths. All these in
+#      vacuo curves are very similar, with an average barrier height of
+#      16.2 kcal/mol (sigma = 0.3 kcal/mol). This shows that the differences in
+#      barrier height between the 16 QM/MM reaction profiles are due to
+#      differences in the microstructure of the active site."
+#
+#   and then
+#
+#     "The difference between the gas-phase and QM/MM energy gives the
+#      stabilization of the reacting system by the protein environment."
+#
+#   This supersedes any attempt to read ORCA's separate QM and MM energies as
+#   chemistry and environment. Under electrostatic embedding the MM charges enter
+#   the QM Hamiltonian as one-electron terms (Senn and Thiel 2009, equation 5),
+#   so the reported QM energy already contains the coupling and is not the
+#   isolated-molecule energy. A single point on the bare QM region at the same
+#   geometry is.
+#
+# WHAT IS COMPUTED
+#   For every frame, the 24-atom substrate is extracted from the optimised
+#   reactant, the climbing-image transition state and the optimised product, and
+#   a single point is run on each in vacuo: same functional, same basis, no MM
+#   charges, no continuum. Then
+#
+#     in vacuo barrier   = E(TS) - E(reactant), all in vacuo
+#     stabilisation      = E(QM/MM) - E(in vacuo), per structure
+#     TS stabilisation   = stabilisation(TS) - stabilisation(reactant)
+#
+#   Claeyssens report an average TS stabilisation of 4.2 kcal/mol and an
+#   excellent linear correlation against the barrier, with gradient 0.95 and
+#   intercept 16.0 kcal/mol, the latter being "the predicted 'intrinsic' barrier
+#   from the bound substrate conformation in the absence of TS stabilization".
+#
+# NOTE ON THE LEVEL OF THEORY
+#   Claeyssens used B3LYP/6-31G(d) with CHARMM27; this work uses B3LYP/def2-SVP
+#   with AMBER. The absolute numbers are therefore not directly comparable, but
+#   the spread and the correlation are, since both are properties of the ensemble
+#   rather than of the basis.
+
+set -uo pipefail
+ORCA=/home/apps2/ORCA/6.0.1
+ROOT=/home/18660916/system_development/05_qmmm
+ENS="$ROOT/19_ensemble"
+WORK="$ROOT/20_invacuo"
+
+export PATH="/apps/openmpi/4.1.1/bin:$PATH"
+export LD_LIBRARY_PATH="$ORCA/lib:/apps/openmpi/4.1.1/lib:/apps/mambaforge/envs/medaka/lib:${LD_LIBRARY_PATH:-}"
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
+
+mkdir -p "$WORK"; cd "$WORK" || exit 1
+if ! mkdir .running 2>/dev/null; then echo "FAIL: another job holds .running"; exit 1; fi
+trap 'rmdir .running 2>/dev/null' EXIT
+echo "host=$(hostname) start=$(date)"; echo
+
+FRAMES="02450 04085 05680 07310 08170 09025 09900 10775 11630 12485 14155 15825 17505 19185"
+
+# ---------------------------------------------------- extract the QM geometries
+echo "=== extracting the 24-atom substrate from each optimised structure"
+python3 - <<'PY'
+import os, re
+ENS = os.path.expanduser("~/system_development/05_qmmm/19_ensemble")
+FR = "02450 04085 05680 07310 08170 09025 09900 10775 11630 12485 14155 15825 17505 19185".split()
+
+def qm_from_pdb(path, lo=6207, hi=6231):
+    a = [l for l in open(path, errors="replace") if l.startswith(("ATOM", "HETATM"))]
+    out = []
+    for l in a[lo:hi]:
+        el = (l[76:78].strip() or l[12:16].strip()[0]).capitalize()
+        out.append((el, float(l[30:38]), float(l[38:46]), float(l[46:54])))
+    return out
+
+def qm_from_neb_trj(path, idx):
+    """The climbing image from the NEB trajectory. ORCA writes the converged
+    band as a multi-frame xyz of the QM region."""
+    if not os.path.exists(path):
+        return None
+    L = open(path, errors="replace").read().splitlines()
+    n = int(L[0].split()[0]); blk = n + 2
+    nfr = len(L) // blk
+    if idx >= nfr:
+        return None
+    s = idx * blk + 2
+    out = []
+    for l in L[s:s + n]:
+        p = l.split()
+        out.append((p[0], float(p[1]), float(p[2]), float(p[3])))
+    return out
+
+def ci_index(neb_out):
+    """Which image carries the climbing image, from the PATH SUMMARY."""
+    txt = open(neb_out, errors="replace").read()
+    m = re.search(r"^\s*(\d+)\s+[-\d.]+\s+[-\d.]+\s+[-\d.]+\s+\S+\s+\S+\s*<=\s*CI",
+                  txt, re.M)
+    return int(m.group(1)) if m else None
+
+def write_xyz(path, atoms, comment):
+    with open(path, "w") as fh:
+        fh.write(f"{len(atoms)}\n{comment}\n")
+        for e, x, y, z in atoms:
+            fh.write(f"{e:2s} {x:12.6f} {y:12.6f} {z:12.6f}\n")
+
+made = 0
+for f in FR:
+    d = f"{ENS}/frame_{f}"
+    for tag, src in (("R", f"{d}/reactant_opt.pdb"), ("P", f"{d}/product_opt.pdb")):
+        if os.path.exists(src):
+            write_xyz(f"{f}_{tag}.xyz", qm_from_pdb(src), f"frame {f} {tag}")
+            made += 1
+    ci = ci_index(f"{d}/neb.out") if os.path.exists(f"{d}/neb.out") else None
+    trj = f"{d}/neb.QMRegion_trj.xyz"
+    if ci is not None:
+        g = qm_from_neb_trj(trj, ci)
+        if g:
+            write_xyz(f"{f}_TS.xyz", g, f"frame {f} TS, climbing image {ci}")
+            made += 1
+        else:
+            print(f"  {f}: could not read image {ci} from {os.path.basename(trj)}")
+    else:
+        print(f"  {f}: no climbing image found in neb.out")
+print(f"  wrote {made} geometries")
+PY
+echo
+
+# ------------------------------------------------------------- run the singles
+echo "=== in vacuo single points, no MM charges and no continuum"
+for x in *.xyz; do
+  b="${x%.xyz}"
+  [[ -f "sp_${b}.out" ]] && grep -q "TERMINATED NORMALLY" "sp_${b}.out" && continue
+  {
+    echo "! B3LYP D3BJ def2-SVP def2/J RIJCOSX TightSCF"
+    echo "%maxcore 3000"
+    echo "%pal nprocs 8 end"
+    echo "%scf MaxIter 300 end"
+    echo "* xyzfile -2 1 ${x}"
+  } > "sp_${b}.inp"
+  "$ORCA/orca" "sp_${b}.inp" > "sp_${b}.out" 2>&1 </dev/null
+  grep -q "TERMINATED NORMALLY" "sp_${b}.out" || echo "  WARN did not terminate: $b"
+done
+echo
+
+# ------------------------------------------------------------------- analysis
+python3 - <<'PY'
+import os, re, math
+ENS = os.path.expanduser("~/system_development/05_qmmm/19_ensemble")
+FR = "02450 04085 05680 07310 08170 09025 09900 10775 11630 12485 14155 15825 17505 19185".split()
+H = 627.5094740631
+
+def vac(tag):
+    p = f"sp_{tag}.out"
+    if not os.path.exists(p): return None
+    t = open(p, errors="replace").read()
+    if "TERMINATED NORMALLY" not in t: return None
+    m = re.findall(r"FINAL SINGLE POINT ENERGY\s+(-?\d+\.\d+)", t)
+    return float(m[-1]) if m else None
+
+def qmmm(path):
+    if not os.path.exists(path): return None
+    for l in reversed(open(path, errors="replace").read().splitlines()):
+        m = re.search(r"FINAL SINGLE POINT ENERGY \(QM/MM\)\s+(-?\d+\.\d+)", l)
+        if m: return float(m.group(1))
+    return None
+
+def neb_barrier(p):
+    if not os.path.exists(p): return None
+    t = open(p, errors="replace").read()
+    blk = re.search(r"PATH SUMMARY.*?(?=Straight line)", t, re.S)
+    if not blk: return None
+    rows = re.findall(r"^\s*\d+\s+[-\d.]+\s+[-\d.]+\s+([-\d.]+)\s", blk.group(0), re.M)
+    return max(float(r) for r in rows) if rows else None
+
+print("=" * 96)
+print("Intrinsic chemistry versus protein environment, after Claeyssens et al. (2005)")
+print("=" * 96)
+print(f"{'frame':<8}{'QM/MM barr':>11}{'vac barr':>10}{'stab(R)':>10}{'stab(TS)':>10}"
+      f"{'TS stab':>9}{'vac dE(R-P)':>13}")
+print("-" * 96)
+rows = []
+for f in FR:
+    d = f"{ENS}/frame_{f}"
+    vR, vT, vP = vac(f"{f}_R"), vac(f"{f}_TS"), vac(f"{f}_P")
+    qR, qP = qmmm(f"{d}/reactant_opt.out"), qmmm(f"{d}/product_opt.out")
+    bar = neb_barrier(f"{d}/neb.out")
+    if None in (vR, vT, qR) or bar is None:
+        print(f"{f:<8}  incomplete"); continue
+    vbar = (vT - vR) * H
+    sR = (qR - vR) * H
+    sT = None
+    # the QM/MM energy at the climbing image, from the PATH SUMMARY
+    t = open(f"{d}/neb.out", errors="replace").read()
+    m = re.search(r"^\s*\d+\s+[-\d.]+\s+(-?\d+\.\d+)\s+[-\d.]+\s+\S+\s+\S+\s*<=\s*CI",
+                  t, re.M)
+    if m:
+        sT = (float(m.group(1)) - vT) * H
+    tsstab = (sT - sR) if sT is not None else float("nan")
+    vdE = (vR - vP) * H if vP else float("nan")
+    rows.append((f, bar, vbar, sR, sT, tsstab, vdE))
+    print(f"{f:<8}{bar:>11.2f}{vbar:>10.2f}{sR:>10.2f}"
+          f"{(sT if sT is not None else float('nan')):>10.2f}{tsstab:>9.2f}{vdE:>13.2f}")
+
+def stats(v):
+    v = [x for x in v if x == x]
+    if len(v) < 2: return float("nan"), float("nan")
+    m = sum(v)/len(v)
+    return m, math.sqrt(sum((x-m)**2 for x in v)/(len(v)-1))
+
+if len(rows) >= 6:
+    mb, sb = stats([r[1] for r in rows])
+    mv, sv = stats([r[2] for r in rows])
+    mt, st = stats([r[5] for r in rows])
+    print("\n" + "=" * 96)
+    print(f"QM/MM barrier      mean {mb:7.2f}   sd {sb:5.2f}    "
+          f"Claeyssens: mean 12.0, sd 1.7")
+    print(f"in vacuo barrier   mean {mv:7.2f}   sd {sv:5.2f}    "
+          f"Claeyssens: mean 16.2, sd 0.3")
+    print(f"TS stabilisation   mean {mt:7.2f}   sd {st:5.2f}    "
+          f"Claeyssens: mean 4.2")
+    print()
+    if sv < 1.0:
+        print("  The in vacuo barrier is nearly constant, so the substrate geometries")
+        print("  are equivalent and the spread in the QM/MM barriers is environmental,")
+        print("  as Claeyssens and co-workers found. The ensemble is measuring what it")
+        print("  was built to measure.")
+    else:
+        print("  The in vacuo barrier is NOT constant. The substrate geometries differ")
+        print("  enough to change the intrinsic chemistry, which the root-mean-square")
+        print("  comparisons did not detect, and the QM/MM spread is therefore not")
+        print("  purely environmental.")
+    x = [r[5] for r in rows if r[5] == r[5]]
+    y = [r[1] for r in rows if r[5] == r[5]]
+    if len(x) >= 6:
+        n = len(x); mx = sum(x)/n; my = sum(y)/n
+        sxx = sum((a-mx)**2 for a in x); sxy = sum((a-mx)*(b-my) for a, b in zip(x, y))
+        syy = sum((b-my)**2 for b in y)
+        r = sxy/math.sqrt(sxx*syy) if sxx and syy else float("nan")
+        grad = sxy/sxx if sxx else float("nan")
+        print()
+        print(f"  barrier against TS stabilisation:  r = {r:+.3f},"
+              f"  gradient {grad:+.3f},  intercept {my - grad*mx:.2f}")
+        print("  Claeyssens report an excellent linear correlation with gradient 0.95")
+        print("  and intercept 16.0 kcal/mol, the intercept being the intrinsic barrier")
+        print("  in the absence of transition-state stabilisation. Note their gradient")
+        print("  is positive because they plot stabilisation as a positive quantity;")
+        print("  compare magnitudes and the quality of the fit rather than the sign.")
+PY
+echo; echo "end=$(date)"
