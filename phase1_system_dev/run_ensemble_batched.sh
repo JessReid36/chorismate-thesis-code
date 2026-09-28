@@ -51,7 +51,26 @@ MAN="$ROOT/12_frame_selection/selection_manifest.tsv"
 cd "$ROOT" || exit 1
 
 frames_new() { awk -F'\t' 'NR>1 && $2>=20000 {printf "%05d\n",$2}' "$MAN"; }
-running()    { qstat -u "$USER" 2>/dev/null | grep -c "cm19_n" ; }
+# JOB-NAME MATCHING - fixed 2026-09-23.
+# Two defects were present here and both are measured, not inferred:
+#   1. The job name is cm19_n${PAD} with PAD=$(printf "%05d"), i.e. cm19_n24883.
+#      The old code asked for cm19_n${f:1} = cm19_n4883, which strips the
+#      leading digit and is not the job's name at all.
+#   2. qstat truncates the Name field to ten characters INCLUDING a trailing
+#      asterisk, so the printed field is a NINE-character prefix of the real
+#      name: cm19_n24883 prints as cm19_n248*.
+# Either defect alone stops the grep matching, so the "still running" guard in
+# harvest has never been able to fire. Compare printed-prefix against full name.
+job_running() {   # job_running <full job name>
+  local want="$1" n
+  while read -r n; do
+    [ -n "$n" ] || continue
+    n="${n%\*}"
+    case "$want" in "$n"*) return 0 ;; esac
+  done < <(qstat -u "$USER" 2>/dev/null | awk '$1 ~ /^[0-9]+\./ {print $4}')
+  return 1
+}
+running()    { qstat -u "$USER" 2>/dev/null | awk '$1 ~ /^[0-9]+\./ && $4 ~ /^cm19_n/ {n++} END{print n+0}'; }
 
 have() {  # have <frame> <stage>
   local d="$ENS/frame_$1"
@@ -90,7 +109,7 @@ stage1)
   n=0
   for f in $(frames_new); do
     have "$f" reactant && continue
-    qstat -u "$USER" 2>/dev/null | grep -q "cm19_r${f:1}" && continue
+    job_running "cm19_r${f}" && continue
     [[ -s "$ENS/frame_$f/reactant_opt.pbs" ]] || { echo "  $f: no job script"; continue; }
     (cd "$ENS/frame_$f" && qsub reactant_opt.pbs >/dev/null) && { echo "  submitted $f"; n=$((n+1)); }
   done
@@ -151,7 +170,11 @@ harvest)
   freed=0
   for f in $(frames_new); do
     have "$f" harvested || continue
-    qstat -u "$USER" 2>/dev/null | grep -q "cm19_n${f:1}" && { echo "  $f still running, left alone"; continue; }
+    job_running "cm19_n${f}" && { echo "  $f still running, left alone"; continue; }
+    # belt and braces: never delete a Hessian that was written in the last hour
+    if [[ -n $(find "$ENS/frame_$f" -maxdepth 1 -name neb.appr.hess -mmin -60 2>/dev/null) ]]; then
+      echo "  $f Hessian modified within the hour, left alone"; continue
+    fi
     d="$ENS/frame_$f"
     before=$(du -sm "$d" 2>/dev/null | cut -f1)
     rm -f "$d"/neb.appr.hess "$d"/neb.gu.tmp "$d"/neb_MEP_ALL_trj.xyz \

@@ -51,22 +51,41 @@ fi
 
 cp "win_${W}.pdb" "$OUT" || { echo "TSGUESS_MISSING: copy failed"; exit 1; }
 
-# Report the guess against the first window, which is the reactant end of the
-# scan. A guess that sits only a few kcal/mol above the reactant is a poor
-# starting point for the band, and one frame of the first ensemble whose guess
-# was 7.18 kcal/mol above its reactant produced a band that relaxed to a
-# monotonically decreasing profile and found no saddle.
-E1=$(sort -k1 -n scan_energies.tsv | head -1 | awk '{print $3}')
-if [[ -n "${E1:-}" ]]; then
-  REL=$(awk -v a="$E" -v b="$E1" 'BEGIN{printf "%.2f", (a-b)*627.5094740631}')
-  echo "TSGUESS window $W, $REL kcal/mol above the first scan window"
-  LOW=$(awk -v r="$REL" 'BEGIN{print (r<8.0) ? 1 : 0}')
-  if [[ "$LOW" == "1" ]]; then
-    echo "TSGUESS_LOW: the guess is less than 8 kcal/mol above the scan start."
-    echo "  The band may relax back into the reactant basin rather than climbing."
-    echo "  Check the converged path for a strictly decreasing profile."
-  fi
-else
-  echo "TSGUESS window $W"
+# Report the guess against TWO references, because the first window is not the
+# reactant minimum and using it alone is misleading.
+#
+#   dE/win01        height above the first RESTRAINED window. This is what the
+#                   original guard used. Window 1 is optimised under restraints
+#                   from the free reactant, so on frames where the scan relaxes
+#                   downhill at the start it sits well above the reactant basin
+#                   and this number understates the barrier badly.
+#   dE/reactant-min height above the lowest window at or before the maximum.
+#                   This is the forward barrier along the scan.
+#
+#   Measured 2026-09-23 on frame 23268: dE/win01 = 4.84, which tripped the old
+#   guard, while dE/reactant-min = 14.83, which is an ordinary barrier. Across
+#   all 44 frames dE/win01 spans 4.84 to 30.31 while the corrected reference is
+#   far tighter. Do NOT reference the global minimum either: on most frames it
+#   lies at window 20, the product end, so that gives the REVERSE barrier.
+#
+# The guard now fires on dE/reactant-min.
+
+read -r D1 DMIN WMIN < <(awk -v W="$W" -v H=627.5094740631 '
+  { w[NR]=$1; e[NR]=$3; if ($1 == W) iw=NR; n=NR }
+  END{
+    if (iw == "") iw = n
+    emin=e[1]; imin=1
+    for (i=1; i<=iw; i++) if (e[i] < emin) { emin=e[i]; imin=i }
+    printf "%.2f %.2f %s", (e[iw]-e[1])*H, (e[iw]-emin)*H, w[imin]
+  }' scan_energies.tsv)
+
+echo "TSGUESS window $W, $DMIN kcal/mol above the reactant-side minimum (window $WMIN)"
+echo "TSGUESS_REF  $D1 kcal/mol above window 01, the old reference, kept for comparison"
+
+LOW=$(awk -v r="$DMIN" 'BEGIN{print (r<8.0) ? 1 : 0}')
+if [[ "$LOW" == "1" ]]; then
+  echo "TSGUESS_LOW: the guess is less than 8 kcal/mol above the reactant-side minimum."
+  echo "  The band may relax back into the reactant basin rather than climbing."
+  echo "  Check the converged path for a strictly decreasing profile."
 fi
 exit 0
