@@ -45,6 +45,12 @@ setting whenever one is cited.
   before the failure is measured, and [DTHESIS] Ch.3.6 attributes the failure to
   missing REPULSION rather than to the singularity alone, so a Gaussian may treat a
   symptom.
+- `s13_lj_charge_site_test.sh` — can a designed charge site carry a Pauli wall? Tests
+  whether `!QMMM` runs without CPCM, whether a hand-edited `ORCAFF.prms` with a
+  free-floating site is accepted, and where a substrate oxygen stops under relaxed
+  optimisation, with a bare point charge as the control. The criterion is step 7's own:
+  2.0–3.2 Å is physical salt-bridge range, below 2.0 Å the wall is too weak, beyond
+  4.0 Å the charge cannot act.
 - `s12_build_grid.py` — candidate-site grid on the union of atom-centred vdW
   spheres, per [DTHESIS] Ch.2 Eq.2.16. Pure function of its configuration; every
   parameter is written into the output header. `min_approach` acts as a FLOOR on the

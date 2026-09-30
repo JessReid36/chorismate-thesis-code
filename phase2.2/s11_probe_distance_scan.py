@@ -86,6 +86,23 @@ O3_INDEX = 7                      # ether oxygen in the cha_gaff atom order
 PROBE_Q = +1.0
 # Distances from O3, in Angstrom. 3.2 is Burschowsky's citrulline NH2 separation.
 DISTANCES = [1.5, 2.0, 2.5, 2.8, 3.2, 3.6, 4.0, 5.0, 6.0, 8.0, 10.0]
+# Charge magnitudes at the fixed Burschowsky distance. This is the MILP's core
+# assumption under test: the difference-potential model is
+#     ddE(q) = q * (V_TS - V_R)
+# i.e. STRICTLY LINEAR in q, because it assumes a frozen substrate density. The true
+# expansion carries a second-order term,
+#     ddE(q) = a*q + b*q^2,   b = -(1/2)(alpha_TS - alpha_R)
+# whose sign is NOT determined a priori: it depends on whether the transition state is
+# more or less polarisable at that site than the reactant. So the linear model
+# underestimates the stabilisation of EACH STATE, but the error on the DIFFERENTIAL
+# may go either way and must be measured.
+#
+# Fitting a and b gives both things at once:
+#   a          the coefficient the MILP actually uses
+#   b          the differential polarisation the MILP neglects, with its sign
+#   |b/a|      the relative error of the linear model at q = 1
+# and severe curvature IS over-polarisation. One scan, two questions.
+MAGNITUDES = [0.25, 0.50, 1.00, 1.50]
 BURSCHOWSKY_D = 3.2
 BURSCHOWSKY_TS = 5.9              # kcal/mol, TS stabilisation
 BURSCHOWSKY_GS = 0.6              # kcal/mol, ground-state binding
@@ -131,7 +148,7 @@ def generate(ens, work, frames):
     ens, work = Path(ens), Path(work)
     work.mkdir(parents=True, exist_ok=True)
     n_inp = 0
-    manifest = ["# frame\tstate\tdistance_A\tprobe_x\tprobe_y\tprobe_z\t"
+    manifest = ["# frame\tstate\tdistance_A\tcharge_e\tprobe_x\tprobe_y\tprobe_z\t"
                 "nearest_atom\tnearest_dist_A"]
     for fr in frames:
         d = ens / f"frame_{fr}"
@@ -154,14 +171,17 @@ def generate(ens, work, frames):
                 f"%output Print[P_Loewdin] 1 end\n"
                 f"* xyzfile {CHARGE} {MULT} {fr}_{state}.xyz\n")
             n_inp += 1
-            for dd in DISTANCES:
+            jobs = [(dd, PROBE_Q) for dd in DISTANCES]
+            jobs += [(BURSCHOWSKY_D, q) for q in MAGNITUDES if q != PROBE_Q]
+            for dd, qq in jobs:
                 px, py, pz = probe_at(atoms, dd)
                 ia, ndist = nearest_atom(atoms, (px, py, pz))
-                manifest.append(f"{fr}\t{state}\t{dd}\t{px:.6f}\t{py:.6f}\t{pz:.6f}\t"
-                                f"{atoms[ia][0]}{ia}\t{ndist:.4f}")
-                tag = f"{fr}_{state}_d{dd:g}"
+                manifest.append(f"{fr}\t{state}\t{dd}\t{qq}\t{px:.6f}\t{py:.6f}\t"
+                                f"{pz:.6f}\t{atoms[ia][0]}{ia}\t{ndist:.4f}")
+                tag = (f"{fr}_{state}_d{dd:g}" if qq == PROBE_Q
+                       else f"{fr}_{state}_d{dd:g}_q{qq:g}")
                 (work / f"{tag}.pc").write_text(
-                    f"1\n{PROBE_Q:.4f} {px:.8f} {py:.8f} {pz:.8f}\n")
+                    f"1\n{qq:.4f} {px:.8f} {py:.8f} {pz:.8f}\n")
                 (work / f"{tag}.inp").write_text(
                     f"{LEVEL}\n%maxcore 3000\n%pal nprocs 8 end\n%scf MaxIter 300 end\n"
                     f"%output Print[P_Loewdin] 1 end\n"
@@ -267,14 +287,20 @@ def analyse(work):
     man = {}
     for l in (work / "probe_manifest.tsv").read_text().splitlines()[1:]:
         f = l.split("\t")
-        man[(f[0], f[1], float(f[2]))] = (f[6], float(f[7]))
+        man[(f[0], f[1], float(f[2]))] = (f[7], float(f[8]))
     data = {}
     for out in work.glob("*.out"):
-        m = re.match(r"(\d+)_(R|TS)_(bare|d[\d.]+)\.out$", out.name)
+        m = re.match(r"(\d+)_(R|TS)_(bare|d[\d.]+(?:_q[\d.]+)?)\.out$", out.name)
         if not m:
             continue
-        key = (m.group(1), m.group(2),
-               None if m.group(3) == "bare" else float(m.group(3)[1:]))
+        spec = m.group(3)
+        if spec == "bare":
+            key = (m.group(1), m.group(2), None, PROBE_Q)
+        elif "_q" in spec:
+            d_s, q_s = spec[1:].split("_q")
+            key = (m.group(1), m.group(2), float(d_s), float(q_s))
+        else:
+            key = (m.group(1), m.group(2), float(spec[1:]), PROBE_Q)
         data[key] = energy(out)
     frames = sorted({k[0] for k in data})
     print(f"probe-distance scan, {len(frames)} frame(s)\n")
@@ -282,8 +308,8 @@ def analyse(work):
     print("NEGATIVE ddE means the transition state is stabilised more than the"
           " reactant.\n")
     for fr in frames:
-        eb_r = data.get((fr, "R", None), (None,) * 3)
-        eb_t = data.get((fr, "TS", None), (None,) * 3)
+        eb_r = data.get((fr, "R", None, PROBE_Q), (None,) * 3)
+        eb_t = data.get((fr, "TS", None, PROBE_Q), (None,) * 3)
         if eb_r[0] is None or eb_t[0] is None:
             print(f"  frame {fr}: bare reference missing, skipping")
             continue
@@ -293,8 +319,8 @@ def analyse(work):
               f"{'HOMO(R)':>11}{'dq(near)':>10}{'slope':>8}")
         rows = []
         for d in DISTANCES:
-            fr_r = data.get((fr, "R", d), (None,) * 3)
-            fr_t = data.get((fr, "TS", d), (None,) * 3)
+            fr_r = data.get((fr, "R", d, PROBE_Q), (None,) * 3)
+            fr_t = data.get((fr, "TS", d, PROBE_Q), (None,) * 3)
             if fr_r[0] is None or fr_t[0] is None:
                 continue
             dd = ((fr_t[0] - eb_t[0]) - (fr_r[0] - eb_r[0])) * HARTREE
@@ -337,6 +363,49 @@ def analyse(work):
                 print(f"    far-field log-log slope {sum(sl)/len(sl):+.2f} "
                       f"(dipole-like coupling predicts about -2)")
         print()
+    print("LINEARITY IN CHARGE MAGNITUDE - the MILP's core assumption")
+    print("  The difference-potential model assumes ddE(q) = a*q exactly. Fitting")
+    print("  ddE(q) = a*q + b*q^2 gives the coefficient the MILP uses (a) and the")
+    print("  differential polarisation it neglects (b), with its sign.\n")
+    print(f"    {'frame':>8}{'a':>10}{'b':>10}{'|b/a| at q=1':>15}  verdict")
+    for fr in frames:
+        eb_r = data.get((fr, "R", None, PROBE_Q), (None,) * 3)
+        eb_t = data.get((fr, "TS", None, PROBE_Q), (None,) * 3)
+        if eb_r[0] is None or eb_t[0] is None:
+            continue
+        pts = []
+        for q in sorted(set(MAGNITUDES) | {PROBE_Q}):
+            r_ = data.get((fr, "R", BURSCHOWSKY_D, q), (None,) * 3)
+            t_ = data.get((fr, "TS", BURSCHOWSKY_D, q), (None,) * 3)
+            if r_[0] is None or t_[0] is None:
+                continue
+            pts.append((q, ((t_[0] - eb_t[0]) - (r_[0] - eb_r[0])) * HARTREE))
+        if len(pts) < 3:
+            print(f"    {fr:>8}   fewer than 3 magnitudes completed")
+            continue
+        # least squares on ddE = a*q + b*q^2, no intercept: ddE(0) = 0 by construction
+        s11_ = sum(q ** 2 for q, _ in pts)
+        s12_ = sum(q ** 3 for q, _ in pts)
+        s22_ = sum(q ** 4 for q, _ in pts)
+        t1 = sum(q * e for q, e in pts)
+        t2 = sum(q * q * e for q, e in pts)
+        det = s11_ * s22_ - s12_ * s12_
+        a = (t1 * s22_ - t2 * s12_) / det
+        b = (s11_ * t2 - s12_ * t1) / det
+        rel = abs(b / a) if a else float("inf")
+        verdict = ("linear, MILP safe" if rel < 0.10 else
+                   "curvature, state it" if rel < 0.25 else
+                   "NONLINEAR - MILP assumption fails here")
+        print(f"    {fr:>8}{a:>+10.3f}{b:>+10.3f}{100*rel:>14.0f}%  {verdict}")
+        for q, e in pts:
+            print(f"        q={q:<5.2f} ddE {e:+8.3f}   linear-only {a*q:+8.3f}"
+                  f"   residual {e-a*q:+7.3f}")
+    print()
+    print("  b < 0 means the transition state is MORE polarisable at this site than the")
+    print("  reactant, so the linear model UNDERSTATES the catalytic effect. b > 0 means")
+    print("  the opposite. Either way the MILP objective is a*q and the error is b*q^2.")
+    print()
+
     print("READING THE SCAN")
     print("  The largest d at which the slope is near -2, the Loewdin drift is smooth")
     print("  and the HOMO is merely pulled down is the shortest distance a BARE point")
