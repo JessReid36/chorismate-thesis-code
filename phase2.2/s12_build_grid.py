@@ -64,6 +64,8 @@ import math
 import random
 from pathlib import Path
 
+import numpy as np
+
 # --------------------------------------------------------------------------- config
 CONFIG = {
     # physics
@@ -81,7 +83,12 @@ CONFIG = {
     "random_seed": 20260930,
     "poisson_candidates": 30,       # k in Bridson's algorithm
     # substrate
-    "frames": "",                   # comma-separated; empty = every frame present
+    "frames": "",                   # comma-separated; empty = every frame present.
+                                    # NOTE: enclosing all 30 post-cut frames plus the
+                                    # 14 pilot ones is 1700+ atoms and a much larger
+                                    # surface than any single design needs. The pilot
+                                    # frames are excluded from reported results, so
+                                    # pass the post-cut list explicitly.
     "path_states": "R,TS",          # which geometries the surface must enclose
     "enclose_mode": "union",        # union | intersect
     # charge model
@@ -108,24 +115,42 @@ def read_xyz(p):
             for f in (l.split() for l in L[2:2 + n])]
 
 
-def collect_atoms(ens, frames, states):
-    """Every atom of every requested geometry, as (element, x, y, z)."""
-    out, used = [], []
+# Some frames keep their geometries only under 20_invacuo, named <frame>_R.xyz rather
+# than frame_<frame>/reactant_qm.xyz. Frames harvested after the in vacuo stage are in
+# that position. Both layouts are searched.
+ALT_STATE = {"R": "_R.xyz", "TS": "_TS.xyz", "P": "_P.xyz"}
+
+
+def collect_atoms(ens, frames, states, alt_dir=None):
+    """Every atom of every requested geometry, as (element, x, y, z).
+
+    Returns (atoms, used, missing). MISSING IS RETURNED AND REPORTED: an earlier version
+    silently skipped frames whose geometry files were absent and announced a frame count
+    lower than the one requested, which is the kind of error that reaches the design
+    without tripping anything.
+    """
+    out, used, missing = [], [], []
     ens = Path(ens)
-    dirs = sorted(ens.glob("frame_*"))
-    if frames:
-        want = set(frames)
-        dirs = [d for d in dirs if d.name.replace("frame_", "") in want]
-    for d in dirs:
+    alt = Path(alt_dir) if alt_dir else ens.parent / "20_invacuo"
+    want = list(frames) if frames else \
+        sorted(d.name.replace("frame_", "") for d in ens.glob("frame_*"))
+    for fr in want:
         got = 0
         for s in states:
-            f = d / STATE_FILE[s]
+            f = ens / f"frame_{fr}" / STATE_FILE[s]
+            if not f.exists():
+                f = alt / f"{fr}{ALT_STATE[s]}"      # the 20_invacuo layout
             if f.exists():
                 out.extend(read_xyz(f))
                 got += 1
-        if got:
-            used.append((d.name.replace("frame_", ""), got))
-    return out, used
+        if got == len(states):
+            used.append((fr, got))
+        elif got:
+            used.append((fr, got))
+            missing.append(f"{fr} (only {got} of {len(states)} states)")
+        else:
+            missing.append(fr)
+    return out, used, missing
 
 
 def site_radius(el, cfg):
@@ -162,6 +187,51 @@ def on_surface(pt, atoms, cfg):
         if d <= r + cfg["site_spacing"]:
             touching = True
     return True, touching
+
+
+def poisson_surface_sites_fast(atoms, cfg):
+    """Vectorised Poisson-disk sampling on the union surface.
+
+    The pure-Python version checks every candidate against every atom one at a time. On
+    a 30-frame ensemble that is about 1700 atoms and roughly 750 candidates per atom,
+    i.e. of order 10^9 distance evaluations, which takes hours. This does the same work
+    with numpy: all atoms at once per candidate batch, and an accepted-site check on a
+    single array. Same acceptance rule, same seed, same result to floating precision.
+    """
+    rng = random.Random(cfg["random_seed"])
+    P = np.array([[a[1], a[2], a[3]] for a in atoms])
+    R = np.array([site_radius(a[0], cfg) for a in atoms])
+    accepted = []
+    spacing2 = cfg["site_spacing"] ** 2
+    order = sorted(range(len(atoms)), key=lambda k: (atoms[k][1], atoms[k][2],
+                                                     atoms[k][3], atoms[k][0]))
+    for k in order:
+        r = R[k]
+        area = 4.0 * math.pi * r * r
+        n_try = max(8, int(cfg["poisson_candidates"] * area /
+                           (math.pi * cfg["site_spacing"] ** 2)))
+        # generate this atom's candidates in one batch
+        u = np.array([rng.random() for _ in range(n_try)])
+        v = np.array([rng.random() for _ in range(n_try)])
+        theta = 2.0 * math.pi * u
+        phi = np.arccos(2.0 * v - 1.0)
+        cand = np.stack([P[k, 0] + r * np.sin(phi) * np.cos(theta),
+                         P[k, 1] + r * np.sin(phi) * np.sin(theta),
+                         P[k, 2] + r * np.cos(phi)], axis=1)
+        # distance from every candidate to every atom, (n_try, n_atoms)
+        d = np.linalg.norm(cand[:, None, :] - P[None, :, :], axis=2)
+        inside = (d < R[None, :] - 1e-6).any(axis=1)
+        touching = (d <= R[None, :] + cfg["site_spacing"]).any(axis=1)
+        keep = (~inside) & touching
+        for c in cand[keep]:
+            if len(accepted) >= cfg["max_sites"]:
+                return [tuple(a) for a in accepted]
+            if accepted:
+                A = np.array(accepted)
+                if ((A - c) ** 2).sum(axis=1).min() < spacing2:
+                    continue
+            accepted.append(c)
+    return [tuple(a) for a in accepted]
 
 
 def poisson_surface_sites(atoms, cfg):
@@ -223,11 +293,19 @@ def main():
     if cfg["charge_model"] == "smeared" and cfg["smearing_width"] <= 0:
         sys.exit("charge_model=smeared requires smearing_width > 0")
 
-    atoms, used = collect_atoms(ens, frames, states)
+    atoms, used, missing = collect_atoms(ens, frames, states)
     if not atoms:
         sys.exit("no geometries found; check the ensemble directory and frames")
+    if missing:
+        print(f"  WARNING: {len(missing)} requested frame(s) had no geometry and were")
+        print(f"  NOT enclosed: {' '.join(missing)}")
+        print(f"  The surface therefore does not cover them. Either supply their")
+        print(f"  geometries or drop them from the frame list, but do not quote this")
+        print(f"  grid as covering the frames you asked for.")
+    if frames and len(used) != len(frames):
+        print(f"  requested {len(frames)} frames, enclosed {len(used)}")
     print(f"enclosing {len(used)} frames x {len(states)} states = {len(atoms)} atoms")
-    sites = poisson_surface_sites(atoms, cfg)
+    sites = poisson_surface_sites_fast(atoms, cfg)
     print(f"accepted {len(sites)} sites at {cfg['site_spacing']} A spacing")
     if len(sites) >= cfg["max_sites"]:
         print(f"  WARNING: hit max_sites={cfg['max_sites']}; the grid is truncated and "
@@ -246,6 +324,8 @@ def main():
     hdr += ["#",
             f"# frames enclosed ({len(used)}): " +
             " ".join(f"{f}({n})" for f, n in used),
+            (f"# FRAMES REQUESTED BUT NOT ENCLOSED ({len(missing)}): "
+             + " ".join(missing)) if missing else "# all requested frames enclosed",
             f"# states: {','.join(states)}",
             f"# atoms enclosed: {len(atoms)}",
             f"# sites: {len(sites)}",

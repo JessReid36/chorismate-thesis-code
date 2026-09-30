@@ -1,0 +1,32 @@
+# s15b_regen_density.sh — WRITTEN, RUN, AND WRONG. Kept as a record, not as a tool.
+#
+# WHAT IT TRIED
+# To write standalone .scfp density files for orca_vpot by rerunning each in vacuo
+# single point with MORead + NoIter + KeepDens, i.e. reading the converged orbitals and
+# doing zero SCF iterations.
+#
+# WHY IT FAILED
+# All 44 frames were rejected by the script's own energy check: the zero-iteration job
+# returned -0.056 Eh against a committed -836.118 Eh. The orbitals were not being read;
+# the job was not computing the molecule at all. The check did its work - every frame
+# was refused rather than writing a garbage density that would have poisoned the entire
+# difference-potential map with nothing downstream able to detect it.
+#
+# WHY IT WAS UNNECESSARY IN THE FIRST PLACE
+# ORCA 6 keeps the SCF density INSIDE the .densities container rather than as a loose
+# .scfp file, and orca_vpot's SECOND ARGUMENT IS THE DENSITY'S NAME IN THAT CONTAINER,
+# not a path on disk. The ORCA 6.0 manual says so obliquely: "In the case that basename
+# of gbw- and densities-file do not match, you have to pass the densities' name as fifth
+# argument to orca_vpot." A fifth argument for the container name only makes sense if
+# the second is a container entry.
+#
+# Verified 2026-09-30 on sp_24883_R:
+#     orca_vpot sp_24883_R.gbw sp_24883_R.scfp points.xyz out.txt
+#   -> "Electrostatic potential evaluated in 0.428 sec", four columns, potential last.
+# No .scfp file exists on disk and none is needed. s15_dv_matrix.py calls it this way.
+#
+# THE LESSON WORTH KEEPING
+# Four separate routes were attempted before the manual was read closely enough:
+# passing .densities directly, KeepDens on a fresh single point, MORead/NoIter
+# regeneration, and orca_plot extraction. Each was plausible and none was checked
+# against a one-line test first. The one-line test took two minutes and settled it.

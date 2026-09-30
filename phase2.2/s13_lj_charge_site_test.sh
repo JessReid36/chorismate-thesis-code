@@ -114,31 +114,53 @@ end
 * xyzfile -2 1 combined.xyz
 EOF
 
-# Hand-write a minimal ORCAFF.prms: 25 atoms, the 24 QM ones plus the charge site.
-# Columns after the index and element are: charge, epsilon, r_min, epsilon_14, r_min_14,
-# read from the existing complex_solvated.ORCAFF.prms written by step13a.
-# The site carries charge +1 and the LJ parameters of a sodium ion, which is the closest
-# available analogue for a small monovalent cation and is a STARTING POINT, not a
-# justified choice.
-python3 - <<'PY'
-L=open('sub.xyz').read().splitlines(); n=int(L[0].split()[0])
-els=[l.split()[0] for l in L[2:2+n]]
-with open('site.ORCAFF.prms','w') as fh:
-    fh.write("$fftype\nAMBER\n$atoms\n")
-    fh.write(f"{n+1} 1 4\n")
-    for i,e in enumerate(els, start=1):
-        fh.write(f"{i:>6}   {e:<3}  0.000000    -0.000000     0.000000    -0.000000     0.000000\n")
-    # Sodium LJ parameters taken verbatim from the committed
-    # 05_qmmm/13_bridge/complex_solvated.ORCAFF.prms, which step13a generated from the
-    # AMBER topology. Line 6260 there reads:
-    #   6256   Na     1.000000    -0.087439     2.738000    -0.043720     2.738000
-    # These are the ff14SB/Joung-Cheatham sodium parameters as ORCA received them, not
-    # invented values. They are still a PLACEHOLDER in the sense that a designed cation
-    # is not necessarily sodium-sized; the point of this test is the MECHANISM.
-    fh.write(f"{n+1:>6}   Na   1.000000    -0.087439     2.738000    -0.043720     2.738000\n")
-    fh.write("$end\n")
-print(f"  wrote site.ORCAFF.prms with {n+1} atoms, last one the +1 site")
-PY
+# Build the ORCAFF.prms by EXTRACTING the substrate's real rows from the file step13a
+# produced, then appending the charge site. Two bugs in the first version of this test
+# made that necessary:
+#
+#   1. It wrote "$end", which does not appear in a real ORCAFF.prms at all. The real
+#      format is $fftype, $atoms, $bonds, $angles, $dihedrals, and then the file ends.
+#      Each section header is followed by a count line.
+#
+#   2. It gave the 24 substrate atoms epsilon = 0 and r_min = 0. THE QM-MM LENNARD-JONES
+#      TERM IS COMPUTED FROM BOTH SIDES' PARAMETERS. With zero on the substrate side the
+#      LJ term vanishes entirely and the run would have reproduced the bare point charge
+#      exactly - a false negative that would have looked like evidence against the route.
+#
+# The substrate occupies 1-based rows 6208-6231 of complex_solvated.ORCAFF.prms, which is
+# the CHA residue 383 the ensemble draws from. Those rows carry the real AMBER parameters
+# and are copied verbatim, renumbered to 1-24.
+PRMS="$ROOT/05_qmmm/13_bridge/complex_solvated.ORCAFF.prms"
+[ -s "$PRMS" ] || { echo "FAIL: $PRMS missing"; exit 1; }
+
+python3 - "$PRMS" <<'PYPRMS'
+import sys
+lines = open(sys.argv[1]).read().splitlines()
+assert lines[2].strip() == "$atoms", "unexpected layout: %r" % lines[2]
+sub = []
+for r in lines[4:]:
+    f = r.split()
+    if not f or not f[0].isdigit():
+        break
+    i = int(f[0])
+    if 6208 <= i <= 6231:
+        sub.append(f)
+    if i > 6231:
+        break
+assert len(sub) == 24, "expected 24 substrate rows, got %d" % len(sub)
+with open('site.ORCAFF.prms', 'w') as fh:
+    fh.write("$fftype\nAMBER\n$atoms\n25 1 4\n")
+    for n, f in enumerate(sub, start=1):
+        fh.write("%6d   %-3s%12.6f%13.6f%13.6f%13.6f%13.6f\n" %
+                 (n, f[1], float(f[2]), float(f[3]), float(f[4]),
+                  float(f[5]), float(f[6])))
+    fh.write("%6d   %-3s%12.6f%13.6f%13.6f%13.6f%13.6f\n" %
+             (25, "Na", 1.0, -0.087439, 2.738000, -0.043720, 2.738000))
+    fh.write("$bonds\n0 2 2\n$angles\n0 3 2\n$dihedrals\n0 4 3\n")
+print("  wrote site.ORCAFF.prms: 24 substrate rows copied verbatim, plus one +1 site")
+print("  substrate LJ is real, first row: %s" % " ".join(sub[0][:5]))
+PYPRMS
+echo
 
 "$ORCA/orca" testA.inp > testA.out 2>&1 </dev/null
 if grep -q "TERMINATED NORMALLY" testA.out; then
@@ -157,14 +179,11 @@ echo
 
 # --------------------------------- C: relaxed optimisation, where does the oxygen stop?
 echo "=== TEST C: relaxed optimisation with the site carrying LJ"
-sed 's/TightSCF QMMM/TightSCF QMMM Opt/' testA.inp > testC.inp
-cat >> testC.inp <<'EOF'
-%geom
-  Constraints
-    { C 24 C }      # freeze the charge site; the substrate relaxes around it
-  end
-end
-EOF
+# Only the substrate is allowed to move. ActiveAtoms is the documented mechanism for
+# this; a %geom constraint on atom 24 was tried first and abandoned, because atom 24 is
+# an MM atom and may not be in the optimisation space at all, in which case the
+# constraint would error rather than do nothing.
+sed 's/TightSCF QMMM/TightSCF QMMM Opt/; s/  QMAtoms {0:23} end/  QMAtoms {0:23} end\n  ActiveAtoms {0:23} end/' testA.inp > testC.inp
 "$ORCA/orca" testC.inp > testC.out 2>&1 </dev/null
 
 echo "--- and the bare point charge, for comparison, same geometry and level"

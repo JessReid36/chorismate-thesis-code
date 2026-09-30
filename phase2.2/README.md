@@ -51,6 +51,20 @@ setting whenever one is cited.
   optimisation, with a bare point charge as the control. The criterion is step 7's own:
   2.0–3.2 Å is physical salt-bridge range, below 2.0 Å the wall is too weak, beyond
   4.0 Å the charge cannot act.
+- `s14_design_milp.py` — the Tier 1 optimiser. Certified global optimum of the
+  linear-response design problem by mixed-integer programming, plus exact enumeration of
+  the gauge-degenerate optimal set by no-good cuts. Solved by HiGHS through
+  `scipy.optimize.milp`, so no commercial licence is needed: the mean-penalised-by-spread
+  objective is LP-representable if spread is measured as a semi-deviation rather than a
+  standard deviation (Konno & Yamazaki, Management Science 1991, 37, 519–531). Run
+  `selftest` before trusting it; one of its checks is against a closed-form optimum.
+- `s15_dv_matrix.py` — the multi-frame difference-potential matrix `s14` consumes.
+  Reworked from `phase2b_charge_design/03_dvpot/s3_dv_on_grid_v2.py`. Uses the IN VACUO
+  densities, not the QM/MM ones, because the design environment is bare substrate plus
+  charges and the QM/MM densities already contain the protein field the design is meant
+  to replace. Reads its frame list from the grid header so the two cannot disagree.
+- `s15b_regen_density.sh.REJECTED` — a wrong turn, kept with its reasoning. Read it
+  before attempting anything with ORCA density files.
 - `s12_build_grid.py` — candidate-site grid on the union of atom-centred vdW
   spheres, per [DTHESIS] Ch.2 Eq.2.16. Pure function of its configuration; every
   parameter is written into the output header. `min_approach` acts as a FLOOR on the
@@ -63,6 +77,40 @@ settings in `s8_invacuo_new.pbs`; jobs cannot run on a login node.
 
 The login node runs **Python 3.6.8**. No `math.dist`, no walrus operator, no
 f-string `=` specifier.
+
+### ORCA 6 density files: orca_vpot takes a NAME, not a path
+
+`orca_vpot`'s second argument is the density's name INSIDE the `.densities` container,
+not a file on disk. ORCA 6 no longer writes a standalone `.scfp`, and `KeepDens` does
+not change that. The manual says so only obliquely, via the note that a mismatched
+container basename must be passed as a FIFTH argument.
+
+Verified 2026-09-30:
+
+        orca_vpot sp_24883_R.gbw sp_24883_R.scfp points.xyz out.txt
+        -> "Electrostatic potential evaluated in 0.428 sec"
+
+Four routes were tried before the manual was read closely enough: passing `.densities`
+directly, `KeepDens` on a fresh single point, `MORead`/`NoIter` regeneration, and
+`orca_plot` extraction. None was checked against a one-line test first; the test took
+two minutes.
+
+### Three staleness bugs, all of which produced plausible numbers
+
+Recorded because they share a shape and will recur.
+
+1. **A hardcoded frame list.** `s8_invacuo_new.pbs` computed in vacuo references for
+   five frames while the ensemble had grown to thirty. `s15_dv_matrix.py` had the same
+   defect and now reads its frame list from the grid header instead.
+2. **A silent skip.** `s12_build_grid.py` was asked for thirty frames, found geometries
+   for twenty-two, enclosed those and reported "22 frames" without complaint. It now
+   names what it could not find and records the gap in the grid header.
+3. **A stale commit.** The committed `s11_probe_distance_scan.py` lacked the
+   charge-magnitude scan that the running copy had, because the repository copy came
+   from an earlier tarball than the one on the cluster.
+
+The common lesson: anything that FILTERS must report what it filtered out. A count that
+looks reasonable is not evidence that nothing was dropped.
 
 ### ORCA job cost on this cluster — measured, after a parsing error
 
