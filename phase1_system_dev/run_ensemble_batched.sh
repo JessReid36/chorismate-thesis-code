@@ -154,6 +154,11 @@ stage4)
     have "$f" band && continue
     have "$f" harvested && continue
     have "$f" product || continue
+    # Never resubmit a frame whose band job is already in the queue. stage4 had
+    # no such guard: a frame that is RUNNING but not yet converged passes every
+    # other test, so each stage4 call submitted a duplicate into the same
+    # directory. Measured 2026-09-28 on frame 36665, which got two jobs.
+    job_running "cm19_n${f}" && { echo "  $f already running, skipped"; continue; }
     [[ -s "$ENS/frame_$f/tsguess.pdb" ]] || { echo "  $f: no transition-state guess"; continue; }
     (cd "$ENS/frame_$f" && qsub neb.pbs >/dev/null) && { echo "  submitted $f"; n=$((n+1)); }
   done

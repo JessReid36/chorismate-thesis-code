@@ -1,0 +1,330 @@
+#!/usr/bin/env bash
+#PBS -N cm_qtest
+#PBS -l select=1:ncpus=8:mem=24gb
+#PBS -l walltime=24:00:00
+#PBS -m ae
+#PBS -M 18660916@sun.ac.za
+#PBS -j oe
+#PBS -o /home/18660916/system_development/phase2b_charge_design/06_charge_tests/s6_charge_tests.pbs.out
+#
+# s6_charge_tests.pbs - test the linear objective against explicit calculation.
+#
+# WHAT IS BEING TESTED
+#   The design objective is DDE = sum_i q_i * Dv(r_i), first order in the charges
+#   and evaluated for a frozen density at fixed geometry. Three sources state the
+#   limitation and none quantifies it for this system.
+#
+#   Politzer and Murray (2002): V(r) "is normally computed for the unperturbed
+#   ground state molecule, and thus does not reflect any polarization effects
+#   produced by the approaching electrophile", and for that reason its extrema
+#   are "not consistently reliable" as predictors.
+#
+#   Sokalski (1985) decomposes the interaction energy as
+#   dE = E_EL(1) + E_EX(1) + E_IND(2) + E_DISP(2) + ...
+#   The objective retains only E_EL(1). He notes the second-order induction terms
+#   are "always attractive" and that "the magnitude of the second-order
+#   interactions is related to polarizabilities of interacting molecules".
+#
+#   Beker and Sokalski (2016) find the polarisation term "responsible for most of
+#   the difference between the electrostatic and Hartree-Fock level", its absolute
+#   value "quite significant", but that it "seems to cancel out with other energy
+#   contributions ... or at least sum up to an approximately systematic value".
+#
+#   Whether it is systematic here is the question. A systematic offset leaves the
+#   ranking intact and the screen valid; scatter does not.
+#
+# HOW THE ORDERS ARE SEPARATED
+#   The first-order term is odd in q and the induction term is even, so running
+#   both signs at one site separates them without any reference calculation:
+#       DDE(+q) - DDE(-q) = 2 x first order    -> compare with 2q*Dv
+#       DDE(+q) + DDE(-q) = 2 x even orders    -> the polarisation term
+#   Note the even part of a BARRIER change is a difference of two always-attractive
+#   induction terms, one at each endpoint, and is therefore not sign-definite even
+#   though each term is.
+#
+# CONTROLS
+#   q = 0            must reproduce the reference barrier exactly. Validates the
+#                    machinery before any result is believed.
+#   Dv ~ 0 site      must change the barrier by ~0 at first order. Any deviation
+#                    is second order and is measured directly.
+#   distant charge   20 A from the substrate; must give ~0.
+#   most stabilising must lower the barrier by about |Dv| for +1.
+#   most destabilising must raise it.
+#   Arg90 probe      anchored to known chemistry rather than to the map; must
+#                    stabilise, as s1_signcheck established.
+#
+# BASIS
+#   def2-SVPD throughout, matching the production map. Test B2 showed the map
+#   ranking is not preserved between bases, so the objective and the test of the
+#   objective must share one.
+#
+# WHY THE MAGNITUDE OF THE TEST CHARGE IS ITSELF TESTED
+#   The parity separation assumes the expansion is perturbative: first order odd
+#   in q, second order even. The classical induction term is expected to scale as
+#   q^2, since the polarisation energy goes as the square of the field and the
+#   field of a point charge goes as q. That expectation is consistent with
+#   Sokalski (1985), who reports the classical induction contribution varying
+#   approximately as R^-4: for a point charge F is proportional to q/R^2, so an
+#   energy in F^2 gives q^2/R^4. (The q^2 relation itself is standard
+#   electrostatics rather than a claim made in that paper.)
+#
+#   Sokalski also notes that the charge-transfer induction contribution "has
+#   exponential character". An exponential is not a polynomial, so q^2 scaling is
+#   not guaranteed where charge transfer contributes, which is precisely the
+#   short-range regime this grid occupies at its innermost shell.
+#
+#   The scaling is therefore measured rather than assumed. At three sites the
+#   charge is run at 0.25, 0.5 and 1.0 e of both signs. If the even part scales
+#   as q^2 the results transfer to any charge magnitude by simple scaling, which
+#   matters because the designs use magnitudes well below 1 e: Dittner and Hartke
+#   report converged GOCAT charges of about -0.11 e and +0.09 e. If it does not
+#   scale as q^2, the expansion is not perturbative at 1 e and that is the finding.
+#
+# NOT TESTED HERE
+#   Lennard-Jones walls. A walled particle contributes an LJ term to the barrier
+#   because the substrate moves between the endpoints while the particle does
+#   not, and that term is invisible to a monopole objective. It is tested
+#   separately so the two effects are not conflated.
+
+set -uo pipefail
+ORCA=/home/apps2/ORCA/6.0.1
+ROOT=/home/18660916/system_development/phase2b_charge_design
+GEOM="$ROOT/01_geometry"
+DV="$ROOT/03_dvpot/dv_grid_svpd.tsv"
+WORK="$ROOT/06_charge_tests"
+
+export PATH="/apps/openmpi/4.1.1/bin:$PATH"
+export LD_LIBRARY_PATH="$ORCA/lib:/apps/openmpi/4.1.1/lib:/apps/mambaforge/envs/medaka/lib:${LD_LIBRARY_PATH:-}"
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
+
+E_R_SVPD=-836.474068323159
+E_TS_SVPD=-836.446124914590
+
+mkdir -p "$WORK"; cd "$WORK" || exit 1
+if ! mkdir .running 2>/dev/null; then echo "FAIL: another job holds .running"; exit 1; fi
+trap 'rmdir .running 2>/dev/null' EXIT
+echo "host=$(hostname)  start=$(date)"; echo
+
+for f in "$GEOM/reactant.xyz" "$GEOM/ts.xyz" "$DV"; do
+  [[ -s "$f" ]] || { echo "FAIL missing $f"; exit 1; }
+done
+cp "$GEOM/reactant.xyz" "$GEOM/ts.xyz" .
+
+# ---------------------------------------------------------------- site list
+python3 - "$DV" > sites.tsv <<'PY'
+import sys
+H = 627.5094740631
+L = [l.split("\t") for l in open(sys.argv[1]).read().splitlines() if l.strip()]
+h = [x.strip() for x in L[0]]
+ix, ic = h.index("idx"), h.index("dv_Eh")
+xs, ys, zs, sh = h.index("x"), h.index("y"), h.index("z"), h.index("shell")
+rows = [(int(r[ix]), float(r[xs]), float(r[ys]), float(r[zs]),
+         float(r[sh]), float(r[ic])) for r in L[1:]]
+rows.sort(key=lambda r: r[5])
+
+pick, seen = [], set()
+def add(r, tag):
+    if r[0] in seen: return
+    seen.add(r[0]); pick.append((tag,) + r)
+
+add(rows[0], "most_stabilising")
+add(rows[-1], "most_destabilising")
+add(min(rows, key=lambda r: abs(r[5])), "near_zero")
+for s in (3.0, 4.0, 5.0):
+    sub = [r for r in rows if r[4] == s]
+    if not sub: continue
+    add(sub[0], f"shell{s:.0f}_min")
+    add(sub[-1], f"shell{s:.0f}_max")
+    add(sub[len(sub)//4], f"shell{s:.0f}_q1")
+    add(sub[3*len(sub)//4], f"shell{s:.0f}_q3")
+print("tag\tidx\tx\ty\tz\tshell\tdv_Eh\tdv_kcal")
+for p in pick:
+    print("%s\t%d\t%.6f\t%.6f\t%.6f\t%.1f\t%.9f\t%.4f"
+          % (p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[6]*H))
+PY
+echo "sites selected:"; column -t -s$'\t' sites.tsv 2>/dev/null || cat sites.tsv
+echo
+
+# ------------------------------------------------------------ run one point
+run_sp () {   # $1 geom  $2 tag  $3 pcfile-or-none
+  local g=$1
+  local tag=$2
+  local pc=$3
+  local base="sp_${g}_${tag}"
+  [[ -f "${base}.out" ]] && grep -q "ORCA TERMINATED NORMALLY" "${base}.out" && return 0
+  {
+    echo "! B3LYP D3BJ def2-SVPD def2/J RIJCOSX CPCM TightSCF"
+    echo "%maxcore 3000"
+    echo "%pal nprocs 8 end"
+    echo "%cpcm epsilon 4.0 end"
+    echo "%scf MaxIter 300 end"
+    [[ "$pc" != "none" ]] && echo "%pointcharges \"$pc\""
+    echo "* xyzfile -2 1 ${g}.xyz"
+  } > "${base}.inp"
+  "$ORCA/orca" "${base}.inp" > "${base}.out" 2>&1 </dev/null
+  grep -q "ORCA TERMINATED NORMALLY" "${base}.out"
+}
+
+echo "=== control: q = 0, must reproduce the reference barrier"
+for g in reactant ts; do run_sp $g q0 none || { echo "FAIL q0 $g"; exit 1; }; done
+python3 - <<PY
+import re
+H=627.5094740631
+def E(p):
+    return float(re.findall(r"FINAL SINGLE POINT ENERGY\s+(-?\d+\.\d+)",open(p).read())[-1])
+r,t=E("sp_reactant_q0.out"),E("sp_ts_q0.out")
+b=(t-r)*H
+print(f"  E(R)  {r:.12f}  reference {$E_R_SVPD:.12f}  diff {abs(r-($E_R_SVPD)):.2e}")
+print(f"  E(TS) {t:.12f}  reference {$E_TS_SVPD:.12f}  diff {abs(t-($E_TS_SVPD)):.2e}")
+print(f"  barrier {b:.4f} kcal/mol  reference {(($E_TS_SVPD)-($E_R_SVPD))*H:.4f}")
+PY
+echo
+
+# ------------------------------------------------------- charged sites, both signs
+echo "=== placing single charges, both signs, at each selected site"
+tail -n +2 sites.tsv | while IFS=$'\t' read -r tag idx x y z shell dvEh dvk; do
+  for q in +1.0 -1.0; do
+    s=$([[ "$q" == "+1.0" ]] && echo p || echo m)
+    printf "1\n%s  %s %s %s\n" "$q" "$x" "$y" "$z" > "pc_${tag}_${s}.pc"
+    for g in reactant ts; do
+      run_sp $g "${tag}_${s}" "pc_${tag}_${s}.pc" \
+        || echo "  WARN did not terminate: $g ${tag}_${s}"
+    done
+  done
+  echo "  done $tag"
+done
+
+echo
+echo "=== charge-magnitude scaling: 0.25, 0.5 and 1.0 e at three sites"
+echo "    (1.0 e is already run above; this adds the two smaller magnitudes)"
+for tag in most_stabilising most_destabilising shell3_q1; do
+  line=$(awk -F'\t' -v T="$tag" '$1==T {print $3"\t"$4"\t"$5}' sites.tsv)
+  [[ -n "$line" ]] || { echo "  no site $tag"; continue; }
+  x=$(echo "$line" | cut -f1); y=$(echo "$line" | cut -f2); z=$(echo "$line" | cut -f3)
+  for qm in 0.25 0.50; do
+    lab=$(echo "$qm" | tr -d '.')
+    for sgn in p m; do
+      q=$([[ "$sgn" == "p" ]] && echo "+$qm" || echo "-$qm")
+      printf "1\n%s  %s %s %s\n" "$q" "$x" "$y" "$z" > "pc_${tag}_q${lab}_${sgn}.pc"
+      for g in reactant ts; do
+        run_sp $g "${tag}_q${lab}_${sgn}" "pc_${tag}_q${lab}_${sgn}.pc" \
+          || echo "  WARN ${g} ${tag}_q${lab}_${sgn}"
+      done
+    done
+  done
+  echo "  done $tag"
+done
+echo
+
+# distant control, 20 A along +x from the substrate centroid
+python3 - <<'PY' > pc_distant_p.pc
+L=open("reactant.xyz").read().splitlines(); n=int(L[0])
+xs=[[float(v) for v in l.split()[1:4]] for l in L[2:2+n]]
+cx=sum(p[0] for p in xs)/n; cy=sum(p[1] for p in xs)/n; cz=sum(p[2] for p in xs)/n
+print(1); print(f"+1.0  {cx+20.0:.6f} {cy:.6f} {cz:.6f}")
+PY
+sed 's/^+1.0/-1.0/' pc_distant_p.pc > pc_distant_m.pc
+for g in reactant ts; do
+  run_sp $g distant_p pc_distant_p.pc
+  run_sp $g distant_m pc_distant_m.pc
+done
+echo
+
+# ------------------------------------------------------------------- report
+python3 - <<'PY'
+import re, os, math
+H = 627.5094740631
+def E(p):
+    if not os.path.exists(p): return None
+    t = open(p).read()
+    if "ORCA TERMINATED NORMALLY" not in t: return None
+    m = re.findall(r"FINAL SINGLE POINT ENERGY\s+(-?\d+\.\d+)", t)
+    return float(m[-1]) if m else None
+
+E0r, E0t = E("sp_reactant_q0.out"), E("sp_ts_q0.out")
+B0 = (E0t - E0r) * H
+print("=" * 100)
+print(f"Reference barrier with no external charge: {B0:.4f} kcal/mol")
+print("=" * 100)
+print(f"{'site':<18}{'shell':>6}{'q*Dv':>10}{'DDE(+1)':>10}{'DDE(-1)':>10}"
+      f"{'1st order':>11}{'predicted':>11}{'error':>9}{'2nd order':>11}")
+print("-" * 100)
+
+rows = [l.split("\t") for l in open("sites.tsv").read().splitlines()[1:] if l.strip()]
+err1, err2 = [], []
+for tag, idx, x, y, z, shell, dvEh, dvk in rows:
+    dv = float(dvk)
+    got = {}
+    for s in ("p", "m"):
+        r, t = E(f"sp_reactant_{tag}_{s}.out"), E(f"sp_ts_{tag}_{s}.out")
+        got[s] = None if (r is None or t is None) else (t - r) * H - B0
+    if got["p"] is None or got["m"] is None:
+        print(f"{tag:<18}{shell:>6}  incomplete"); continue
+    first = (got["p"] - got["m"]) / 2.0      # odd part, compare with q*Dv at q=+1
+    second = (got["p"] + got["m"]) / 2.0     # even part
+    e = first - dv
+    err1.append(e); err2.append(second)
+    print(f"{tag:<18}{shell:>6}{dv:>10.3f}{got['p']:>10.3f}{got['m']:>10.3f}"
+          f"{first:>11.3f}{dv:>11.3f}{e:>9.3f}{second:>11.3f}")
+
+d = E("sp_reactant_distant_p.out"), E("sp_ts_distant_p.out")
+if all(v is not None for v in d):
+    print(f"\n{'distant control':<18}{'20 A':>6}{0.0:>10.3f}"
+          f"{(d[1]-d[0])*H-B0:>10.3f}   (must be near zero)")
+
+print("\n" + "=" * 100)
+print("Charge-magnitude scaling: does the even part go as q^2?")
+print("=" * 100)
+print(f"{'site':<20}{'q':>6}{'1st order':>12}{'/q':>10}{'2nd order':>12}{'/q^2':>10}")
+print("-" * 72)
+for tag in ("most_stabilising", "most_destabilising", "shell3_q1"):
+    for lab, qv in (("025", 0.25), ("050", 0.50), ("", 1.00)):
+        sp = f"_{tag}_q{lab}_p" if lab else f"_{tag}_p"
+        sm = f"_{tag}_q{lab}_m" if lab else f"_{tag}_m"
+        r1, t1 = E(f"sp_reactant{sp}.out"), E(f"sp_ts{sp}.out")
+        r2, t2 = E(f"sp_reactant{sm}.out"), E(f"sp_ts{sm}.out")
+        if None in (r1, t1, r2, t2): continue
+        dp = (t1 - r1) * H - B0
+        dm = (t2 - r2) * H - B0
+        fo = (dp - dm) / 2.0
+        so = (dp + dm) / 2.0
+        print(f"{tag:<20}{qv:>6.2f}{fo:>12.4f}{fo/qv:>10.4f}"
+              f"{so:>12.4f}{so/qv**2:>10.4f}")
+print()
+print("  The first-order column divided by q, and the second-order column")
+print("  divided by q^2, should each be constant down a site block. Constancy")
+print("  in the second column confirms the expansion is perturbative at 1 e and")
+print("  that every result here transfers to smaller charges by scaling.")
+print("  Departure indicates higher-order or charge-transfer contamination,")
+print("  which Sokalski (1985) notes has exponential rather than polynomial")
+print("  character and would invalidate the parity separation at this magnitude.")
+
+if err1:
+    n = len(err1); m1 = sum(err1)/n
+    s1 = math.sqrt(sum((v-m1)**2 for v in err1)/(n-1)) if n > 1 else 0.0
+    m2 = sum(err2)/n
+    s2 = math.sqrt(sum((v-m2)**2 for v in err2)/(n-1)) if n > 1 else 0.0
+    print("\n" + "=" * 100)
+    print(f"first-order error (explicit minus q*Dv): mean {m1:+.4f}  sd {s1:.4f}"
+          f"  max |e| {max(abs(v) for v in err1):.4f} kcal/mol")
+    print(f"second-order (polarisation) term:        mean {m2:+.4f}  sd {s2:.4f}"
+          f"  max |t| {max(abs(v) for v in err2):.4f} kcal/mol")
+    print()
+    if s1 < 0.05:
+        print("  The first-order term is reproduced. Any discrepancy is a constant")
+        print("  offset, which leaves the ranking and therefore the screen intact.")
+    else:
+        print("  The first-order term is not reproduced within a constant. The error")
+        print("  scatters, so the ranking is affected and the screen cannot be")
+        print("  trusted without correction.")
+    print()
+    if s2 < 0.1 * (abs(m2) + 1e-9):
+        print("  The polarisation term is systematic, in the sense Beker and Sokalski")
+        print("  describe: significant in magnitude but summing to an approximately")
+        print("  constant value, so it does not reorder candidates.")
+    else:
+        print("  The polarisation term is not systematic across sites. Its scatter")
+        print("  sets the accuracy the linear objective can claim, and top-ranked")
+        print("  candidates must be verified explicitly rather than trusted.")
+PY
+echo; echo "end=$(date)"

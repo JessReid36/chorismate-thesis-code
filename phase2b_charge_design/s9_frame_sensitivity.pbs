@@ -227,8 +227,8 @@ def spearman(a, b):
 maps = {}
 for f in frames:
     vr, vt = read_vpot("vpot_%s_R.out" % f), read_vpot("vpot_%s_TS.out" % f)
-    if vr and vt and len(vr) == len(pv):
-        maps[f] = [(vt[i]-vr[i])*H for i in range(len(pv))]
+    if vr and vt and len(vr) == len(prod):
+        maps[f] = [(vt[i]-vr[i])*H for i in range(len(prod))]
     else:
         print("  %s: incomplete, excluded" % f)
 
@@ -236,7 +236,7 @@ if not maps:
     raise SystemExit("no frames produced a map")
 
 # the ensemble mean map, site by site
-ens = [sum(maps[f][i] for f in maps)/len(maps) for i in range(len(pv))]
+ens = [sum(maps[f][i] for f in maps)/len(maps) for i in range(len(prod))]
 
 def top10(v):
     return set(sorted(range(len(v)), key=lambda i: v[i])[:10])
@@ -267,6 +267,16 @@ print("=" * 78)
 print("%-8s%12s%14s%16s%14s" % ("frame", "Spearman", "top-10 kept",
                                 "best site same", "max |diff|"))
 print("-" * 66)
+# pv: the production map in the SAME row order as the vpot files.
+# row_order.tsv maps vpot row -> grid idx; pmap maps idx -> dv in kcal/mol.
+# Defined here rather than assumed: prod is read from dv_grid_svpd.tsv in that
+# file's own order, which need not match points_bohr.xyz.
+_ro = [l.split("\t") for l in open("row_order.tsv").read().splitlines() if l.strip()]
+_h = [x.strip() for x in _ro[0]]
+_ri, _ii = _h.index("row"), _h.index("idx")
+pv = [pmap[int(r[_ii])] for r in sorted(_ro[1:], key=lambda r: int(r[_ri]))]
+assert len(pv) == len(ens), "production map %d rows, ensemble map %d" % (len(pv), len(ens))
+
 pt, pb = top10(pv), best(pv)
 for f in sorted(maps):
     v = maps[f]

@@ -25,7 +25,7 @@
 #
 # DESIGN
 # ------
-# 2 environments x 2 basis sets x 2 geometries = 8 single points, seconds each.
+# 3 environments x 2 basis sets x 2 geometries = 12 single points, seconds each.
 # Geometries are the committed reactant and TS, used without re-optimisation, so
 # every number is directly comparable to the +17.47 and +16.00 barriers.
 #
@@ -67,13 +67,20 @@ done
 # Serial (no %pal): these are 24-atom single points, and running serial avoids
 # the MPI startup path entirely.
 for basis in def2-SVP def2-SVPD; do
-  for env in vac cpcm; do
+  for env in vac cpcm cpcm78; do
     for g in reactant ts; do
       tag="${g}_${basis}_${env}"
       {
         if [[ "$env" == "cpcm" ]]; then
           echo "! B3LYP D3BJ $basis def2/J RIJCOSX CPCM TightSCF"
           echo "%cpcm epsilon 4.0 end"
+        elif [[ "$env" == "cpcm78" ]]; then
+          # Bulk-water dielectric. Added 2026-09-29: the original diagnostic
+          # tested vacuum and eps=4 only, so it could say nothing about the
+          # solution reference against which catalysis is actually defined,
+          # nor whether a water-like medium binds the dianion.
+          echo "! B3LYP D3BJ $basis def2/J RIJCOSX CPCM TightSCF"
+          echo "%cpcm epsilon 78.4 end"
         else
           echo "! B3LYP D3BJ $basis def2/J RIJCOSX TightSCF"
         fi
@@ -140,7 +147,7 @@ print("-" * 103)
 
 rows = {}
 for basis in ("def2-SVP", "def2-SVPD"):
-    for env, lbl in (("vac", "vacuum"), ("cpcm", "CPCM eps=4")):
+    for env, lbl in (("vac", "vacuum"), ("cpcm", "CPCM eps=4"), ("cpcm78", "CPCM eps=78.4")):
         er = energy(f"reactant_{basis}_{env}.out")
         et = energy(f"ts_{basis}_{env}.out")
         hr = homo(f"reactant_{basis}_{env}.out")

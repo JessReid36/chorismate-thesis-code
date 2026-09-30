@@ -43,7 +43,7 @@ export LD_LIBRARY_PATH="$ORCA/lib:/apps/openmpi/4.1.1/lib:/apps/mambaforge/envs/
 export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
 
 # ---- the frame list, defined once ------------------------------------------
-export FRAMES="24883 26495 34991 43738"
+export FRAMES="42436 49592 50892 52192 53493"
 export ENS WORK
 
 mkdir -p "$WORK"; cd "$WORK" || exit 1
