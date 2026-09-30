@@ -85,12 +85,24 @@ O3_INDEX = 7
 BURSCHOWSKY_R = 3.2      # Angstrom, citrulline NH2 to ether oxygen, PNAS 2014
 PROBE_Q = +1.0
 
+# Per method: (keyword line, number of MPI ranks).
+#
+# MEASURED 2026-09-30, on one core, 24-atom single points:
+#     hf3c    14 s   (MINIX basis, no DFT grid)
+#     b97-3c 202 s   (mTZVP + grid integration)
+# The 14x gap is cost PER CYCLE, not convergence: b97-3c takes 20 SCF cycles against
+# hf3c's 12. So it is basis and grid, which is expected and not a pathology.
+#
+# Consequence for parallelism, and this was got wrong once. A job of 14 s is dominated
+# by MPI startup, so %pal COSTS time. A job of 202 s on one core is compute-bound and
+# %pal genuinely helps. The earlier blanket removal of %pal was a fix measured on the
+# cheap methods and wrongly applied to all of them.
 METHODS = {
-    "xtb2":      "! XTB2",
-    "hf3c":      "! HF-3c",
-    "b97-3c":    "! B97-3c",
-    "r2scan-3c": "! r2SCAN-3c",
-    "ref":       "! B3LYP D3BJ def2-SVP def2/J RIJCOSX TightSCF",
+    "xtb2":      ("! XTB2", 1),          # seconds; serial
+    "hf3c":      ("! HF-3c", 1),         # 14 s; startup-dominated, serial
+    "b97-3c":    ("! B97-3c", 8),        # 202 s; compute-bound, parallel
+    "r2scan-3c": ("! r2SCAN-3c", 8),     # def2-mTZVPP, expect >= b97-3c
+    "ref":       ("! B3LYP D3BJ def2-SVP def2/J RIJCOSX TightSCF", 8),
 }
 
 
@@ -141,15 +153,13 @@ def generate(ens_dir, work):
             px, py, pz = probe_position(atoms)
             pc = work / f"{fr}_{state}.pc"
             pc.write_text(f"1\n{PROBE_Q:.4f} {px:.8f} {py:.8f} {pz:.8f}\n")
-            for mname, kw in METHODS.items():
+            for mname, (kw, nproc) in METHODS.items():
                 for field in ("bare", "field"):
                     tag = f"{fr}_{state}_{mname}_{field}"
-                    # NO %pal. These are 24-atom single points: ORCA reports 2-4 s of
-                    # compute, but with %pal nprocs 8 each job took ~180 s wall, i.e.
-                    # 98% MPI startup and teardown. Measured from file timestamps: the
-                    # xtb2 jobs, the only ones without %pal, ran 8 s apart while every
-                    # other method ran 2.5-4.5 min apart. Serial is ~40x faster here.
-                    body = [kw, "%maxcore 3000", "%scf MaxIter 300 end"]
+                    body = [kw, "%maxcore 3000"]
+                    if nproc > 1:
+                        body.append(f"%pal nprocs {nproc} end")
+                    body.append("%scf MaxIter 300 end")
                     if field == "field":
                         body.append(f'%pointcharges "{fr}_{state}.pc"')
                     body.append(f"* xyzfile {CHARGE} {MULT} {fr}_{state}.xyz")
@@ -158,7 +168,7 @@ def generate(ens_dir, work):
     pbs = work / "s10_benchmark.pbs"
     pbs.write_text(f"""#!/usr/bin/env bash
 #PBS -N cm_s10bm
-#PBS -l select=1:ncpus=1:mem=8gb
+#PBS -l select=1:ncpus=8:mem=24gb
 #PBS -l walltime=24:00:00
 #PBS -m ae
 #PBS -M 18660916@sun.ac.za
@@ -179,7 +189,6 @@ export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
 
 cd "$WORK" || exit 1
 if ! mkdir .running 2>/dev/null; then echo "FAIL: another job holds .running"; exit 1; fi
-trap 'rmdir .running 2>/dev/null' EXIT
 echo "host=$(hostname) start=$(date)"
 
 # Clear any output left by a failed attempt, so they are not mistaken for results.
@@ -187,26 +196,37 @@ for f in *.out; do
   [ -e "$f" ] || continue
   grep -q "TERMINATED NORMALLY" "$f" 2>/dev/null || rm -f "$f"
 done
-
+""" + r"""
 n=0; ok=0; bad=0
+SCRATCH="${TMPDIR:-/tmp}/orca_$$"
+mkdir -p "$SCRATCH" || { echo "FAIL: cannot create $SCRATCH"; exit 1; }
+trap 'rm -rf "$SCRATCH"; rmdir .running 2>/dev/null' EXIT
+echo "scratch: $SCRATCH"
+
+# MEASURED 2026-09-30: the same 24-atom job takes 28.7 s real on the shared
+# filesystem and 6.6 s in node-local scratch, user time 4.9 s vs 3.6 s. The
+# difference is ORCA temporary-file I/O, not compute. Each job therefore runs in
+# node-local scratch and only the .out is copied back.
 for inp in *.inp; do
-  out="${{inp%.inp}}.out"
+  out="${inp%.inp}.out"
   if [ -f "$out" ] && grep -q "TERMINATED NORMALLY" "$out"; then continue; fi
   n=$((n+1))
-  "$ORCA/orca" "$inp" > "$out" 2>&1 </dev/null
-  if grep -q "TERMINATED NORMALLY" "$out"; then
-    ok=$((ok+1))
-  else
-    bad=$((bad+1)); echo "  WARN did not terminate: $inp"
-  fi
+  base="${inp%.inp}"
+  rm -rf "$SCRATCH/$base"; mkdir -p "$SCRATCH/$base"
+  cp "$inp" "$SCRATCH/$base/" || continue
+  for dep in $(grep -oE '[A-Za-z0-9_.-]+\.(xyz|pc)' "$inp" | sort -u); do
+    [ -f "$dep" ] && cp "$dep" "$SCRATCH/$base/"
+  done
+  ( cd "$SCRATCH/$base" && "$ORCA/orca" "$inp" > "$out" 2>&1 </dev/null )
+  cp "$SCRATCH/$base/$out" "$out" 2>/dev/null
+  rm -rf "$SCRATCH/$base"
+  if grep -q "TERMINATED NORMALLY" "$out" 2>/dev/null; then ok=$((ok+1))
+  else bad=$((bad+1)); echo "  WARN did not terminate: $inp"; fi
   if [ $((n % 50)) -eq 0 ]; then echo "  ... $n run, $ok ok, $bad failed  $(date +%H:%M)"; fi
 done
 echo
 echo "run=$n ok=$ok failed=$bad"
 echo "end=$(date)"
-echo "now run, from ~/system_development:"
-echo "  python3 s10_cheap_method_benchmark.py analyse {work.resolve()} \\"
-echo "      05_qmmm/19_ensemble_barriers/ensemble_barriers.tsv"
 """)
     pbs.chmod(0o755)
     print(f"wrote {len(jobs)} inputs and {pbs}")

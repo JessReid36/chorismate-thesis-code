@@ -92,6 +92,12 @@ BURSCHOWSKY_GS = 0.6              # kcal/mol, ground-state binding
 BURSCHOWSKY_DIFFERENTIAL = BURSCHOWSKY_TS - BURSCHOWSKY_GS
 DEFAULT_FRAMES = ["24883", "20000", "43087"]
 LEVEL = "! B3LYP D3BJ def2-SVP def2/J RIJCOSX TightSCF"
+# Every job here is at the production level and is compute-bound: measured on the
+# equivalent b97-3c jobs, 202 s serial against 71-89 s on 8 ranks, with 81 per cent of
+# the time in SCF iterations and 12 per cent in startup. That is the profile where
+# parallelism pays. Cheap methods with second-scale runtimes are startup-dominated and
+# must stay serial - see METHODS in s10_cheap_method_benchmark.py.
+NPROCS = 8
 
 
 def read_xyz(p):
@@ -144,7 +150,7 @@ def generate(ens, work, frames):
                                   for a in atoms))
             # bare reference, no probe
             (work / f"{fr}_{state}_bare.inp").write_text(
-                f"{LEVEL}\n%maxcore 3000\n%scf MaxIter 300 end\n"
+                f"{LEVEL}\n%maxcore 3000\n%pal nprocs 8 end\n%scf MaxIter 300 end\n"
                 f"%output Print[P_Loewdin] 1 end\n"
                 f"* xyzfile {CHARGE} {MULT} {fr}_{state}.xyz\n")
             n_inp += 1
@@ -157,7 +163,7 @@ def generate(ens, work, frames):
                 (work / f"{tag}.pc").write_text(
                     f"1\n{PROBE_Q:.4f} {px:.8f} {py:.8f} {pz:.8f}\n")
                 (work / f"{tag}.inp").write_text(
-                    f"{LEVEL}\n%maxcore 3000\n%scf MaxIter 300 end\n"
+                    f"{LEVEL}\n%maxcore 3000\n%pal nprocs 8 end\n%scf MaxIter 300 end\n"
                     f"%output Print[P_Loewdin] 1 end\n"
                     f'%pointcharges "{tag}.pc"\n'
                     f"* xyzfile {CHARGE} {MULT} {fr}_{state}.xyz\n")
@@ -167,7 +173,7 @@ def generate(ens, work, frames):
     pbs = work / "s11_probe_scan.pbs"
     pbs.write_text(f"""#!/usr/bin/env bash
 #PBS -N cm_s11probe
-#PBS -l select=1:ncpus=1:mem=8gb
+#PBS -l select=1:ncpus=8:mem=24gb
 #PBS -l walltime=24:00:00
 #PBS -m ae
 #PBS -M 18660916@sun.ac.za
@@ -188,25 +194,43 @@ export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
 
 cd "$WORK" || exit 1
 if ! mkdir .running 2>/dev/null; then echo "FAIL: another job holds .running"; exit 1; fi
-trap 'rmdir .running 2>/dev/null' EXIT
 echo "host=$(hostname) start=$(date)"
 
 for f in *.out; do
   [ -e "$f" ] || continue
   grep -q "TERMINATED NORMALLY" "$f" 2>/dev/null || rm -f "$f"
 done
-
+""" + r"""
 n=0; ok=0; bad=0
+SCRATCH="${TMPDIR:-/tmp}/orca_$$"
+mkdir -p "$SCRATCH" || { echo "FAIL: cannot create $SCRATCH"; exit 1; }
+trap 'rm -rf "$SCRATCH"; rmdir .running 2>/dev/null' EXIT
+echo "scratch: $SCRATCH"
+
+# MEASURED 2026-09-30: the same 24-atom job takes 28.7 s real on the shared
+# filesystem and 6.6 s in node-local scratch, user time 4.9 s vs 3.6 s. The
+# difference is ORCA temporary-file I/O, not compute. Each job therefore runs in
+# node-local scratch and only the .out is copied back.
 for inp in *.inp; do
-  out="${{inp%.inp}}.out"
+  out="${inp%.inp}.out"
   if [ -f "$out" ] && grep -q "TERMINATED NORMALLY" "$out"; then continue; fi
   n=$((n+1))
-  "$ORCA/orca" "$inp" > "$out" 2>&1 </dev/null
-  if grep -q "TERMINATED NORMALLY" "$out"; then ok=$((ok+1))
+  base="${inp%.inp}"
+  rm -rf "$SCRATCH/$base"; mkdir -p "$SCRATCH/$base"
+  cp "$inp" "$SCRATCH/$base/" || continue
+  for dep in $(grep -oE '[A-Za-z0-9_.-]+\.(xyz|pc)' "$inp" | sort -u); do
+    [ -f "$dep" ] && cp "$dep" "$SCRATCH/$base/"
+  done
+  ( cd "$SCRATCH/$base" && "$ORCA/orca" "$inp" > "$out" 2>&1 </dev/null )
+  cp "$SCRATCH/$base/$out" "$out" 2>/dev/null
+  rm -rf "$SCRATCH/$base"
+  if grep -q "TERMINATED NORMALLY" "$out" 2>/dev/null; then ok=$((ok+1))
   else bad=$((bad+1)); echo "  WARN did not terminate: $inp"; fi
+  if [ $((n % 50)) -eq 0 ]; then echo "  ... $n run, $ok ok, $bad failed  $(date +%H:%M)"; fi
 done
-echo; echo "run=$n ok=$ok failed=$bad"; echo "end=$(date)"
-echo "now: python3 s11_probe_distance_scan.py analyse {work.resolve()}"
+echo
+echo "run=$n ok=$ok failed=$bad"
+echo "end=$(date)"
 """)
     pbs.chmod(0o755)
     print(f"wrote {n_inp} inputs for {len(frames)} frames")

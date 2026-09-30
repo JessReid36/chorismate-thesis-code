@@ -58,7 +58,45 @@ settings in `s8_invacuo_new.pbs`; jobs cannot run on a login node.
 The login node runs **Python 3.6.8**. No `math.dist`, no walrus operator, no
 f-string `=` specifier.
 
-**Do not use `%pal` for small single points.** Measured 2026-09-30 on 24-atom jobs:
-ORCA reported 2-4 s of compute while consecutive outputs appeared ~180 s apart, i.e.
-98 per cent MPI startup and teardown. Serial is roughly 40x faster in wall time for
-jobs this size.
+### ORCA job cost on this cluster — measured, after a parsing error
+
+**First, the error that caused three wrong conclusions.** ORCA prints
+
+        TOTAL RUN TIME: 0 days 0 hours 4 minutes 12 seconds 340 msec
+
+so the fields are days, hours, MINUTES, seconds. A parser reading `$4*3600+$6*60+$8`
+returns days*3600 + hours*60 + minutes and drops the seconds entirely. "4.0 s" was
+really 4 minutes. Every timing conclusion drawn before 2026-09-30 came from that.
+
+        correct:  awk '{t=$4*86400+$6*3600+$8*60+$10}'
+
+Sanity-check any parsed timing against something independent — `qstat -f` reports
+`resources_used.cput` and `walltime` — before building on it.
+
+**What actually drives cost: basis and grid, not I/O.** Measured on 24-atom single
+points of the chorismate dianion, one core:
+
+        hf3c      14 s    MINIX basis, no DFT grid, 12 SCF cycles
+        b97-3c   202 s    mTZVP plus grid integration, 20 SCF cycles
+
+A 14x time difference on 1.7x the cycles, so it is cost PER CYCLE. Not a convergence
+pathology, despite the substrate being an electronically unbound dianion.
+
+**Parallelism must be chosen per method, by measured cost.**
+
+        b97-3c   202 s serial  ->  71-89 s on 8 ranks    about 2.5x
+        profile: 81 % SCF iterations, 12 % startup
+
+That is the profile where `%pal` pays. A 14 s job is startup-dominated and `%pal`
+costs more than it saves. `s10` therefore sets ranks per method: xtb2 and hf3c
+serial, b97-3c / r2scan-3c / ref on 8. `s11` is entirely at the production level and
+runs parallel throughout. A blanket setting either way is wrong.
+
+**Node-local scratch is real but secondary.** The same input, measured with `time`:
+
+        shared filesystem   real 28.7 s   user 4.9 s
+        node-local scratch  real  6.6 s   user 3.6 s
+
+Worth keeping — both scripts run each job in `${TMPDIR:-/tmp}` and copy back only the
+`.out` — but it is a smaller effect than basis and grid, and the earlier claim that it
+was *the* cause was wrong.
