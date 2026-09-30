@@ -144,10 +144,12 @@ def generate(ens_dir, work):
             for mname, kw in METHODS.items():
                 for field in ("bare", "field"):
                     tag = f"{fr}_{state}_{mname}_{field}"
-                    body = [kw, "%maxcore 3000"]
-                    if mname != "xtb2":          # ORCA's xtb interface ignores %pal
-                        body.append("%pal nprocs 8 end")
-                    body.append("%scf MaxIter 300 end")
+                    # NO %pal. These are 24-atom single points: ORCA reports 2-4 s of
+                    # compute, but with %pal nprocs 8 each job took ~180 s wall, i.e.
+                    # 98% MPI startup and teardown. Measured from file timestamps: the
+                    # xtb2 jobs, the only ones without %pal, ran 8 s apart while every
+                    # other method ran 2.5-4.5 min apart. Serial is ~40x faster here.
+                    body = [kw, "%maxcore 3000", "%scf MaxIter 300 end"]
                     if field == "field":
                         body.append(f'%pointcharges "{fr}_{state}.pc"')
                     body.append(f"* xyzfile {CHARGE} {MULT} {fr}_{state}.xyz")
@@ -156,7 +158,7 @@ def generate(ens_dir, work):
     pbs = work / "s10_benchmark.pbs"
     pbs.write_text(f"""#!/usr/bin/env bash
 #PBS -N cm_s10bm
-#PBS -l select=1:ncpus=8:mem=24gb
+#PBS -l select=1:ncpus=1:mem=8gb
 #PBS -l walltime=24:00:00
 #PBS -m ae
 #PBS -M 18660916@sun.ac.za

@@ -35,11 +35,30 @@ setting whenever one is cited.
   loop for THIS reaction? Tests XTB2, HF-3c, B97-3c and r2SCAN-3c against the
   committed `barrier_vac` column, plus a field-response test using a +1 charge at
   Burschowsky's 3.2 A from the ether oxygen. Verdict rules fixed before running.
-- `s11_smearing_calibration.py` — sets the Gaussian width of the smeared charge so
-  that one +1 at 3.2 A reproduces Burschowsky's measured 5.9 kcal/mol of
-  differential transition-state stabilisation.
+- `s11_probe_distance_scan.py` — where does the bare point-charge model break for
+  this substrate, and what does one +1 at Burschowsky's 3.2 A actually buy? A
+  distance scan with three diagnostics whose expected behaviour is stated in
+  advance: log-log slope of the differential stabilisation (dipole-like coupling
+  predicts about -2), Loewdin charge on the nearest atom, and the reactant HOMO.
+  Calibrates against the DIFFERENTIAL, 5.9 - 0.6 = 5.3 kcal/mol, not 5.9.
+  Replaces the smearing-width calibration that was planned: a width cannot be chosen
+  before the failure is measured, and [DTHESIS] Ch.3.6 attributes the failure to
+  missing REPULSION rather than to the singularity alone, so a Gaussian may treat a
+  symptom.
+- `s12_build_grid.py` — candidate-site grid on the union of atom-centred vdW
+  spheres, per [DTHESIS] Ch.2 Eq.2.16. Pure function of its configuration; every
+  parameter is written into the output header. `min_approach` acts as a FLOOR on the
+  site radius and is set by `s11`; `min_approach=0` recovers [DTHESIS] exactly.
 
 ## Conventions
 
 ORCA is not on PATH on this cluster. Invoke it by full path with the library
 settings in `s8_invacuo_new.pbs`; jobs cannot run on a login node.
+
+The login node runs **Python 3.6.8**. No `math.dist`, no walrus operator, no
+f-string `=` specifier.
+
+**Do not use `%pal` for small single points.** Measured 2026-09-30 on 24-atom jobs:
+ORCA reported 2-4 s of compute while consecutive outputs appeared ~180 s apart, i.e.
+98 per cent MPI startup and teardown. Serial is roughly 40x faster in wall time for
+jobs this size.
