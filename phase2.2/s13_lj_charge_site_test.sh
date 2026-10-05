@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-#PBS -N cm_s13lj
+#PBS -N cm_s13lj2
 #PBS -l select=1:ncpus=8:mem=24gb
-#PBS -l walltime=04:00:00
+#PBS -l walltime=36:00:00
 #PBS -m ae
 #PBS -M 18660916@sun.ac.za
 #PBS -j oe
-#PBS -o /home/18660916/system_development/phase2.2/s13_lj_test/s13_lj_test.pbs.out
+#PBS -o /home/18660916/system_development/phase2.2/s13_lj_test2/s13_lj_test2.pbs.out
 #
 # s13_lj_charge_site_test.sh - can a designed charge site carry a Pauli wall?
 #
@@ -59,7 +59,7 @@
 set -uo pipefail
 ORCA=/home/apps2/ORCA/6.0.1
 ROOT=/home/18660916/system_development
-WORK="$ROOT/phase2.2/s13_lj_test"
+WORK="$ROOT/phase2.2/s13_lj_test2"
 
 export PATH="/apps/openmpi/4.1.1/bin:$PATH"
 export LD_LIBRARY_PATH="$ORCA/lib:/apps/openmpi/4.1.1/lib:/apps/mambaforge/envs/medaka/lib:${LD_LIBRARY_PATH:-}"
@@ -178,15 +178,11 @@ fi
 echo
 
 # --------------------------------- C: relaxed optimisation, where does the oxygen stop?
-echo "=== TEST C: relaxed optimisation with the site carrying LJ"
-# Only the substrate is allowed to move. ActiveAtoms is the documented mechanism for
-# this; a %geom constraint on atom 24 was tried first and abandoned, because atom 24 is
-# an MM atom and may not be in the optimisation space at all, in which case the
-# constraint would error rather than do nothing.
-sed 's/TightSCF QMMM/TightSCF QMMM Opt/; s/  QMAtoms {0:23} end/  QMAtoms {0:23} end\n  ActiveAtoms {0:23} end/' testA.inp > testC.inp
-"$ORCA/orca" testC.inp > testC.out 2>&1 </dev/null
-
-echo "--- and the bare point charge, for comparison, same geometry and level"
+# THE CONTROL RUNS FIRST. In the first version of this test the bare point charge was
+# run AFTER the LJ case; the LJ optimisation then exhausted the walltime and the control
+# never ran at all, leaving the comparison that gives the number its meaning unmeasured.
+# The control is also the cheaper of the two, so it costs nothing to front-load.
+echo "=== CONTROL: bare point charge, no Lennard-Jones"
 cat > testBare.inp <<'EOF'
 ! B3LYP D3BJ def2-SVP def2/J RIJCOSX TightSCF Opt
 %maxcore 3000
@@ -195,50 +191,89 @@ cat > testBare.inp <<'EOF'
 * xyzfile -2 1 sub.xyz
 EOF
 "$ORCA/orca" testBare.inp > testBare.out 2>&1 </dev/null
+echo "  $(grep -c 'GEOMETRY OPTIMIZATION CYCLE' testBare.out) cycles, terminated=$(grep -c 'TERMINATED NORMALLY' testBare.out)"
+echo
+
+echo "=== TEST C: relaxed optimisation with the site carrying LJ"
+# Only the substrate is allowed to move. ActiveAtoms is the documented mechanism for
+# this; a %geom constraint on atom 24 was tried first and abandoned, because atom 24 is
+# an MM atom and may not be in the optimisation space at all, in which case the
+# constraint would error rather than do nothing.
+sed 's/TightSCF QMMM/TightSCF QMMM Opt/; s/  QMAtoms {0:23} end/  QMAtoms {0:23} end\n  ActiveAtoms {0:23} end/' testA.inp > testC.inp
+"$ORCA/orca" testC.inp > testC.out 2>&1 </dev/null
+echo "  $(grep -c 'GEOMETRY OPTIMIZATION CYCLE' testC.out) cycles, terminated=$(grep -c 'TERMINATED NORMALLY' testC.out)"
 echo
 
 # ------------------------------------------------------------------- read the result
 python3 - <<'PY'
 import re, math
-px,py,pz = [float(x) for x in open('probe.xyz').read().split()]
+px, py, pz = [float(x) for x in open('probe.xyz').read().split()]
 
-def final_geom(path, nsub=24):
-    t=open(path, errors='replace').read()
-    if "TERMINATED NORMALLY" not in t: return None, "did not terminate"
-    blocks=re.findall(r"CARTESIAN COORDINATES \(ANGSTROEM\)\n-+\n(.*?)\n\n", t, re.S)
-    if not blocks: return None, "no coordinate block"
-    at=[]
-    for line in blocks[-1].splitlines():
-        f=line.split()
-        if len(f)>=4:
-            try: at.append((f[0], float(f[1]), float(f[2]), float(f[3])))
-            except ValueError: pass
-    return at[:nsub], None
+def trajectory(path, nsub=24):
+    """Closest substrate oxygen to the charge, at every optimisation cycle.
 
-print(f"{'run':<22}{'closest O to site':>20}{'verdict':>34}")
-for label, path in (("bare point charge","testBare.out"), ("site with LJ","testC.out")):
-    at, err = final_geom(path)
-    if at is None:
-        print(f"{label:<22}{'-':>20}   {err}")
+    The first version of this test read only the FINAL geometry, so a run that hit the
+    walltime gave nothing. The trajectory answers the question whether or not the
+    optimisation converges: what matters is whether the approach STOPS, not whether
+    every other coordinate has settled.
+    """
+    t = open(path, errors='replace').read() if __import__('os').path.exists(path) else ''
+    if not t:
+        return None, None, "file absent"
+    blocks = re.findall(r"CARTESIAN COORDINATES \(ANGSTROEM\)\n-+\n(.*?)\n\n", t, re.S)
+    if not blocks:
+        return None, None, "no coordinate block"
+    ds = []
+    for blk in blocks:
+        d = []
+        for line in blk.splitlines()[:nsub]:
+            f = line.split()
+            if len(f) >= 4 and f[0].upper().startswith('O'):
+                d.append(math.sqrt((float(f[1]) - px) ** 2 + (float(f[2]) - py) ** 2 +
+                                   (float(f[3]) - pz) ** 2))
+        if d:
+            ds.append(min(d))
+    conv = "TERMINATED NORMALLY" in t
+    return ds, conv, None
+
+print(f"{'run':<22}{'start':>8}{'final':>8}{'min':>8}{'last 10 range':>16}  verdict")
+for label, path in (("bare point charge", "testBare.out"), ("site with LJ", "testC.out")):
+    ds, conv, err = trajectory(path)
+    if ds is None:
+        print(f"{label:<22}   {err}")
         continue
-    ds=[(math.sqrt((x-px)**2+(y-py)**2+(z-pz)**2), e)
-        for e,x,y,z in at if e.upper().startswith('O')]
-    d=min(ds)[0]
-    if   d < 2.0: v="TOO WEAK - no better than bare"
-    elif d <= 3.2: v="PHYSICAL - salt-bridge range"
-    elif d <= 4.0: v="slightly long"
-    else: v="TOO HARD - the charge cannot act"
-    print(f"{label:<22}{d:>17.3f} A   {v:>31}")
+    # The tail must be a genuine tail. Taking a fixed last-10 on a short run captures
+    # the approach itself and reports it as movement, which is the opposite of the
+    # intended test. Use the last third, never fewer than three points.
+    ntail = max(3, len(ds) // 3)
+    tail = ds[-ntail:]
+    spread = max(tail) - min(tail)
+    d = ds[-1]
+    if   d < 2.0:  v = "TOO WEAK - collapsing"
+    elif d <= 3.2: v = "PHYSICAL - salt-bridge range"
+    elif d <= 4.0: v = "slightly long"
+    else:          v = "TOO HARD - the charge cannot act"
+    if spread > 0.05:
+        v += ", STILL MOVING"
+    print(f"{label:<22}{ds[0]:>8.3f}{d:>8.3f}{min(ds):>8.3f}{spread:>12.3f} A ({ntail}c)  {v}"
+          + ("" if conv else "   (not converged)"))
+    step = max(1, len(ds) // 8)
+    print("    " + "  ".join(f"{i}:{ds[i]:.2f}" for i in range(0, len(ds), step)))
 
 print()
 print("step_7 recorded 0.879 A for a bare +1 with a designed charge set, 0.641 A inside")
-print("the oxygen vdW contact. The criterion here is 2.0-3.2 A, the range the structural")
-print("consensus gives for Arg-carboxylate salt bridges, because step_7's own reframing")
-print("is that inward motion is correct down to that distance and unphysical only below.")
+print("the oxygen van der Waals contact. The criterion here is 2.0-3.2 A, the range the")
+print("structural consensus gives for Arg-carboxylate salt bridges, because step_7's own")
+print("reframing is that inward motion is correct down to that distance and unphysical")
+print("only below it.")
 print()
-print("If the LJ site stops in range, the mechanism works and the next question is which")
-print("LJ parameters are justified - the sodium values used here are a placeholder.")
-print("If it does not, molecular surrogates stand as step_7b concluded.")
+print("A FLAT tail means the approach has STOPPED, which is the result being tested, even")
+print("if the optimisation has not converged on every other coordinate.")
+print()
+print("NOTE ON THE PARAMETERS: the site carries sodium Lennard-Jones values taken from the")
+print("committed force field. A designed cation standing in for a guanidinium is not")
+print("sodium-sized, so a stopping distance at the short end of the range points at the")
+print("parameter, not at the mechanism. Burschowsky's 3.2 A is the calibration target.")
 PY
 echo
 echo "end=$(date)"

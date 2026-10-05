@@ -47,7 +47,7 @@ needs SCF at two or more charge magnitudes per site, which orca_vpot cannot give
 runs on the linear model and says so; see the plan's section on the Tier 2 extension.
 
 USAGE, on the HPC where the in vacuo .gbw files live
-    python3 s15_dv_matrix.py prepare <grid.tsv> <workdir>
+    python3 s15_dv_matrix.py prepare <grid.tsv> <workdir> [aligned_dir]
     qsub <workdir>/s15_dv.pbs
     python3 s15_dv_matrix.py assemble <grid.tsv> <workdir> <out_amatrix.tsv>
 """
@@ -95,34 +95,67 @@ def read_grid(path):
     return sites
 
 
-def prepare(grid_path, work):
+def prepare(grid_path, work, align_dir=None):
     work = Path(work)
     work.mkdir(parents=True, exist_ok=True)
     sites = read_grid(grid_path)
     if not sites:
         sys.exit(f"no sites parsed from {grid_path}")
 
+    frames_list = frames_from_grid(grid_path)
+    if frames_list:
+        print(f"frame set read from the grid header: {len(frames_list)} frames")
+    else:
+        frames_list = FALLBACK_FRAMES
+        print(f"  WARNING: no frame list in the grid header; falling back to the")
+        print(f"  hardcoded {len(frames_list)}-frame list, which may be stale. Rebuild the")
+        print(f"  grid with s12_build_grid.py so the two cannot disagree.")
+    (work / "frames.txt").write_text("\n".join(frames_list) + "\n")
+    frames = frames_list
+
     # orca_vpot returns values POSITIONALLY with no site identifiers. If the row order
     # were lost the whole map would be silently scrambled, so it is written separately
     # and checked on assembly.
-    with open(work / "points_bohr.xyz", "w") as fh:
-        fh.write(f"{len(sites)}\n")
-        for _, x, y, z in sites:
-            fh.write(f"{x*ANG2BOHR:.10f} {y*ANG2BOHR:.10f} {z*ANG2BOHR:.10f}\n")
+    #
+    # ONE POINT FILE PER FRAME, NOT ONE SHARED FILE.
+    # The grid is defined in the ALIGNED frame of reference, but each wavefunction was
+    # computed on the ORIGINAL geometry and still lives in those coordinates. So for
+    # every frame the common grid is mapped back by the inverse of that frame's
+    # alignment transform:
+    #     p_orig = (p_aligned - t) @ R.T
+    # This is what lets the existing .gbw files be reused: no SCF is repeated, only
+    # orca_vpot, which takes under a second per call.
+    # If no transform.txt is present the frames were never aligned, and a single shared
+    # point file is written with a warning - that is the configuration that produced the
+    # unusable 0.7 per cent sign agreement.
+    import numpy as _np
+    P = _np.array([[s[1], s[2], s[3]] for s in sites])
+    aligned_dir = Path(align_dir) if align_dir else None
+    wrote_per_frame = 0
+    if aligned_dir:
+        for fr in frames_list:
+            tf = aligned_dir / f"frame_{fr}" / "transform.txt"
+            if not tf.exists():
+                continue
+            M = _np.loadtxt(tf)
+            R, tt = M[:3], M[3]
+            Q = (P - tt) @ R.T
+            with open(work / f"points_{fr}.xyz", "w") as fh:
+                fh.write(f"{len(sites)}\n")
+                for x, y, z in Q:
+                    fh.write(f"{x*ANG2BOHR:.10f} {y*ANG2BOHR:.10f} {z*ANG2BOHR:.10f}\n")
+            wrote_per_frame += 1
+    if not wrote_per_frame:
+        with open(work / "points_bohr.xyz", "w") as fh:
+            fh.write(f"{len(sites)}\n")
+            for _, x, y, z in sites:
+                fh.write(f"{x*ANG2BOHR:.10f} {y*ANG2BOHR:.10f} {z*ANG2BOHR:.10f}\n")
     with open(work / "row_order.tsv", "w") as fh:
         fh.write("row\tidx\tx\ty\tz\n")
         for r, (i, x, y, z) in enumerate(sites):
             fh.write(f"{r}\t{i}\t{x:.6f}\t{y:.6f}\t{z:.6f}\n")
 
-    frames = frames_from_grid(grid_path)
-    if frames:
-        print(f"frame set read from the grid header: {len(frames)} frames")
-    else:
-        frames = FALLBACK_FRAMES
-        print(f"  WARNING: no frame list in the grid header; falling back to the")
-        print(f"  hardcoded {len(frames)}-frame list, which may be stale. Rebuild the")
-        print(f"  grid with s12_build_grid.py so the two cannot disagree.")
-    (work / "frames.txt").write_text("\n".join(frames) + "\n")
+
     pbs = work / "s15_dv.pbs"
     pbs.write_text(f"""#!/usr/bin/env bash
 #PBS -N cm_s15dv
@@ -157,6 +190,8 @@ for f in {' '.join(frames)}; do
   for tag in R TS; do
     gbw="$VAC/sp_${{f}}_${{tag}}.gbw"
     out="vpot_${{f}}_${{tag}}.out"
+    # per-frame point file when the ensemble was aligned, shared file otherwise
+    if [ -s "points_${{f}}.xyz" ]; then PTS="points_${{f}}.xyz"; else PTS="points_bohr.xyz"; fi
     if [ ! -s "$gbw" ]; then
       echo "  MISSING $gbw"; miss=$((miss+1)); continue
     fi
@@ -169,7 +204,7 @@ for f in {' '.join(frames)}; do
     # The manual's note that a mismatched basename must be passed as a FIFTH argument
     # is the tell: the second argument is a container entry.
     "$ORCA/orca_vpot" "$gbw" "sp_${{f}}_${{tag}}.scfp" \\
-        points_bohr.xyz "$out" "$VAC/sp_${{f}}_${{tag}}" > /dev/null 2>&1
+        "$PTS" "$out" "$VAC/sp_${{f}}_${{tag}}" > /dev/null 2>&1
     if [ -s "$out" ]; then ok=$((ok+1)); else echo "  FAILED $f $tag"; miss=$((miss+1)); fi
   done
 done
@@ -179,7 +214,16 @@ echo "end=$(date)"
 echo "now: python3 s15_dv_matrix.py assemble <grid.tsv> {work.resolve()} amatrix.tsv"
 """)
     pbs.chmod(0o755)
-    print(f"{len(sites)} sites written to {work/'points_bohr.xyz'} (Bohr)")
+    if wrote_per_frame:
+        print(f"{len(sites)} sites, mapped into each frame's own coordinates:")
+        print(f"  {wrote_per_frame} per-frame point files written (Bohr)")
+        print(f"  the wavefunctions are reused unchanged; NO SCF is repeated")
+    else:
+        print(f"{len(sites)} sites written to {work/'points_bohr.xyz'} (Bohr)")
+        print(f"  WARNING: no alignment transforms found. The frames are being treated")
+        print(f"  as already superimposed. If they are not, every frame's potential is")
+        print(f"  evaluated at a different place relative to its own substrate - the")
+        print(f"  configuration that produced 0.7 per cent sign agreement.")
     print(f"row order recorded in {work/'row_order.tsv'}")
     print(f"{len(frames)} frames, 2 states each = {2*len(frames)} orca_vpot calls")
     print(f"\nsubmit:  qsub {pbs.resolve()}")
@@ -292,7 +336,8 @@ def main():
     if len(sys.argv) < 4 or sys.argv[1] not in ("prepare", "assemble"):
         sys.exit(__doc__)
     if sys.argv[1] == "prepare":
-        prepare(sys.argv[2], sys.argv[3])
+        prepare(sys.argv[2], sys.argv[3],
+                sys.argv[4] if len(sys.argv) > 4 else None)
     else:
         if len(sys.argv) < 5:
             sys.exit(__doc__)
