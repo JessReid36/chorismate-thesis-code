@@ -43,7 +43,8 @@ H = 627.5094740631
 # Frames failing theta2, and any frame without a converged climbing image, are
 # harvested too but flagged, so that the decision to report or exclude them is
 # made in the write-up and not silently here.
-FULL_NAC = ["02450", "04085", "09025", "09900", "10775", "11630", "12485", "14155", "17505", "19185", "20000", "21634", "23268", "24883", "26495", "33320", "34991", "36665", "38344", "40485", "41786", "42436", "43087", "43738", "44388", "45688", "46990", "47641", "48292", "49592", "50892", "52192", "53493", "54144", "54795", "55446", "56098", "57397", "58698", "59999"]
+FULL_NAC = ["02450", "04085", "09025", "09900", "10775",
+            "11630", "12485", "14155", "17505", "19185"]
 NEAR_NAC = ["05680", "07310", "15825"]
 OTHER = ["08170"]
 
@@ -152,51 +153,28 @@ def main():
             rec["E_qm_P"] = last_energy(f"{d}/product_opt.out")
 
             # ---- derived
-            vR, vT, vP = rec.get("E_vac_R"), rec.get("E_vac_TS"), rec.get("E_vac_P")
+            vR, vT = rec.get("E_vac_R"), rec.get("E_vac_TS")
             rec["barrier_vac"] = (vT - vR) * H if (vR and vT) else None
-            # ---- stab_TS: the differential TS stabilisation of Claeyssens et
-            # al. (Chem. Commun. 2005, 5068; Org. Biomol. Chem. 2011, 9, 1578).
-            # Their E_INTERACTION(TS) - E_INTERACTION(reactant) reduces exactly
-            # to the QM/MM barrier minus the in vacuo barrier at the same
-            # geometries: the MM-only terms cancel in that difference. That is
-            # why it can be formed here without an embedded QM energy at the
-            # climbing image, which the path summary does not report.
-            # Negative means the environment lowers the barrier.
-            b, bv = rec.get("barrier"), rec.get("barrier_vac")
-            rec["stab_TS"] = (float(b) - float(bv)) if (b is not None and bv is not None) else None
-
-            # ---- E_int_*: the EMBEDDED QM energy of a structure minus its
-            # gas-phase energy at the same geometry. Interaction plus
-            # polarisation of the QM region by the MM charges. Large and
-            # negative for this dianion in a cationic site.
-            # NOT a stabilisation. NEVER difference these against any quantity
-            # built from a QM/MM TOTAL energy (e.g. E_ci_Eh): the total carries
-            # the MM energy of ~55680 atoms and the result is meaningless.
-            # The former stab_TS_total column did exactly that and was wrong by
-            # about -240 Eh; it has been removed.
-            qR, qP = rec.get("E_qm_R"), rec.get("E_qm_P")
-            rec["E_int_R"] = (qR - vR) * H if (qR and vR) else None
-            rec["E_int_P"] = (qP - vP) * H if (qP and vP) else None
+            qR, qT = rec.get("E_qm_R"), rec.get("E_ci_Eh")
+            # stabilisation of a structure is its embedded QM energy minus its
+            # gas-phase energy; the TS value uses the climbing image's QM/MM
+            # total, which is what the path summary reports
+            rec["stab_R"] = (qR - vR) * H if (qR and vR) else None
+            eci = rec.get("E_ci_Eh")
+            rec["stab_TS_total"] = (eci - vT) * H if (eci and vT) else None
             rows.append(rec)
 
     # ------------------------------------------------------------ the table
     cols = ["frame", "group", "neb_converged", "ci_image", "D01", "barrier",
-            "barrier_vac", "stab_TS", "E_ci_Eh", "E_qmmm_R", "E_qmmm_P",
-            "E_qm_R", "E_qm_P", "E_vac_R", "E_vac_TS", "E_vac_P",
-            "E_int_R", "E_int_P"]
+            "barrier_vac", "E_ci_Eh", "E_qmmm_R", "E_qmmm_P", "E_qm_R",
+            "E_qm_P", "E_vac_R", "E_vac_TS", "E_vac_P", "stab_R",
+            "stab_TS_total"]
     out = f"{args.out}/ensemble_barriers.tsv"
     with open(out, "w") as fh:
         fh.write("# barrier ensemble, harvested by step19e_harvest_barriers.py\n")
         fh.write("# barrier: kcal/mol, from the '<= CI' row of the path summary\n")
         fh.write("# barrier_vac: kcal/mol, in vacuo at the same geometries\n")
-        fh.write("# stab_TS: kcal/mol, barrier - barrier_vac. The differential TS\n")
-        fh.write("#   stabilisation of Claeyssens et al. Negative = the environment\n")
-        fh.write("#   lowers the barrier. This is the column to quote.\n")
-        fh.write("# E_int_R, E_int_P: kcal/mol, EMBEDDED QM energy minus gas-phase\n")
-        fh.write("#   energy at the same geometry. Interaction plus polarisation,\n")
-        fh.write("#   NOT a stabilisation. Never difference against E_ci_Eh or any\n")
-        fh.write("#   other QM/MM total.\n")
-        fh.write("# energies: Eh.\n")
+        fh.write("# energies: Eh. stab_*: kcal/mol, QM/MM minus in vacuo\n")
         fh.write("# group: full_NAC frames are those reported in the write-up\n")
         fh.write("\t".join(cols) + "\n")
         for r in rows:
