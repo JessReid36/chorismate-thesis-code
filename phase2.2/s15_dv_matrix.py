@@ -55,10 +55,12 @@ import sys
 import math
 from pathlib import Path
 
-ANG2BOHR = 1.8897259886   # older CODATA value; 1/0.529177210903 (CODATA 2018) = 1.8897261246. The
-                           # difference moves a point by about 5e-6 A at these coordinates (checked
-                           # 5 Oct 2026 against the committed s15_dv2 outputs) and is left as it is
-                           # so that A_v2 stays reproducible.
+ANG2BOHR = 1.8897259886   # NOT the value ORCA uses. ORCA 6.0.1 converts with 1.8897261339 (fitted
+                           # 6 Oct 2026 to 3168 coordinate pairs in the committed 20_invacuo outputs;
+                           # = 1/0.5291772083). The mismatch, -7.7e-8 relative, places each orca_vpot
+                           # point at most 6.4e-6 A from where it should sit relative to its density
+                           # (all 233 sites x 30 frames) and changes a by at most 3.2e-5 kcal/mol per
+                           # unit charge. Kept so that A_v2 stays bit-reproducible.
 HARTREE2KCAL = 627.5094740631
 
 # The frame set is READ FROM THE GRID'S OWN HEADER, not hardcoded. s12_build_grid.py

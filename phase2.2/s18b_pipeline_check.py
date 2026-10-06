@@ -531,10 +531,9 @@ def main():
             "substrate".format(rms[len(rms) // 2], rms[-1], max(x[6] for x in dips), min(x[3] for x in dips),
                                max(x[3] for x in dips)))
     nsp = Counter(len(re.findall(r"FINAL SINGLE POINT ENERGY \(QM/MM\)", nebtxt[f])) for f in frames)
-    say("INFO", "neb.out does not record the QM and MM energy of each image on the final band "
-        "(QM/MM single-point blocks per neb.out: {}). Splitting the dip into QM and MM needs single points "
-        "on the final images (full active-region geometries on hpc1 only, checksum-only); the geometric "
-        "test above locates the dip without it".format(dict(nsp)))
+    say("INFO", "neb.out does not record per-image QM and MM energy components on the final band (QM/MM "
+        "single-point blocks per neb.out: {}). Under electrostatic embedding they would not separate substrate "
+        "from environment anyway (HANDOFF.md section 7); the geometric test above is the diagnosis".format(dict(nsp)))
 
     head("SUMMARY")
     print("  " + "   ".join("{} {}".format(k, counts[k]) for k in ("PASS", "FAIL", "GAP", "INFO")))
