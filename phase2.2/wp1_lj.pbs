@@ -1,0 +1,82 @@
+#!/bin/bash
+#PBS -N cm23_wp1_lj
+#PBS -l select=1:ncpus=1:mem=4gb
+#PBS -l walltime=04:00:00
+#PBS -m ae
+#PBS -M 18660916@sun.ac.za
+#PBS -j oe
+#PBS -o /home/18660916/system_development/phase2.2/wp1_lj_combining/wp1.pbs.out
+#
+# WP1 (charge-model plan): how ORCA 6.0.1 combines Lennard-Jones parameters between unlike atoms,
+# and what the length column of ORCAFF.prms means. The ORCA manual lists only "LJ coefficients".
+#
+# Two atoms, zero charges, no bonds, MM only. Each pair is scanned from 2.00 to 6.00 A in 0.05 A
+# steps, once with ORCA's default LJ force switching and once with it switched off. The LJ
+# parameters are copied exactly from the committed 05_qmmm/13_bridge/complex_solvated.ORCAFF.prms.
+# The like pair O/O tests the column itself (full R_min or half of it); the unlike pairs test the
+# combining rule. No heredocs (they fail on hpc1): every file is written with printf or awk.
+set -uo pipefail
+W=/home/18660916/system_development/phase2.2/wp1_lj_combining
+mkdir -p "$W" && cd "$W" || exit 1
+export PATH="/apps/openmpi/4.1.1/bin:$PATH"
+export LD_LIBRARY_PATH="/home/apps2/ORCA/6.0.1/lib:/apps/openmpi/4.1.1/lib:${LD_LIBRARY_PATH:-}"
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
+ORCA=/home/apps2/ORCA/6.0.1/orca
+echo "host=$(hostname) start=$(date)"
+
+# name  element1 eps1 Rcol1  element2 eps2 Rcol2  multiplicity (odd electron count -> 2)
+printf '%s\n' \
+  "NaOc Na -0.087439 2.738000 O -0.210000 3.322400 2" \
+  "NOc  N  -0.170000 3.648000 O -0.210000 3.322400 2" \
+  "NaOe Na -0.087439 2.738000 O -0.170000 3.367400 2" \
+  "OcOc O  -0.210000 3.322400 O -0.210000 3.322400 1" > "$W/pairs.txt"
+awk 'BEGIN{for (i = 0; i <= 80; i++) printf "%.2f\n", 2 + 0.05 * i}' > "$W/distances.txt"
+
+# criteria, fixed before the first single point runs
+printf '%s\n' \
+  "WP1 pass criteria, fixed $(date -Iseconds) before any single point ran" \
+  "Candidate rules, with Rc = the length column and e = |epsilon column|:" \
+  "  A  R_ij = (Rc_i + Rc_j)/2,  e_ij = sqrt(e_i e_j)   (column = full R_min; Amber's R*_i + R*_j)" \
+  "  B  R_ij = sqrt(Rc_i Rc_j),  e_ij = sqrt(e_i e_j)   (geometric mean of R_min)" \
+  "  C  R_ij = Rc_i + Rc_j,      e_ij = sqrt(e_i e_j)   (column = R_min/2)" \
+  "  D  column = sigma: R_ij = 2^(1/6) (Rc_i + Rc_j)/2,  e_ij = sqrt(e_i e_j)" \
+  "  each with E(r) = e_ij [ (R_ij/r)^12 - 2 (R_ij/r)^6 ]" \
+  "1. With switching off, exactly one rule reproduces every energy of all four pairs to within 1e-8 Eh;" \
+  "   every other rule misses by more than 1e-4 Eh somewhere in 2-6 A." \
+  "2. With default switching, energies equal the switched-off ones plus one constant per pair, to 1e-8 Eh," \
+  "   over 2-6 A (force switching starts at 10 A by default, so forces are unchanged here)." \
+  "3. All 648 single points terminate normally." > "$W/WP1_CRITERIA.txt"
+
+for sw in default noswitch; do
+  while read -r name e1 p1 r1 e2 p2 r2 mult; do
+    D="$W/$sw/$name"
+    mkdir -p "$D" && cd "$D" || exit 1
+    printf '%s\n' '$fftype' 'AMBER' '$atoms' '2 1 4' > pair.ORCAFF.prms
+    awk -v e1="$e1" -v p1="$p1" -v r1="$r1" -v e2="$e2" -v p2="$p2" -v r2="$r2" 'BEGIN{
+      printf "%6d   %-3s %12.6f %12.6f %12.6f %12.6f %12.6f\n", 1, e1, 0, p1, r1, p1/2, r1
+      printf "%6d   %-3s %12.6f %12.6f %12.6f %12.6f %12.6f\n", 2, e2, 0, p2, r2, p2/2, r2}' >> pair.ORCAFF.prms
+    printf '%s\n' '$bonds' '0 2 2' '$angles' '0 3 2' '$dihedrals' '0 4 3' >> pair.ORCAFF.prms
+    while read -r r; do
+      b="sp_$r"
+      {
+        printf '%s\n' '! MM' '%mm' '  ORCAFFFilename "pair.ORCAFF.prms"'
+        if [ "$sw" = noswitch ]; then printf '%s\n' '  SwitchForceLJ false'; fi
+        printf '%s\n' 'end' "* xyz 0 $mult"
+        printf '%s 0.0 0.0 0.0\n' "$e1"
+        printf '%s %s 0.0 0.0\n' "$e2" "$r"
+        printf '%s\n' '*'
+      } > "$b.inp"
+      "$ORCA" "$b.inp" > "$b.out" 2>&1
+    done < "$W/distances.txt"
+    cd "$W" || exit 1
+  done < "$W/pairs.txt"
+done
+
+echo "end=$(date)"
+n=$(find "$W" -name 'sp_*.out' | wc -l)
+ok=$(grep -l 'ORCA TERMINATED NORMALLY' $(find "$W" -name 'sp_*.out') | wc -l)
+echo "single points: $n written, $ok terminated normally (expected 648)"
+echo "== format sample: default/NaOc/sp_3.00.out, energy lines"
+grep -n -i -E 'energy|LJ|vdw|van der' "$W/default/NaOc/sp_3.00.out" | head -30
+echo "== the prms file ORCA read for NaOc"
+cat "$W/default/NaOc/pair.ORCAFF.prms"
