@@ -32,8 +32,8 @@ Measured per-atom deviation after a whole-molecule fit across the post-cut frame
 
 Fitting on all 24 atoms lets the rotating carboxylates drag the superposition, which
 moves the reacting centre for no good reason. The default alignment set is therefore the
-RIGID CORE: the ring carbons, the ether oxygen and the atoms directly bonded into the
-ring. Pass align_set=all to fit on everything instead and compare.
+RIGID CORE: the six ring carbons (8 10 12 13 15 17), the ether oxygen O3 (7) and C2 (3),
+the enol-pyruvyl carbon bonded to O3. Pass align_set=all to fit on everything instead and compare.
 
 THE TRANSFORM IS DERIVED ONCE PER FRAME AND APPLIED TO EVERY STATE
 The rotation and translation are computed from the REACTANT geometry and then applied
@@ -62,7 +62,7 @@ CONFIG = {
 #   0:C 1:H 2:H 3:C 4:C 5:O 6:O 7:O 8:C 9:H 10:C 11:H 12:C 13:C 14:H 15:C 16:H
 #   17:C 18:H 19:O 20:H 21:C 22:O 23:O
 # Index 7 is the ether oxygen O3, the atom the design targets.
-CORE = [3, 7, 8, 10, 12, 13, 15, 17]        # ring carbons plus the ether oxygen
+CORE = [3, 7, 8, 10, 12, 13, 15, 17]        # six ring carbons (8 10 12 13 15 17), O3 (7), C2 (3)
 CARBOXYLATE_O = [5, 6, 22, 23]              # free to rotate; excluded from the fit
 
 SRC_STATE = {"R": "reactant_qm.xyz",
@@ -135,7 +135,7 @@ def main():
 
     if cfg["align_set"] == "core":
         idx = CORE
-        what = "rigid core: ring carbons and the ether oxygen"
+        what = "rigid core: the six ring carbons, the ether oxygen O3 and C2 (index 3)"
     elif cfg["align_set"] == "heavy":
         idx = [i for i, e in enumerate(ref_els) if e.upper() != "H"]
         what = "all heavy atoms"

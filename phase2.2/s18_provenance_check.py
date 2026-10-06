@@ -186,8 +186,10 @@ def main():
     art = OrderedDict()
     art["12 frame rst7"] = lambda f: SEL / "frames" / "frame_{}_CHA2.rst7".format(f)
     art["12 frame qmatoms"] = lambda f: SEL / "frames" / "frame_{}_CHA2.qmatoms".format(f)
-    art["19h reactant_opt.inp"] = lambda f: HAR / "frame_{}".format(f) / "reactant_opt.inp"
-    art["19h reactant_qm.xyz"] = lambda f: HAR / "frame_{}".format(f) / "reactant_qm.xyz"
+    E19 = Q / "19_ensemble"
+    art["19e reactant_opt.inp"] = lambda f: E19 / "frame_{}".format(f) / "reactant_opt.inp"
+    art["19e scan/targets.txt"] = lambda f: E19 / "frame_{}".format(f) / "scan" / "targets.txt"
+    art["19e neb.out.xz"] = lambda f: E19 / "frame_{}".format(f) / "neb.out.xz"
     art["19 neb.inp"] = lambda f: ENS / "frame_{}".format(f) / "neb.inp"
     art["19 path_summary.txt"] = lambda f: ENS / "frame_{}".format(f) / "path_summary.txt"
     for s, long in STATES.items():
@@ -216,10 +218,11 @@ def main():
     for name, n in gaps:
         if name not in needed:
             say("GAP", "{} not committed for {} of {} post-cut frames".format(name, n, len(post)))
-    say("GAP", "no per-frame scan inputs or outputs are committed for any ensemble frame. "
-        "The scan restraint (run_scan.sh: harmonic colvar restraints, SPRING in kJ/mol/A^2; "
-        "2500 now, 400 for the pilot frames per the phase2.2 README) cannot be verified per "
-        "frame from the repository")
+    nsc = [f for f in post + pilot if len(list((E19 / "frame_{}".format(f) / "scan").glob("scan_*.inp"))) != 20]
+    say("PASS" if not nsc else "GAP", "per-frame scan inputs (20 windows) committed in 05_qmmm/19_ensemble for "
+        "all {} frames {}; restraints are checked by s18b_pipeline_check.py".format(len(post + pilot), nsc or ""))
+    say("INFO", "05_qmmm/19_ensemble_harvest is the older pilot-only harvest; 05_qmmm/19_ensemble now holds "
+        "every frame's full pipeline")
     say("INFO", "frame 08170 (pilot) has no TS geometry anywhere: 19 and 20 both lack it")
 
     # ============================================================== 3 inputs
@@ -497,8 +500,7 @@ def main():
         core = [int(x) for x in re.search(r"^CORE = \[([^\]]*)\]", s16, re.M).group(1).split(",")]
         ring = {8, 10, 12, 13, 15, 17}
         say("PASS" if set(core) == ring | {3, 7} else "FAIL",
-            "s16 CORE {} = ring carbons {} + O3 (7) + C2 (3); its comment calls it "
-            "'ring carbons plus the ether oxygen'".format(core, sorted(ring)))
+            "s16 CORE {} = ring carbons {} + O3 (7) + C2 (3)".format(core, sorted(ring)))
         for name in ("s11_probe_distance_scan.py", "s13_lj_charge_site_test.sh"):
             t = read(C / "phase2.2" / name)
             say("INFO", "{} refers to O3 as index 7: {}".format(

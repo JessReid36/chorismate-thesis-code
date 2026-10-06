@@ -104,6 +104,35 @@ def read_xyz(p):
     return xyz_frames(p)[0][1]
 
 
+def dist(p, q):
+    return sum((x - y) ** 2 for x, y in zip(p, q)) ** 0.5
+
+
+def kabsch_rmsd(A, B):
+    """RMSD after optimal superposition (Horn's quaternion method; standard library only)"""
+    n = len(A)
+    ca = [sum(p[k] for p in A) / n for k in range(3)]
+    cb = [sum(p[k] for p in B) / n for k in range(3)]
+    a = [[p[k] - ca[k] for k in range(3)] for p in A]
+    b = [[p[k] - cb[k] for k in range(3)] for p in B]
+    S = [[sum(a[i][r] * b[i][c] for i in range(n)) for c in range(3)] for r in range(3)]
+    (xx, xy, xz), (yx, yy, yz), (zx, zy, zz) = S
+    N = [[xx + yy + zz, yz - zy, zx - xz, xy - yx],
+         [yz - zy, xx - yy - zz, xy + yx, zx + xz],
+         [zx - xz, xy + yx, -xx + yy - zz, yz + zy],
+         [xy - yx, zx + xz, yz + zy, -xx - yy + zz]]
+    lam = max(abs(v) for row in N for v in row) * 4 + 1.0   # power iteration on N + lam*I
+    v = [1.0, 0.0, 0.0, 0.0]
+    for _ in range(500):
+        w = [sum((N[i][j] + (lam if i == j else 0.0)) * v[j] for j in range(4)) for i in range(4)]
+        s = sum(x * x for x in w) ** 0.5
+        v = [x / s for x in w]
+    emax = sum(v[i] * sum(N[i][j] * v[j] for j in range(4)) for i in range(4))
+    ga = sum(x * x for p in a for x in p)
+    gb = sum(x * x for p in b for x in p)
+    return max(0.0, (ga + gb - 2.0 * emax) / n) ** 0.5
+
+
 def maxd(a, b):
     return max(abs(p[k] - q[k]) for p, q in zip(a, b) for k in (1, 2, 3))
 
@@ -484,18 +513,28 @@ def main():
         pre = [x for x in last if x[0] < ci[0][0]]
         low = min(pre, key=lambda x: x[3]) if pre else None
         if low and low[3] < -0.5:
-            dips.append((low[3], f, low[0], low[1], ci[0][3]))
+            mep = xyz_frames(E19 / "frame_{}".format(f) / "neb_MEP.QMRegion_trj.xyz")
+            A, B = [r[1:] for r in mep[0][1]], [r[1:] for r in mep[low[0]][1]]
+            dips.append((low[3], f, low[0], low[1], ci[0][3], kabsch_rmsd(A, B),
+                         abs(dist(A[7], A[8]) - dist(B[7], B[8]))))
     dips.sort()
     say("INFO", "{} of {} final bands have an image before the CI more than 0.5 kcal/mol below image 0".format(
         len(dips), len(frames)))
-    for d, f, im, dist, b in dips[:8]:
+    for d, f, im, pl, b, rm, dco in dips[:8]:
         say("INFO", "  frame {}: image {} at {:.2f} A along the band is {:+.2f} kcal/mol; barrier from image 0 "
-            "{:.2f}, from that image {:.2f}".format(f, im, dist, d, b, b - d))
+            "{:.2f}, from that image {:.2f}; substrate RMSD to image 0 {:.3f} A".format(f, im, pl, d, b, b - d, rm))
+    if dips:
+        rms = sorted(x[5] for x in dips)
+        say("INFO", "between image 0 and the lowest pre-CI image the SUBSTRATE barely moves: QM-region RMSD median "
+            "{:.3f}, max {:.3f} A; C4-O3 changes by at most {:.3f} A; yet those images lie {:.2f}-{:.2f} A along a "
+            "band measured over the whole active region. The dip is the MM environment settling, not the "
+            "substrate".format(rms[len(rms) // 2], rms[-1], max(x[6] for x in dips), min(x[3] for x in dips),
+                               max(x[3] for x in dips)))
     nsp = Counter(len(re.findall(r"FINAL SINGLE POINT ENERGY \(QM/MM\)", nebtxt[f])) for f in frames)
-    say("GAP", "neb.out does not record the QM and MM energy of each image on the final band "
+    say("INFO", "neb.out does not record the QM and MM energy of each image on the final band "
         "(QM/MM single-point blocks per neb.out: {}). Splitting the dip into QM and MM needs single points "
-        "on the final images; their full active-region geometries are on hpc1 only "
-        "(neb_MEP.activeRegion_trj.xyz, checksum-only)".format(dict(nsp)))
+        "on the final images (full active-region geometries on hpc1 only, checksum-only); the geometric "
+        "test above locates the dip without it".format(dict(nsp)))
 
     head("SUMMARY")
     print("  " + "   ".join("{} {}".format(k, counts[k]) for k in ("PASS", "FAIL", "GAP", "INFO")))

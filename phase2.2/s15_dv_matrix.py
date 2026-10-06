@@ -55,7 +55,10 @@ import sys
 import math
 from pathlib import Path
 
-ANG2BOHR = 1.8897259886
+ANG2BOHR = 1.8897259886   # older CODATA value; 1/0.529177210903 (CODATA 2018) = 1.8897261246. The
+                           # difference moves a point by about 5e-6 A at these coordinates (checked
+                           # 5 Oct 2026 against the committed s15_dv2 outputs) and is left as it is
+                           # so that A_v2 stays reproducible.
 HARTREE2KCAL = 627.5094740631
 
 # The frame set is READ FROM THE GRID'S OWN HEADER, not hardcoded. s12_build_grid.py
@@ -133,10 +136,17 @@ def prepare(grid_path, work, align_dir=None):
     aligned_dir = Path(align_dir) if align_dir else None
     wrote_per_frame = 0
     if aligned_dir:
+        # Every frame needs its transform. A frame without one would be evaluated on the
+        # grid in ALIGNED coordinates against a density in ORIGINAL coordinates - the
+        # failure that produced A_v1. Stop rather than mix the two.
+        no_tf = [fr for fr in frames_list
+                 if not (aligned_dir / f"frame_{fr}" / "transform.txt").exists()]
+        if no_tf:
+            sys.exit(f"{len(no_tf)} of {len(frames_list)} frames have no transform.txt in "
+                     f"{aligned_dir}: {' '.join(no_tf)}. Rerun s16_align_frames.py for every "
+                     f"frame in the grid header before preparing the a-matrix.")
         for fr in frames_list:
             tf = aligned_dir / f"frame_{fr}" / "transform.txt"
-            if not tf.exists():
-                continue
             M = _np.loadtxt(tf)
             R, tt = M[:3], M[3]
             Q = (P - tt) @ R.T
@@ -145,6 +155,12 @@ def prepare(grid_path, work, align_dir=None):
                 for x, y, z in Q:
                     fh.write(f"{x*ANG2BOHR:.10f} {y*ANG2BOHR:.10f} {z*ANG2BOHR:.10f}\n")
             wrote_per_frame += 1
+    stale = work / "points_bohr.xyz"
+    if wrote_per_frame and stale.exists():
+        # the PBS loop falls back to this file for any frame without its own points file,
+        # so an unaligned copy left over from an earlier run must not survive
+        stale.unlink()
+        print(f"  removed stale {stale.name} from an earlier unaligned run")
     if not wrote_per_frame:
         with open(work / "points_bohr.xyz", "w") as fh:
             fh.write(f"{len(sites)}\n")
