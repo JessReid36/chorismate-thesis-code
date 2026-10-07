@@ -53,7 +53,7 @@ q = [float(l.split()[2]) for l in L[i + 2:i + 2 + 24]]
 S = {}
 for l in open(os.path.join(B, "sites.tsv")).read().splitlines()[1:]:
     f = l.split("\t"); S[f[0]] = (float(f[1]), float(f[2]), float(f[3]), float(f[4]), int(f[5]))
-aff = {k: K * sum(qj / math.dist(X[j], S[k][:3]) for j, qj in enumerate(q)) for k in "CMF"}
+aff = {k: K * sum(qj / math.sqrt(sum((X[j][i] - S[k][i]) ** 2 for i in range(3))) for j, qj in enumerate(q)) for k in "CMF"}
 aq = {"C": aC, "M": aM, "F": aF}
 say("")
 say("site  nearest  beyond12  a_QMMM (kcal/mol/e)  a_vpot      difference   force-field charges (rigid model)")
