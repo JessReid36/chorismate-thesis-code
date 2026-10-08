@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 """
-cs4b_analyse.py - Stage 4b: applies STAGE4B_CRITERIA.txt to phase2.2/cs_stage4b/ (and, for the bare sphere at 2.674 A,
-Stage 4's committed single points in phase2.2/cs_stage4/). Python 3.6, standard library only. Writes STAGE4B_REPORT.txt.
+cs4b_analyse.py - Stage 4b: applies STAGE4B_CRITERIA.txt, as amended by STAGE4B_AMENDMENT1.txt, to
+phase2.2/cs_stage4b/ (and, for the bare sphere at 2.674 A, Stage 4's committed single points in phase2.2/cs_stage4/).
+Python 3.6, standard library only. Writes STAGE4B_REPORT.txt.
+Amendment 1 (Arm B only; criteria and thresholds unchanged): ORCA would not attach the %basis pseudopotential to a
+zero-charge Ne> centre and refuses a Ne> centre without one, so q = 0 comes from B2_inline_<basis>_q0 (or, if that
+did not run, the mean of B2_inline_<basis>_q{p,m}00001), and the check-1 controls are B2_pc_svp_q{p,m}1 (the sphere as
+an external point-charge file, no pseudopotential).
 USAGE  python3 cs4b_analyse.py [phase2.2 folder]
 """
 import os, re, sys
@@ -87,16 +92,33 @@ for q in (0.5, 0.75, 1.0):
     say("     q=%+.2f: %s" % (q, "%.3f A" % min(ds) if ds else "none of the tested distances"))
 # ---------------- Arm B
 say("\nARM B - sphere = coreless ECP centre Ne> with charge q and the Ne-type pseudopotential (Marefat Khah 2020, SI S2)")
-B = {(bt, q): parse(os.path.join(B4, "B_ecp_%s_%s" % (bt, qt), "job.out"), False) for bt in ("svp", "svpd") for q, qt in QS}
-c1 = parse(os.path.join(B4, "B_noecp_svp_qp1", "job.out"), False)
-c2 = parse(os.path.join(B4, "B_noecp_svp_qm1", "job.out"), False)
+B = {(bt, q): parse(os.path.join(B4, "B_ecp_%s_%s" % (bt, qt), "job.out"), False) for bt in ("svp", "svpd") for q, qt in QS if qt != "q0"}
+extra = []                                     # replacement runs used, for check 0
+for bt in ("svp", "svpd"):                     # Amendment 1: q = 0 with the pseudopotential given inline
+    z = parse(os.path.join(B4, "B2_inline_%s_q0" % bt, "job.out"), False)
+    zp = parse(os.path.join(B4, "B2_inline_%s_qp00001" % bt, "job.out"), False)
+    zm = parse(os.path.join(B4, "B2_inline_%s_qm00001" % bt, "job.out"), False)
+    if z is not None:
+        B[bt, 0.0] = z; extra.append(z); src = "B2_inline_%s_q0" % bt
+        if zp is not None and zm is not None:
+            extra += [zp, zm]
+            src += "; the +-0.0001 pair's mean differs by %+.2e Eh" % ((zp["E"] + zm["E"]) / 2 - z["E"])
+    elif zp is not None and zm is not None:
+        z = dict(zp); z["E"] = (zp["E"] + zm["E"]) / 2; B[bt, 0.0] = z; extra += [zp, zm]
+        src = "mean of B2_inline_%s_q+-0.0001 (the q = 0 run did not complete)" % bt
+    else:
+        B[bt, 0.0] = None; src = "missing"
+    say("  q = 0 (%s): %s" % (bt, src))
+c1 = parse(os.path.join(B4, "B2_pc_svp_qp1", "job.out"), False)
+c2 = parse(os.path.join(B4, "B2_pc_svp_qm1", "job.out"), False)
 ci = parse(os.path.join(B4, "B_inline_svp_qp1", "job.out"), False)
-runs = [v for v in B.values()] + [c1, c2, ci]
+runs = [v for v in B.values()] + [c1, c2, ci] + extra
 if any(v is None for v in runs):
-    say("  a run is missing or did not terminate normally -> Arm B not assessable"); 
+    say("  a run is missing or did not terminate normally -> Arm B not assessable")
 else:
     nel = {v["nel"] for v in runs}; nbf = {(k[0], v["nbf"]) for k, v in B.items()}
-    ck0 = nel == {118} and nbf == {("svp", 264), ("svpd", 402)} and c1["nbf"] == c2["nbf"] == ci["nbf"] == 264
+    ck0 = nel == {118} and nbf == {("svp", 264), ("svpd", 402)} and c1["nbf"] == c2["nbf"] == ci["nbf"] == 264 \
+        and {v["nbf"] for v in extra} <= {264, 402}
     say("  check 0 (118 electrons in every run; the centre adds no basis functions: 264 / 402): %s  [NEL %s; basis %s]" % (
         "PASS" if ck0 else "FAIL", sorted(nel), sorted(nbf)))
     ok1 = True
@@ -105,7 +127,7 @@ else:
         dd3 = (c["d3"] or 0.0) - (s4["d3"] or 0.0)
         diff = c["E"] - s4["E"]
         ok1 = ok1 and abs(diff - dd3) <= 1e-6
-        say("  check 1 control (no ECP, %s) vs the QM part of Stage 4's QM/MM energy: %+.2e Eh; dispersion-correction "
+        say("  check 1 control (point-charge file, no ECP, %s) vs the QM part of Stage 4's QM/MM energy: %+.2e Eh; dispersion-correction "
             "difference %+.2e Eh; residual %+.2e Eh" % (qt, diff, dd3, diff - dd3))
     say("  check 1 -> %s" % ("PASS" if ok1 else "FAIL"))
     dinl = ci["E"] - B["svp", 1.0]["E"]
