@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 spa_stage.py - the in-job checks of the stationary-point barriers under SP Amendment 1, the alternating scheme (results
-05_qmmm/24_sp_barriers/SP_AMENDMENT1.txt). Called by the job scripts on hpc1 (job_*.pbs, written by spa_prepare.py)
+05_qmmm/24_sp_barriers/SP_AMENDMENT1.txt), with the cycle limit of SP Amendment 2 (SP_AMENDMENT2.txt, A2.6). Called by the job scripts on hpc1 (job_*.pbs, written by spa_prepare.py)
 before and after each ORCA step. Python 3.6, standard library; deterministic. Every check writes STAGE_RESULT.txt in
 its folder (key=value lines; status=PASS or FAIL; never overwritten) and exits 1 on FAIL, so the job stops and the jobs
 that depend on it (PBS afterok) never start. prep and alt_prep write no record: when they refuse (a folder or start
@@ -29,7 +29,8 @@ substrate atoms alone, environment fixed; OptTS with an exact substrate Hessian 
                             most 0.10 kcal/mol, the core energy changed by at most 0.10 kcal/mol from cycle K-1, and no
                             substrate atom moved more than 0.02 A between the two cycles' core geometries. Then
                             STEP/final.xyz = cycle K's core.xyz and STEP/STAGE_RESULT.txt is PASS (exit 0). Not yet: exit
-                            3. Not converged after 8 cycles: FAIL (exit 1)
+                            3. Not converged after KMAX = 20 cycles: FAIL (exit 1). (SP Amendment 2 A2.6; Amendment 1
+                            had 8; the convergence test is unchanged.)
   alt_fail RD STEP REASON   records a failed cycle as the step's FAIL
   check_freq RD STEP KIND   partial-Hessian frequencies (24 substrate atoms displaced): counted imaginary modes
                             (|nu| >= 20 cm-1): exactly 1 for KIND ts, 0 for KIND min
@@ -48,7 +49,8 @@ R_BRK_MAX, R_FRM_MIN = 1.80, 2.40
 IMAG_MIN = 20.0              # cm-1
 MOVE_TOL = 2e-6              # A
 H = 627.5094740631
-KMAX = 8                     # cycles (Zhang, Liu & Yang 2000: "no more than eight cycles")
+KMAX = 20                    # cycles: SP_AMENDMENT2.txt A2.6 (Amendment 1 had 8, from Zhang, Liu & Yang 2000's observed
+                             # "no more than eight cycles", which was a count, not a limit)
 ALT_DE = 0.10                # kcal/mol
 ALT_DX = 0.02                # A
 PLATEAU_EH, PLATEAU_N = 2.5e-4, 50

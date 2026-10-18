@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 spa_prepare.py - inputs of the stationary-point barriers under SP Amendment 1, the alternating scheme (results
-05_qmmm/24_sp_barriers/SP_AMENDMENT1.txt; everything not changed there is SP_PLAN.txt). RUN ON hpc1 (login node; builds
+05_qmmm/24_sp_barriers/SP_AMENDMENT1.txt; everything not changed there is SP_PLAN.txt), with the cycle limit of SP
+Amendment 2 (SP_AMENDMENT2.txt A2.6: 20 cycles; Amendment 1 had 8). RUN ON hpc1 (login node; builds
 inputs only, runs no QM). Python 3.6, standard library; deterministic (no dates, no random). It is sp_prepare.py with
 the four optimisations (ts, r_irc, p_irc, r0) replaced by alternations; regions and start files are made exactly as
 sp_prepare.py makes them.
@@ -264,10 +265,10 @@ finish_step() {{   # folder, ORCA basename, 1 if the step passed its checks: siz
   fi
   du -sk . | awk '{{print "folder_kB_after_cleanup=" $1}}'
 }}
-alternate() {{   # step, GB of free disk needed per part: cycles K = 1..8 of environment step then core step, until
-                # spa_stage.py alt_decide finds the alternation converged (exit 0) or not converged after cycle 8 (exit 1)
+alternate() {{   # step, GB of free disk needed per part: cycles K = 1..20 of environment step then core step, until
+                # spa_stage.py alt_decide finds the alternation converged (exit 0) or not converged after cycle 20 (exit 1)
   local S=$1 K P C rc
-  for K in 1 2 3 4 5 6 7 8; do
+  for K in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
     for P in env core; do
       C=$(printf "c%02d_%s" "$K" "$P")
       PY alt_prep "$RD" "$S" "$K" "$P" || {{ echo "SP_${{S}}_FAIL alt_prep $S/$C"; quit 1; }}
@@ -280,7 +281,7 @@ alternate() {{   # step, GB of free disk needed per part: cycles K = 1..8 of env
     [[ $rc == 0 ]] && {{ echo "SP_${{S}}_PASS"; return 0; }}
     [[ $rc == 3 ]] || {{ echo "SP_${{S}}_FAIL"; quit 1; }}
   done
-  echo "SP_${{S}}_FAIL no decision after cycle 8"; quit 1
+  echo "SP_${{S}}_FAIL no decision after cycle 20"; quit 1
 }}
 echo "job={job} host=$(hostname) start=$(date)"
 """

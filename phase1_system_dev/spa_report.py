@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """
 spa_report.py - read-only report of the stationary-point barriers under SP Amendment 1, the alternating scheme (results
-05_qmmm/24_sp_barriers/SP_AMENDMENT1.txt and SP_PLAN.txt). Runs on hpc1 or on a fetched copy. Python 3.6, standard
+05_qmmm/24_sp_barriers/SP_AMENDMENT1.txt and SP_PLAN.txt), reading up to SP Amendment 2's 20 cycles (A2.6). Runs on hpc1 or on a fetched copy. Python 3.6, standard
 library; deterministic; writes nothing.
 
   spa_report.py RD [RD ...]       per run folder (f<FRAME>_r<R>[_ci]_a1): every job, every step, every alternation
                                   cycle, and the quantities of SP_PLAN.txt
-  spa_report.py smoke SD FRAME    the region rule (SP_AMENDMENT1.txt) on SD/f<FRAME>_r8_a1 and SD/f<FRAME>_r6_a1
+  spa_report.py smoke SD FRAME    the region rule (SP_AMENDMENT1.txt) on SD/f<FRAME>_r8_a1 and SD/f<FRAME>_r6_a1; it is
+                                  Amendment 1's rule, which smoke test 2 decided, and its text keeps Amendment 1's
+                                  8 cycles (SP_AMENDMENT2.txt A2.6); not for the package
 
 Energies are re-read from the ORCA outputs (.out or .out.xz) and must equal the in-job records (STAGE_RESULT.txt);
 any difference is printed as PROBLEM. kcal/mol = Eh x 627.5094740631.
@@ -16,7 +18,7 @@ import os, re, subprocess, sys
 H = 627.5094740631
 QM0, NQM = 6207, 24
 QMS = list(range(QM0, QM0 + NQM))
-KMAX = 8
+KMAX = 20                    # SP_AMENDMENT2.txt A2.6 (Amendment 1: 8); the smoke verdict below is Amendment 1's
 STEPS = ["ts", "ts_freq", "irc", "r_irc", "r_irc_freq", "p_irc", "p_irc_freq", "r0", "r0_freq"]
 BASE = {"ts_freq": "freq", "irc": "irc", "r_irc_freq": "freq", "p_irc_freq": "freq", "r0_freq": "freq"}
 JOBS = [("job_ts", ["ts"]), ("job_ts_freq_irc", ["ts_freq", "irc"]), ("job_r_irc", ["r_irc"]),
