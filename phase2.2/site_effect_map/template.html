@@ -1,0 +1,517 @@
+<title>Chorismate Site Effect Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a two-row lab figure. Each row pairs a 3D map (where) with a ranked plot (how much), on quiet paper-grey. */
+:root {
+  --bg: #f4f6f4;
+  --surface: #ffffff;
+  --ink: #1b221e;
+  --muted: #59645d;
+  --rule: #dce2de;
+  --accent: #1f5c58;
+  --band: rgba(31, 92, 88, 0.14);
+  --zone: rgba(31, 92, 88, 0.06);
+  --atom-c: #4a524d;
+  --atom-h: #b9c0bb;
+  --atom-o: #3d6fb0;
+  --atom-n: #2a8c8c;
+  --bond: #7b847e;
+  --pin: #7a3fd0;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111513; --surface: #181d1a; --ink: #e4eae6; --muted: #9aa59e; --rule: #2a322d;
+    --accent: #7cc2ba; --band: rgba(124, 194, 186, 0.16); --zone: rgba(124, 194, 186, 0.07);
+    --atom-c: #aab3ad; --atom-h: #5d665f; --atom-o: #7fa6e0; --atom-n: #6cc6c0; --bond: #8a948d; --pin: #b48cff;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111513; --surface: #181d1a; --ink: #e4eae6; --muted: #9aa59e; --rule: #2a322d;
+  --accent: #7cc2ba; --band: rgba(124, 194, 186, 0.16); --zone: rgba(124, 194, 186, 0.07);
+  --atom-c: #aab3ad; --atom-h: #5d665f; --atom-o: #7fa6e0; --atom-n: #6cc6c0; --bond: #8a948d; --pin: #b48cff;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 40px;
+}
+.wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: 22px; }
+header { display: grid; gap: 8px; }
+.eyebrow { font-family: var(--font-data); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+h1 { margin: 0; font-size: clamp(22px, 3.2vw, 30px); font-weight: 600; line-height: 1.2; text-wrap: balance; }
+.lede { margin: 0; max-width: 72ch; color: var(--muted); }
+.lede b { color: var(--ink); font-weight: 500; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; padding: 10px 14px; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; }
+.ctl { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ctl-label { font-size: 13px; color: var(--muted); }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.seg button { font: 500 13px var(--font-body); color: var(--ink); background: transparent; border: 0; padding: 6px 12px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--rule); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+.seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.symkey { font-size: 13px; color: var(--muted); display: inline-flex; gap: 6px; align-items: center; }
+.sym { color: var(--ink); font-size: 12px; }
+.reset { font: 500 13px var(--font-body); color: var(--accent); background: transparent; border: 1px solid var(--rule); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+.reset:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.facts .ser { font-family: var(--font-data); color: var(--ink); font-weight: 500; }
+.facts .fline { display: flex; flex-wrap: wrap; gap: 4px 18px; width: 100%; justify-content: flex-end; }
+.reskey { display: inline-flex; gap: 6px; align-items: center; }
+.nw { white-space: nowrap; }
+.rk { display: inline-flex; align-items: center; gap: 3px; font-family: var(--font-data); font-size: 11px; color: var(--ink); }
+.rk i { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+.legend { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.ramp { width: 180px; height: 12px; border-radius: 3px; background: linear-gradient(90deg, #9fd39a 0%, #e4cb52 38%, #e47d2e 68%, #a3231c 100%); }
+.ramp-ticks { display: flex; justify-content: space-between; width: 180px; font-family: var(--font-data); font-size: 11px; }
+.legend-scale { display: grid; gap: 2px; }
+section.row { display: grid; gap: 12px; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; }
+.row-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 18px; }
+.row-head h2 { margin: 0; font-size: 18px; font-weight: 600; }
+.facts { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 13px; color: var(--muted); }
+.facts span b { font-family: var(--font-data); font-weight: 500; color: var(--ink); }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.panel { min-width: 0; display: grid; gap: 4px; }
+.panel-cap { font-size: 12.5px; color: var(--muted); }
+.plot { width: 100%; height: 440px; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); }
+.pick { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: 13px; color: var(--muted); padding: 8px 10px; border: 1px dashed var(--rule); border-radius: 6px; }
+.pick b { font-family: var(--font-data); font-weight: 500; color: var(--ink); }
+.pick-clear { font: 500 12.5px var(--font-body); color: var(--accent); background: transparent; border: 1px solid var(--rule); border-radius: 5px; padding: 3px 10px; cursor: pointer; }
+.pick-clear:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.notes { display: grid; gap: 6px; font-size: 13px; color: var(--muted); max-width: 90ch; }
+.notes p { margin: 0; }
+.notes ul { margin: 0; padding-left: 20px; display: grid; gap: 2px; }
+code { font-family: var(--font-data); font-size: 12px; overflow-wrap: anywhere; }
+@media (max-width: 820px) {
+  .pair { grid-template-columns: 1fr; }
+  .plot { height: 380px; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Phase 2.2 · development set · exploratory</div>
+    <h1>Where a <span class="qlabel">+1</span> sphere lowers or raises the barrier</h1>
+    <p class="lede">Each point is a sphere centre on the development grid. Its colour and size give the first-order change in barrier for a <b><span class="qlabel">+1</span> e</b> sphere at that site, <b>q × a</b> with <b>a = V<sub>TS</sub> − V<sub>R</sub></b>, averaged over the 30 Phase 1 band frames. Green means close to no effect, red means a large effect. All coordinates are the real ones, in the common aligned frame.</p>
+  </header>
+
+  <div class="controls" role="group" aria-label="View settings">
+    <div class="ctl"><span class="ctl-label" id="lbl-q">Sphere charge</span>
+      <div class="seg" role="group" aria-labelledby="lbl-q">
+        <button type="button" id="q-pos" aria-pressed="true">+1 e</button><button type="button" id="q-neg" aria-pressed="false">−1 e</button><button type="button" id="q-both" aria-pressed="false">Both</button>
+      </div>
+      <span class="symkey" aria-label="Marker shapes"><span class="sym">●</span> +1 e <span class="sym">◆</span> −1 e</span></div>
+    <div class="ctl"><span class="ctl-label" id="lbl-geom">Substrate shown</span>
+      <div class="seg" role="group" aria-labelledby="lbl-geom">
+        <button type="button" id="g-R" aria-pressed="true">Reactant</button><button type="button" id="g-TS" aria-pressed="false">Transition state</button>
+      </div></div>
+    <div class="ctl"><span class="ctl-label" id="lbl-lay">Layer</span>
+      <div class="seg" role="group" aria-labelledby="lbl-lay">
+        <button type="button" id="l-both" aria-pressed="true">Both</button><button type="button" id="l-cat" aria-pressed="false">Cation layer</button><button type="button" id="l-an" aria-pressed="false">Anion/neutral layer</button>
+      </div></div>
+    <div class="ctl"><span class="ctl-label" id="lbl-set">Spheres</span>
+      <div class="seg" role="group" aria-labelledby="lbl-set">
+        <button type="button" id="s-all" aria-pressed="true">All sites</button><button type="button" id="s-50" aria-pressed="false">Strongest 50</button>
+      </div></div>
+    <div class="ctl"><span class="ctl-label" id="lbl-res">Enzyme residues</span>
+      <div class="seg" role="group" aria-labelledby="lbl-res">
+        <button type="button" id="r-on" aria-pressed="true">Show</button><button type="button" id="r-off" aria-pressed="false">Hide</button>
+      </div>
+      <span class="symkey" aria-label="Residue colour: literature rank of catalytic importance, 1 most to 6 least"><span class="nw">catalytic rank, 1 = most</span> <span class="reskey" id="res-key"></span></span>
+      </div>
+    <button type="button" class="reset" id="reset-view">Reset 3D view</button>
+    <div class="legend" aria-label="Colour scale">
+      <span>|change in barrier|, kcal/mol</span>
+      <div class="legend-scale"><div class="ramp" role="img" aria-label="green at 0, yellow, orange, red at 7.5"></div>
+        <div class="ramp-ticks"><span>0</span><span>2.5</span><span>5</span><span>7.5</span></div></div>
+    </div>
+  </div>
+
+  <section class="row" aria-labelledby="h-low">
+    <div class="row-head">
+      <h2 id="h-low">Spheres that lower the barrier</h2>
+      <div class="facts" id="facts-low"></div>
+    </div>
+    <div class="pair">
+      <div class="panel"><div id="p3-low" class="plot" role="img" aria-label="3D map of sites where the sphere lowers the barrier"></div>
+        <div class="panel-cap">Drag to rotate, scroll to zoom. The two 3D views turn together and share one box, so the molecule sits in the same place at the same scale in every view. "Reset 3D view" returns both to the starting view.</div></div>
+      <div class="panel"><div id="pr-low" class="plot" role="img" aria-label="Ranked change in barrier for those sites"></div>
+        <div class="panel-cap">Sites ranked strongest first. The band is ±1 standard deviation across the 30 frames. Hover a point for its values; click it to colour that site purple in 3D.</div></div>
+    </div>
+    <div class="pick" id="pick-low"><span class="pick-text">No site pinned. Click a point in either chart: it turns purple in 3D and is ringed in the ranking.</span><button type="button" class="pick-clear" id="clear-low" hidden>Clear</button></div>
+  </section>
+
+  <section class="row" aria-labelledby="h-high">
+    <div class="row-head">
+      <h2 id="h-high">Spheres that raise the barrier</h2>
+      <div class="facts" id="facts-high"></div>
+    </div>
+    <div class="pair">
+      <div class="panel"><div id="p3-high" class="plot" role="img" aria-label="3D map of sites where the sphere raises the barrier"></div>
+        <div class="panel-cap">Oxygens are drawn blue so that red stays reserved for large effects.</div></div>
+      <div class="panel"><div id="pr-high" class="plot" role="img" aria-label="Ranked change in barrier for those sites"></div>
+        <div class="panel-cap">Sites ranked strongest first, with the same ±1 sd band. Both ranking charts use the same axes and scale, mirrored about zero. Click a point to colour that site purple in 3D.</div></div>
+    </div>
+    <div class="pick" id="pick-high"><span class="pick-text">No site pinned. Click a point in either chart: it turns purple in 3D and is ringed in the ranking.</span><button type="button" class="pick-clear" id="clear-high" hidden>Clear</button></div>
+  </section>
+
+  <div class="notes">
+    <p><b>Why there are two layers.</b> The substrate carries a charge of −2, so a sphere's charge decides how close it can sit.</p>
+    <ul>
+      <li>A <b>+1 sphere</b> is pulled in. In Stage 2's free tests, +1 spheres came to rest closer than plain touching distance, about 2.75 Å from O3. The <b>cation layer</b> sits at those measured closest distances, and only positive spheres may use it.</li>
+      <li>A <b>−1 sphere</b> is pushed away. In Stage 2 none stayed anywhere, so it can get no closer than touching distance (Lennard-Jones contact). The <b>anion/neutral layer</b> sits there, and any charge may use it, because farther out is always allowed. That is why +1 spheres also appear on it.</li>
+      <li><b>Beside the OH hydrogen (H8)</b> it is the other way round. H8 is slightly positive, so a −1 sphere may come in to 2.33 Å, while a +1 sphere stays about 3.7 Å away. There the cation-layer sites lie outside the anion/neutral layer. Since Stage 5 Amendment 2 they admit +1 only, so negative and neutral spheres sit at touching distance everywhere, H8 included.</li>
+    </ul>
+    <p>One layer would have put either charge in the wrong place: positive spheres held farther out than they really come, or negative spheres closer than any ever gets. A design built on impossible contacts would fall apart when the molecule relaxes.</p>
+    <p><b>What is plotted.</b> Only the sites that admit the chosen charge are shown, from the amended development grid <code>cs_stage5/exploratory/dev_sites_a2.tsv</code> (Stage 5 Amendment 2):</p>
+    <ul>
+      <li><b>+1 e:</b> 2552 sites. The 217 anion/neutral-layer sites beside H8 admit no positive charge.</li>
+      <li><b>−1 e:</b> 1541 sites, all on the anion/neutral layer (Stage 5 Amendment 2: charges ≤ 0 only there).</li>
+    </ul>
+    <p><b>Both</b> overlays the two: +1 e spheres as circles, −1 e as diamonds, each ranked within its own charge. Sites on the anion/neutral layer admit both charges. Because the two effects are equal and opposite, such a site appears in one row for +1 and in the other row for −1.</p>
+    <p>Values come from <code>dev_A/A_dev.tsv</code> (results 6edfbb1). Each is the first-order electrostatic change at frozen geometry, so a −1 sphere has exactly the opposite effect of a +1 sphere at the same place. The steric term L and polarisation are not included.</p>
+    <p><b>Negative spheres.</b> No negative sphere found a resting place in Stage 2. The −1 positions are therefore Lennard-Jones contact, or 2.331 Å at H8, and a sphere would have to be held there. Net-negative arrangements also push the dianion's highest occupied orbital up (Stage 4c).</p>
+    <p><b>Molecule.</b> Frame 20000, the alignment reference, at its reactant or transition state. In the transition state, the dashed lines mark the bond that breaks, O3–C4 (2.08 Å), and the one that forms, C1–C6 (2.44 Å). The grid encloses R, TS and P of all 30 frames, so some spheres sit off this one frame's surface.</p>
+    <p><b>Markers</b> mark sphere centres only. A real sphere is 1.824 Å in radius and is not drawn to scale. This is a development-set picture for building the optimiser, not a result.</p>
+    <p><b>Enzyme residues</b> (switch with "Enzyme residues"). These are the six charged active-site residues that Stage 4d analyses after Szefczyk et al. (2004): Arg90, Arg7, Glu78 and Arg116 of chain B, and Arg63′ and Lys60′ of chain A (′ marks the other subunit). They are taken exactly as the substrate is: frame 20000, at its reactant (NEB image 0) or transition state (the climbing image) as chosen under "Substrate shown", from the same NEB structures, placed with the same alignment transform. Each side chain is drawn from CA outwards with its hydrogens, in the substrate's colours; nitrogen is teal.</p>
+    <ul>
+      <li><b>Source.</b> <code>05_qmmm/19_ensemble/frame_20000/neb_MEP.activeRegion_trj.xyz.xz</code> (image 0) and <code>neb_NEB-CI_converged.activeRegion.xyz.xz</code> (results 9880ac3, brought down by x89): the optimised region ORCA wrote alongside the substrate files. In all 30 frames, the substrate inside them, placed with the frame's transform, equals the aligned substrate to within 1×10⁻⁸ Å.</li>
+      <li><b>Hover</b> an atom for its name. The charge centre (CZ for arginine, NZ for lysine, CD for glutamate) also shows how far it moves from R to TS and how much it varies across the 30 frames.</li>
+      <li><b>Colour.</b> Each residue's carbons and sticks are coloured by its rank in the literature for catalytic importance, red (1, most) to green (6, least), on the page's ramp. The rank is also shown in each label. It follows Szefczyk et al. (2004, Table 1), who order the residues by MP2 differential transition-state stabilisation: Arg90 −9.06, Arg7 −5.90, Glu78 −3.57, Arg116 −2.45, Arg63 −1.40, Lys60 +1.39 kcal/mol (Lys60 raises the barrier). Claeyssens et al. (2011, Table 3; 16 B3LYP QM/MM pathways) give the same order for the five they report (Arg90 6.0, Arg7 3.1, Glu78 2.1, Arg116 1.0, Arg63 −0.6 kcal/mol of transition-state stabilisation).
+        <ul>
+          <li>Glu78's contribution depends strongly on the hydroxyl's orientation and distance: −8.70 to +7.33 kcal/mol in Szefczyk's Tables 2–3.</li>
+          <li>Arg63's sign changes between theory levels in Szefczyk's Table 1, and on average it slightly destabilises the transition state in Claeyssens'.</li>
+          <li>At the simplest electrostatic levels Arg7 edges out Arg90.</li>
+          <li>This is the literature's ranking, not this project's: Stage 4d at frame 41786 differs in sign for Arg7 and Arg116.</li>
+        </ul></li>
+      <li><b>What they are not.</b> These are the enzyme's own residues, shown for orientation. They are not grid sites.</li>
+    </ul>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script type="application/json" id="data">__DATA__</script>
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById("data").textContent);
+  const N = D.names, EL = D.el;
+  const CMAX = 7.5;
+  const SCALE = [[0, "#9fd39a"], [0.38, "#e4cb52"], [0.68, "#e47d2e"], [1, "#a3231c"]];
+  const SYM3 = { "1": "circle", "-1": "diamond" }, SYM2 = { "1": "circle", "-1": "diamond" };
+  const QTXT = { "1": "+1", "-1": "−1" };
+  // site row: [id, cationLayer, x, y, z, mean a, sd, min, max, nearestAtomIndex, nearestDist, qMinPos, sign of the unrounded mean a, admits -1]
+  const S = D.sites.map(r => ({ id: r[0], cat: r[1], x: r[2], y: r[3], z: r[4], m: r[5], sd: r[6], lo: r[7], hi: r[8], na: r[9], nd: r[10], qp: r[11], sg: r[12], neg: r[13] }));
+  const state = { geom: "R", top: false, mode: "pos", layer: "both", res: true };
+  const RES = D.res;   // the six charged active-site residues, side chains at frame 20000's reactant (R) and transition state (TS)
+
+  // Fixed frames of reference: the same 3D box, home view and ranking axes in every view and every charge.
+  // The residues count towards the box whether shown or not, so switching them on or off never moves the view.
+  const allPts = S.map(s => [s.x, s.y, s.z]).concat(D.R, D.TS, ...RES.map(r => r.R), ...RES.map(r => r.TS));
+  const box = [0, 1, 2].map(k => { const v = allPts.map(p => p[k]); return [Math.min(...v) - 1, Math.max(...v) + 1]; });
+  const span = box.map(b => b[1] - b[0]), smax = Math.max(...span);
+  const HOME = { eye: { x: 1.35, y: 1.35, z: 0.9 }, up: { x: 0, y: 0, z: 1 }, center: { x: 0, y: 0, z: 0 } };
+  let camera = JSON.parse(JSON.stringify(HOME));
+  const XMAX = Math.log10(1400);
+  const YR = { low: [-11, 3], high: [-3, 11] };
+
+  // series: one per charge shown; each item carries its charge, its effect e = q*a and its rank within its series
+  const groups = { low: [], high: [] };
+  function series(q) {
+    const inLayer = s => state.layer === "both" || (state.layer === "cat" ? s.cat === 1 : s.cat === 0);
+    const v = S.filter(s => (q > 0 ? s.qp !== "none" : s.neg === 1) && inLayer(s)).map(s => Object.assign({}, s,
+      { q: q, key: q + "|" + s.id, e: q * s.m, elo: q > 0 ? s.lo : -s.hi, ehi: q > 0 ? s.hi : -s.lo, esg: q * s.sg }));
+    const low = v.filter(s => s.esg < 0).sort((a, b) => a.e - b.e);
+    const high = v.filter(s => s.esg > 0).sort((a, b) => b.e - a.e);
+    low.forEach((s, i) => { s.rank = i + 1; s.of = low.length; });
+    high.forEach((s, i) => { s.rank = i + 1; s.of = high.length; });
+    return { q: q, low: low, high: high };
+  }
+  function buildGroups() {
+    const qs = state.mode === "pos" ? [1] : state.mode === "neg" ? [-1] : [1, -1];
+    const ser = qs.map(series);
+    groups.low = ser.map(s => ({ q: s.q, items: s.low }));
+    groups.high = ser.map(s => ({ q: s.q, items: s.high }));
+  }
+  buildGroups();
+  function findItem(key, k) { for (const g of groups[key]) { const s = g.items.find(it => it.key === k); if (s) return s; } }
+
+  function tok(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function count(arr, f) { const c = {}; arr.forEach(s => { const k = f(s); c[k] = (c[k] || 0) + 1; }); return Object.entries(c).sort((a, b) => b[1] - a[1]); }
+  function median(a) { const b = a.slice().sort((x, y) => x - y); const n = b.length; return n % 2 ? b[(n - 1) / 2] : (b[n / 2 - 1] + b[n / 2]) / 2; }
+
+  function facts(key) {
+    const sign = key === "low" ? "" : "+";
+    document.getElementById("facts-" + key).innerHTML = groups[key].map(g => {
+      const it = g.items, s0 = it[0];
+      if (!s0) return "<div class=\"fline\"><span class=\"ser\">" + (g.q > 0 ? "● " : "◆ ") + QTXT[g.q] + " e</span><span>no sites on this layer</span></div>";
+      const near = count(it.slice(0, 50), s => N[s.na]).map(([k, v]) => v + " " + k).join(", ");
+      return "<div class=\"fline\"><span class=\"ser\">" + (g.q > 0 ? "● " : "◆ ") + QTXT[g.q] + " e</span>" +
+        "<span><b>" + it.length + "</b> sites</span>" +
+        "<span>strongest <b>" + sign + s0.e.toFixed(2) + "</b> kcal/mol, " + s0.nd.toFixed(2) + " Å from " + N[s0.na] + "</span>" +
+        "<span>strongest 50 nearest to: <b>" + near + "</b></span>" +
+        "<span>median sd across frames <b>" + median(it.map(s => s.sd)).toFixed(2) + "</b></span></div>";
+    }).join("");
+  }
+
+  function hoverSite(s) {
+    return QTXT[s.q] + " e sphere at site " + s.id + " (" + (s.cat ? "cation" : "anion/neutral") + " layer)<br>" +
+      "mean " + (s.e > 0 ? "+" : "") + s.e.toFixed(2) + " kcal/mol, sd " + s.sd.toFixed(2) + "<br>" +
+      "30 frames: " + s.elo.toFixed(2) + " to " + s.ehi.toFixed(2) + "<br>" +
+      "nearest " + N[s.na] + " at " + s.nd.toFixed(2) + " Å" + (s.q > 0 && s.qp !== "0.00" ? "<br>admits q ≥ +" + s.qp : "");
+  }
+
+  function moleculeTraces() {
+    const X = D[state.geom];
+    const bonds = state.geom === "R" ? D.bR : D.bT;
+    const bx = [], by = [], bz = [];
+    bonds.forEach(([i, j]) => { bx.push(X[i][0], X[j][0], null); by.push(X[i][1], X[j][1], null); bz.push(X[i][2], X[j][2], null); });
+    const traces = [{ type: "scatter3d", mode: "lines", x: bx, y: by, z: bz, hoverinfo: "skip", showlegend: false,
+      line: { color: tok("--bond"), width: 6 } }];
+    if (state.geom === "TS") {
+      const px = [], py = [], pz = [];
+      D.breaking.concat(D.forming).forEach(([i, j]) => { px.push(X[i][0], X[j][0], null); py.push(X[i][1], X[j][1], null); pz.push(X[i][2], X[j][2], null); });
+      traces.push({ type: "scatter3d", mode: "lines", x: px, y: py, z: pz, hoverinfo: "skip", showlegend: false,
+        line: { color: tok("--bond"), width: 4, dash: "dash" } });
+    }
+    const col = atomColours(), size = ASIZE;
+    traces.push({ type: "scatter3d", mode: "markers", x: X.map(p => p[0]), y: X.map(p => p[1]), z: X.map(p => p[2]),
+      marker: { size: EL.map(e => size[e]), color: EL.map(e => col[e]), line: { width: 0 } },
+      hovertemplate: "%{customdata}<extra></extra>", customdata: N.map(n => "atom " + n), showlegend: false });
+    return traces;
+  }
+
+  const msize = s => 3 + 7 * Math.min(Math.abs(s.e), CMAX) / CMAX;   // marker size in px, by effect size
+  function siteTraces(key) {
+    const pk = pin[key] ? pin[key].key : null;
+    return groups[key].map(g => {
+      // weakest first so the strongest draw on top; the pinned site is left out here and drawn purple in its own trace
+      const it = (state.top ? g.items.slice(0, 50) : g.items).filter(s => s.key !== pk).slice().reverse();
+      return { type: "scatter3d", mode: "markers", x: it.map(s => s.x), y: it.map(s => s.y), z: it.map(s => s.z),
+        marker: { size: it.map(msize), color: it.map(s => Math.abs(s.e)), symbol: SYM3[g.q],
+          cmin: 0, cmax: CMAX, colorscale: SCALE, opacity: 0.9, line: { width: 0 } },
+        text: it.map(hoverSite), hovertemplate: "%{text}<extra></extra>", customdata: it.map(s => s.key), showlegend: false };
+    });
+  }
+
+  const RFONT = { family: "IBM Plex Sans, sans-serif", size: 11 };   // the 3D axis titles' font and size
+  // Enzyme residues: drawn exactly like the substrate (same frame, same state, same balls and sticks), labelled in the axis titles' font.
+  // Carbons and sticks take the residue's literature rank colour (1 red = most catalytic ... 6 green = least), on the page's own ramp.
+  const ASIZE = { C: 11, H: 7, O: 12, N: 12 };
+  function atomColours() { return { C: tok("--atom-c"), H: tok("--atom-h"), O: tok("--atom-o"), N: tok("--atom-n") }; }
+  const STATE = { R: "reactant", TS: "transition state" };
+  const NRANK = RES.length;
+  function rampAt(t) {      // colour at t (0..1) on SCALE, linear in RGB between its stops
+    for (let k = 1; k < SCALE.length; k++) if (t <= SCALE[k][0]) {
+      const [t0, c0] = SCALE[k - 1], [t1, c1] = SCALE[k], f = (t - t0) / (t1 - t0);
+      const a = [1, 3, 5].map(m => parseInt(c0.substr(m, 2), 16)), b = [1, 3, 5].map(m => parseInt(c1.substr(m, 2), 16));
+      return "#" + a.map((v, m) => Math.round(v + (b[m] - v) * f).toString(16).padStart(2, "0")).join("");
+    }
+    return SCALE[SCALE.length - 1][1];
+  }
+  const rankColour = r => rampAt((NRANK - r.rank) / (NRANK - 1));
+  function litLine(r) {
+    return "literature rank " + r.rank + " of " + NRANK + ": Szefczyk 2004 MP2 " + (r.szef > 0 ? "+" : "−") + Math.abs(r.szef).toFixed(2) + " kcal/mol" +
+      (r.szef > 0 ? " (raises the barrier)" : "") + "; Claeyssens 2011 " +
+      (r.clae ? (r.clae[0] < 0 ? "−" : "") + Math.abs(r.clae[0]).toFixed(1) + " ± " + r.clae[1].toFixed(1) + " kcal/mol TS stabilisation" : "not reported");
+  }
+  function hoverAtom(r, k) {
+    const n = r.names[k], near = state.geom === "R" ? r.nearR : r.nearTS;
+    let h = r.lab + " " + n + " · chain " + r.chain + ", residue " + r.seq + " in the system<br>frame " + D.res_frame + ", " + STATE[state.geom] + "<br>" + litLine(r);
+    if (n === r.centre) h += "<br>charge centre (" + (r.q > 0 ? "+1" : "−1") + "): nearest substrate atom " + near[0] + " at " + near[1].toFixed(2) + " Å" +
+      "<br>moves " + r.moveCentre.toFixed(2) + " Å from R to TS (median over " + D.nframes + " frames " + r.moveMedian.toFixed(2) + ")" +
+      "<br>across the " + D.nframes + " frames it varies by " + (state.geom === "R" ? r.spreadR : r.spreadTS).toFixed(2) + " Å (rms)";
+    return h;
+  }
+  function residueTraces() {
+    if (!state.res) return [];
+    const ax = [], ay = [], az = [], ac = [], as = [], at = [], col = atomColours(), tr = [];
+    RES.forEach(r => {
+      const X = r[state.geom], rc = rankColour(r), bx = [], by = [], bz = [];
+      r.bonds.forEach(([i, j]) => { bx.push(X[i][0], X[j][0], null); by.push(X[i][1], X[j][1], null); bz.push(X[i][2], X[j][2], null); });
+      tr.push({ type: "scatter3d", name: "residue bonds " + r.lab, mode: "lines", x: bx, y: by, z: bz, hoverinfo: "skip", showlegend: false,
+        line: { color: rc, width: 6 } });
+      X.forEach((p, k) => { ax.push(p[0]); ay.push(p[1]); az.push(p[2]); ac.push(r.el[k] === "C" ? rc : col[r.el[k]]); as.push(ASIZE[r.el[k]]); at.push(hoverAtom(r, k)); });
+    });
+    return tr.concat([{ type: "scatter3d", name: "residues", mode: "markers", x: ax, y: ay, z: az, marker: { size: as, color: ac, line: { width: 0 } },
+      text: at, hovertemplate: "%{text}<extra></extra>", customdata: at.map(() => "res"), showlegend: false }]);
+  }
+  function residueLabels() {
+    if (!state.res) return [];
+    return RES.map(r => { const p = r[state.geom][r.names.indexOf(r.centre)];
+      return { x: p[0], y: p[1], z: p[2], text: r.lab + " (" + r.rank + ")", showarrow: false, xanchor: "left", xshift: 10, font: Object.assign({ color: tok("--ink") }, RFONT) }; });
+  }
+  // the residue colour key in the controls: one swatch per rank, most catalytic first
+  document.getElementById("res-key").innerHTML = RES.slice().sort((a, b) => a.rank - b.rank).map(r =>
+    '<span class="rk" title="' + r.lab + '"><i style="background:' + rankColour(r) + '"></i>' + r.rank + "</span>").join("");
+
+  const pin = { low: null, high: null };
+  function pinTraces3d(key) {
+    const s = pin[key], X = D[state.geom];
+    const ring = { type: "scatter3d", name: "pin", mode: "markers", x: [], y: [], z: [], hoverinfo: "skip", showlegend: false,
+      marker: { size: s ? msize(s) : 6, symbol: s ? SYM3[s.q] : "circle", color: tok("--pin"), opacity: 1, line: { width: 0 } } };
+    const line = { type: "scatter3d", name: "pinline", mode: "lines", x: [], y: [], z: [], hoverinfo: "skip", showlegend: false,
+      line: { color: tok("--pin"), width: 4, dash: "dot" } };
+    if (s) {
+      const a = X[s.na];
+      ring.x = [s.x]; ring.y = [s.y]; ring.z = [s.z];
+      line.x = [s.x, a[0]]; line.y = [s.y, a[1]]; line.z = [s.z, a[2]];
+    }
+    return [ring, line];
+  }
+  function pinRank(key) {
+    const s = pin[key];
+    return { type: "scatter", name: "pin", mode: "markers", hoverinfo: "skip", showlegend: false,
+      x: s ? [s.rank] : [], y: s ? [s.e] : [],
+      marker: { size: 16, color: "rgba(0,0,0,0)", line: { width: 2.5, color: tok("--ink") } } };
+  }
+
+  const labelled = i => EL[i] === "O" || ["C1", "C4", "C6"].includes(N[i]);
+  function annotations3d(key) {
+    const X = D[state.geom];
+    const a = N.map((n, i) => i).filter(labelled).map(i => ({ x: X[i][0], y: X[i][1], z: X[i][2], text: N[i], showarrow: false, yshift: 12,
+      font: { family: "IBM Plex Mono, monospace", size: 12, color: tok("--ink") } }));
+    const s = pin[key];
+    if (s) a.push({ x: s.x, y: s.y, z: s.z, text: "site " + s.id + " (" + QTXT[s.q] + ")", showarrow: false, xanchor: "left", xshift: 10,
+      font: { family: "IBM Plex Mono, monospace", size: 13, color: tok("--pin") } });
+    return a.concat(residueLabels());
+  }
+  function layout3d(key) {
+    const ax = { showbackground: false, showgrid: true, gridcolor: tok("--rule"), zeroline: false, autorange: false,
+      color: tok("--muted"), tickfont: { family: "IBM Plex Mono, monospace", size: 10 } };
+    // each axis's title carries its text and font together (a shared title object here used to replace the text, leaving bare x, y, z)
+    const t = s => ({ title: { text: s, font: RFONT } });
+    return { margin: { l: 0, r: 0, t: 0, b: 0 }, paper_bgcolor: tok("--surface"), font: { family: "IBM Plex Sans, sans-serif", color: tok("--ink") },
+      hoverlabel: { font: { family: "IBM Plex Mono, monospace", size: 12 } },
+      scene: { xaxis: Object.assign({ range: box[0] }, ax, t("x / Å")), yaxis: Object.assign({ range: box[1] }, ax, t("y / Å")),
+        zaxis: Object.assign({ range: box[2] }, ax, t("z / Å")),
+        aspectmode: "manual", aspectratio: { x: span[0] / smax, y: span[1] / smax, z: span[2] / smax },
+        camera: camera, bgcolor: tok("--surface"), annotations: annotations3d(key) } };
+  }
+
+  function rankTraces(key) {
+    const tr = [];
+    groups[key].forEach(g => {
+      const it = g.items, r = it.map(s => s.rank);
+      tr.push({ type: "scatter", mode: "lines", x: r, y: it.map(s => s.e - s.sd), line: { width: 0 }, hoverinfo: "skip", showlegend: false });
+      tr.push({ type: "scatter", mode: "lines", x: r, y: it.map(s => s.e + s.sd), line: { width: 0 }, fill: "tonexty", fillcolor: tok("--band"), hoverinfo: "skip", showlegend: false });
+    });
+    groups[key].forEach(g => {
+      const it = g.items;
+      tr.push({ type: "scatter", name: "dots", mode: "markers", x: it.map(s => s.rank), y: it.map(s => s.e),
+        marker: { size: g.q > 0 ? 5 : 6, symbol: SYM2[g.q], color: it.map(s => Math.abs(s.e)), cmin: 0, cmax: CMAX, colorscale: SCALE },
+        text: it.map(hoverSite), hovertemplate: "rank %{x}<br>%{text}<extra></extra>", customdata: it.map(s => s.key), showlegend: false });
+    });
+    tr.push(pinRank(key));
+    return tr;
+  }
+
+  function layoutRank(key) {
+    const ax = { gridcolor: tok("--rule"), zerolinecolor: tok("--muted"), color: tok("--muted"), tickfont: { family: "IBM Plex Mono, monospace", size: 11 } };
+    const qt = state.mode === "pos" ? "+1 e" : state.mode === "neg" ? "−1 e" : "±1 e";
+    return { margin: { l: 58, r: 14, t: 14, b: 46 }, paper_bgcolor: tok("--surface"), plot_bgcolor: tok("--surface"),
+      font: { family: "IBM Plex Sans, sans-serif", color: tok("--ink"), size: 12 },
+      hoverlabel: { font: { family: "IBM Plex Mono, monospace", size: 12 } },
+      xaxis: Object.assign({ title: { text: "site rank, strongest first (log scale)" }, type: "log", range: [0, XMAX], autorange: false,
+        tickvals: [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000], ticktext: ["1", "2", "5", "10", "20", "50", "100", "200", "500", "1000"] }, ax),
+      yaxis: Object.assign({ title: { text: "change in barrier, kcal/mol (" + qt + ")" }, zeroline: true, range: YR[key], autorange: false, dtick: 2 }, ax),
+      shapes: [{ type: "rect", xref: "x", yref: "paper", x0: 1, x1: 50, y0: 0, y1: 1, fillcolor: tok("--zone"), line: { width: 0 }, layer: "below" }],
+      annotations: [{ xref: "x", yref: "paper", x: Math.log10(7), y: 0.98, xanchor: "center", yanchor: "top", showarrow: false,
+        text: "strongest 50", font: { size: 11, color: tok("--muted") } }] };
+  }
+
+  const cfg3 = { displaylogo: false, responsive: true, modeBarButtonsToRemove: ["toImage", "resetCameraDefault3d", "resetCameraLastSave3d"] };
+  const cfg2 = { displaylogo: false, responsive: true, modeBarButtonsToRemove: ["toImage", "lasso2d", "select2d", "autoScale2d"] };
+  const ids = { low: ["p3-low", "pr-low"], high: ["p3-high", "pr-high"] };
+  let syncing = false;
+
+  function draw3d(key) {
+    Plotly.react(document.getElementById(ids[key][0]), moleculeTraces().concat(siteTraces(key), residueTraces(), pinTraces3d(key)), layout3d(key), cfg3);
+  }
+  function drawRank(key) { Plotly.react(document.getElementById(ids[key][1]), rankTraces(key), layoutRank(key), cfg2); }
+  function drawAll() { ["low", "high"].forEach(k => { draw3d(k); drawRank(k); facts(k); }); }
+
+  function idx(el, name) { return el.data.findIndex(tr => tr.name === name); }
+
+  function setPin(key, site) {
+    pin[key] = site || null;
+    const p3 = document.getElementById(ids[key][0]), pr = document.getElementById(ids[key][1]);
+    const pr0 = pinRank(key);
+    draw3d(key);   // redraws the 3D view with the pinned site purple, at its own size and shape
+    Plotly.restyle(pr, { x: [pr0.x], y: [pr0.y] }, [idx(pr, "pin")]);
+    const bx = document.getElementById("pick-" + key), clr = document.getElementById("clear-" + key);
+    if (!site) {
+      bx.querySelector(".pick-text").innerHTML = "No site pinned. Click a point in either chart: it turns purple in 3D and is ringed in the ranking.";
+      clr.hidden = true; return;
+    }
+    bx.querySelector(".pick-text").innerHTML = "Pinned: <b>site " + site.id + "</b>, <b>" + QTXT[site.q] + " e</b> sphere, rank <b>" + site.rank + "</b> of " + site.of +
+      " · mean <b>" + (site.e > 0 ? "+" : "") + site.e.toFixed(2) + "</b> kcal/mol (sd " + site.sd.toFixed(2) + "; 30 frames " + site.elo.toFixed(2) + " to " + site.ehi.toFixed(2) + ")" +
+      " · " + (site.cat ? "cation" : "anion/neutral") + " layer · closest approach to <b>" + N[site.na] + "</b> over all frames " + site.nd.toFixed(2) +
+      " Å (dotted line, drawn to " + N[site.na] + " in the frame shown)" + (state.top && site.rank > 50 ? " · outside the strongest 50, shown pinned anyway" : "");
+    clr.hidden = false;
+  }
+
+  function setCamera(cam, except) {
+    camera = JSON.parse(JSON.stringify(cam));
+    syncing = true;
+    const jobs = ["low", "high"].filter(k => k !== except).map(k => Plotly.relayout(document.getElementById(ids[k][0]), { "scene.camera": camera }));
+    Promise.all(jobs).then(() => { syncing = false; }, () => { syncing = false; });
+  }
+
+  function wire(key) {
+    const p3 = document.getElementById(ids[key][0]), pr = document.getElementById(ids[key][1]);
+    const pick = ev => ev && ev.points && ev.points.length ? findItem(key, ev.points[0].customdata) : undefined;
+    pr.on("plotly_click", ev => { const s = pick(ev); if (s) setPin(key, s); });
+    // In 3D, Plotly reports a click from inside its render loop, also at the end of a drag. Pin only on a real click
+    // (pointer moved less than 5 px), only if the site changed, and after the render has finished.
+    let down = null, moved = false;
+    p3.addEventListener("pointerdown", e => { down = [e.clientX, e.clientY]; moved = false; }, true);
+    p3.addEventListener("pointermove", e => { if (down && Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 4) moved = true; }, true);
+    p3.on("plotly_click", ev => {
+      const s = pick(ev);
+      if (!s || moved || (pin[key] && pin[key].key === s.key)) return;
+      setTimeout(() => setPin(key, s), 0);
+    });
+    document.getElementById("clear-" + key).onclick = () => setPin(key, null);
+    p3.on("plotly_relayout", ev => {
+      if (syncing || !ev["scene.camera"]) return;
+      setCamera(ev["scene.camera"], key);
+    });
+  }
+
+  function press(group, on) { group.forEach(id => document.getElementById(id).setAttribute("aria-pressed", id === on)); }
+  function setMode(mode) {
+    state.mode = mode; press(["q-pos", "q-neg", "q-both"], mode === "pos" ? "q-pos" : mode === "neg" ? "q-neg" : "q-both");
+    document.querySelectorAll(".qlabel").forEach(el => { el.textContent = mode === "pos" ? "+1" : mode === "neg" ? "−1" : "+1 or −1"; });
+    buildGroups(); setPin("low", null); setPin("high", null); drawAll();
+  }
+  document.getElementById("q-pos").onclick = () => setMode("pos");
+  document.getElementById("q-neg").onclick = () => setMode("neg");
+  document.getElementById("q-both").onclick = () => setMode("both");
+  function setLayer(l) {
+    state.layer = l; press(["l-both", "l-cat", "l-an"], l === "both" ? "l-both" : l === "cat" ? "l-cat" : "l-an");
+    buildGroups(); pin.low = null; pin.high = null; setPin("low", null); setPin("high", null); drawAll();
+  }
+  document.getElementById("l-both").onclick = () => setLayer("both");
+  document.getElementById("l-cat").onclick = () => setLayer("cat");
+  document.getElementById("l-an").onclick = () => setLayer("an");
+  function redraw3d() { ["low", "high"].forEach(k => { if (pin[k]) setPin(k, pin[k]); else draw3d(k); }); }
+  document.getElementById("g-R").onclick = () => { state.geom = "R"; press(["g-R", "g-TS"], "g-R"); redraw3d(); };
+  document.getElementById("g-TS").onclick = () => { state.geom = "TS"; press(["g-R", "g-TS"], "g-TS"); redraw3d(); };
+  document.getElementById("s-all").onclick = () => { state.top = false; press(["s-all", "s-50"], "s-all"); redraw3d(); };
+  document.getElementById("s-50").onclick = () => { state.top = true; press(["s-all", "s-50"], "s-50"); redraw3d(); };
+  document.getElementById("r-on").onclick = () => { state.res = true; press(["r-on", "r-off"], "r-on"); redraw3d(); };
+  document.getElementById("r-off").onclick = () => { state.res = false; press(["r-on", "r-off"], "r-off"); redraw3d(); };
+  document.getElementById("reset-view").onclick = () => setCamera(HOME, null);
+
+  drawAll(); wire("low"); wire("high");
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  if (mq.addEventListener) mq.addEventListener("change", drawAll);
+  new MutationObserver(drawAll).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+})();
+</script>
