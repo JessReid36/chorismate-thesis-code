@@ -36,9 +36,13 @@ the anion/neutral layer holds that place at the same resolution. Cation-layer si
 resting nearer than LJ contact) and outside it (beside H8, which a cation does not approach as near as the q <= 0
 floor) are kept, as are on-surface sites whose admitted charges no anion/neutral site within res offers.
 
-CHARGES A SITE ADMITS: every charge whose floors the site clears at every geometry. q in [-1, 0] if it clears the
-q <= 0 floors (q_min_neg -1; otherwise q_min_neg 0 and no charge <= 0 at that site); q in [q_min_pos, +1] for the
-smallest positive level whose floors it clears (0 = any q > 0; 0.25, 0.50, 0.75, 1.00; "none" = no positive charge).
+CHARGES A SITE ADMITS: every charge whose floors the site clears at every geometry, with one restriction (Stage 5
+Amendment 2): q <= 0 is admitted on the anion/neutral layer only. q in [-1, 0] if an anion/neutral-layer site clears the
+q <= 0 floors (q_min_neg -1; otherwise, and at every cation-layer site, q_min_neg 0 and no charge <= 0 at that site);
+q in [q_min_pos, +1] for the smallest positive level whose floors it clears (0 = any q > 0; 0.25, 0.50, 0.75, 1.00;
+"none" = no positive charge). Amendment 2: beside H8 the cation layer lies outside the anion/neutral layer and its sites
+clear the q <= 0 floors; admitting q <= 0 there gave negative and neutral spheres a second, farther-out set of positions
+at H8 alone, which the anion/neutral layer already covers at contact.
 A charge between two levels takes the floors of the level below it (cs5_floors.py). An empty site (no sphere, no L)
 is always allowed. The spacing between spheres (>= 3.25 A) is the optimiser's constraint, over both layers.
 
@@ -168,10 +172,11 @@ def pair_dist(A, B, chunk=20000):
     return np.concatenate([np.sqrt(((A[c:c + chunk, None, :] - B[None, :, :]) ** 2).sum(-1)) for c in range(0, len(A), chunk)]) \
         if len(A) else np.zeros((0, len(B)))
 
-def admitted(dist, F, ngeo):
-    """per site: clearance to each level's floors (min over atoms and geometries), q_min_neg, q_min_pos (None = none)"""
+def admitted(dist, F, ngeo, anion_layer):
+    """per site: clearance to each level's floors (min over atoms and geometries), q_min_neg, q_min_pos (None = none);
+    anion_layer: per site, True on the anion/neutral layer, the only layer that admits q <= 0 (Amendment 2)"""
     clear = {c: (dist - np.tile(F[c], ngeo)[None, :]).min(1) for c in COLS}
-    qneg = np.where(clear["neg"] >= -TOL, -1.0, 0.0)
+    qneg = np.where((clear["neg"] >= -TOL) & np.asarray(anion_layer, bool), -1.0, 0.0)
     qpos = [next((LEVEL_LO[c] for c in POS if clear[c][i] >= -TOL), None) for i in range(dist.shape[0])]
     return clear, qneg, qpos
 
@@ -253,7 +258,7 @@ def build_grid(adir, prms, floors_p, out, args):
         Q, cand, st = surface(C, np.tile(F[LAYER_COL[lay]], ngeo), atom_of, geo_of, ngeo, cfg)
         cov = pair_dist(cand, Q).min(1).max() if len(Q) else float("nan")     # every open candidate lies within res of a site
         dist = pair_dist(Q, C)
-        clear, qneg, qpos = admitted(dist, F, ngeo)
+        clear, qneg, qpos = admitted(dist, F, ngeo, np.full(len(Q), lay == "anion"))
         own = clear[LAYER_COL[lay]]
         if (own < -TOL).any(): die("internal: a %s site lies inside its own layer's floors" % lay)
         on = (dist - np.tile(F[LAYER_COL[lay]], ngeo)[None, :]).argmin(1)
@@ -280,7 +285,8 @@ def build_grid(adir, prms, floors_p, out, args):
            "#   open to the outside (flood fill); deterministic greedy Poisson-disk thinning at res within each layer; cation-layer",
            "#   sites ON the anion/neutral surface (clearance to the q <= 0 floors zero within %g A) dropped where an anion/neutral" % TOL,
            "#   site within res admits every charge they admit: that layer holds the place",
-           "# each site admits every charge whose floors it clears at every geometry: q in [q_min_neg, 0] if q_min_neg = -1;",
+           "# each site admits every charge whose floors it clears at every geometry, q <= 0 on the anion/neutral layer only",
+           "#   (Stage 5 Amendment 2): q in [q_min_neg, 0] if q_min_neg = -1;",
            "#   q in [q_min_pos, +1] (q_min_pos 0.00: any q > 0; none: no positive charge); an empty site is always allowed",
            "# frames (%d): %s" % (len(frames), " ".join(frames)),
            "# states: %s; aligned geometries %s" % (",".join(states), adir),
@@ -336,7 +342,7 @@ def check(adir, prms, floors_p, sites_p, args):
     if not any(l.startswith("# force field ") and l.endswith(sha(prms)) for l in com): die("the force field differs from the one the grid was built on")
     Q = sites_xyz(rows)
     dist = pair_dist(Q, C)
-    clear, qneg, qpos = admitted(dist, F, ngeo)
+    clear, qneg, qpos = admitted(dist, F, ngeo, [r["layer"] == "anion" for r in rows])
     res = float([l for l in com if l.startswith("# parameters:")][0].split("res=")[1].split()[0])
     ma = np.array([r["layer"] == "anion" for r in rows])
     anion = (Q[ma], [qpos[i] for i in np.where(ma)[0]])
