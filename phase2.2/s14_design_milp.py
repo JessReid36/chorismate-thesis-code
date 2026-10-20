@@ -86,9 +86,12 @@ IMPLEMENTED BUT INACTIVE WITHOUT FURTHER DATA:
 CONSEQUENCE OF THE MISSING CONSTRAINT, STATED BECAUSE IT IS VISIBLE IN EVERY RESULT:
 A linear objective over a box has its optimum at a VERTEX, so without a field-limiting
 constraint every charge saturates at +/-qmax and the continuous charge layer does no work
-- the problem reduces to choosing sites and signs. [D2018] Fig. 11 finds charges at
-+/-0.751, NOT saturated, because their objective is a full NEB barrier whose validity
-terms penalise strong fields. Use l1_budget to impose a total-field budget sum_i |q_i| <= B
+- the problem reduces to choosing sites and signs. [D2018]'s charges are NOT saturated,
+because their objective is a full NEB barrier whose validity terms penalise strong fields:
+the charges labelled in their Fig. 11 reach 0.193 e and in Fig. 8 0.294 e. (Corrected
+20 Oct 2026: this docstring read "Fig. 11 finds charges at +/-0.751"; that range is the
+figure's colour scale, not a charge. Results phase2.2/LIBRARY_ERRATUM1_20261020.md item 1.)
+Use l1_budget to impose a total-field budget sum_i |q_i| <= B
 if interior charges are wanted before the unimodality data exists.
 
 USAGE
