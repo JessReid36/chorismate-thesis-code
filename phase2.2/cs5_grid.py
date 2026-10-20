@@ -77,6 +77,11 @@ TOL = 1e-6                                           # A: clearance tolerance (f
 HEAD = ["site", "layer", "x", "y", "z", "on_atom", "on_state", "clearance_A", "q_min_neg", "q_min_pos"] + ["d_" + n for n in NAMES]
 
 def die(m): sys.stderr.write("STOP: " + m + "\n"); sys.exit(1)
+def fmt(v, nd):
+    """v to nd decimals, with a value that rounds to zero written without a sign: floating-point noise of order 1e-16
+    gives -0.0000 on one machine and 0.0000 on another, and the file must not depend on the machine"""
+    t = "%.*f" % (nd, v)
+    return t[1:] if t.startswith("-") and float(t) == 0.0 else t
 def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 def cfg_of(args):
     c = dict(DEFAULTS)
@@ -292,8 +297,8 @@ def build_grid(adir, prms, floors_p, out, args):
     with open(out, "x") as o:
         o.write("\n".join(hdr) + "\n")
         for i, r in enumerate(rows):
-            o.write("\t".join([str(i), r[0]] + ["%.6f" % v for v in r[1]] + [r[2], r[3], "%.4f" % r[4], "%.2f" % r[5],
-                              "none" if r[6] is None else "%.2f" % r[6]] + ["%.4f" % v for v in r[7]]) + "\n")
+            o.write("\t".join([str(i), r[0]] + [fmt(v, 6) for v in r[1]] + [r[2], r[3], fmt(r[4], 4), fmt(r[5], 2),
+                              "none" if r[6] is None else fmt(r[6], 2)] + [fmt(v, 4) for v in r[7]]) + "\n")
     print("grid: %d frames x %d states; anion/neutral layer %d sites, cation layer %d sites (%d dropped on the anion/neutral surface);"
           " resolution %s A; nearest neighbour %.3f-%.3f A" % (len(frames), len(states), na, nc, stats["cation"][4], cfg["res"], nn.min(), nn.max()))
 
@@ -445,7 +450,7 @@ def lj_term(adir, prms, sites_p, out, args):
            "# range %.3f to %.3f kcal/mol; median %.3f" % (L.min(), L.max(), float(np.median(L)))]
     with open(out, "x") as o:
         o.write("\n".join(hdr) + "\n")
-        for row in L: o.write("\t".join("%.6f" % v for v in row) + "\n")
+        for row in L: o.write("\t".join(fmt(v, 6) for v in row) + "\n")
     print("L: %d sites x %d frames; range %.3f to %.3f kcal/mol" % (L.shape[0], L.shape[1], L.min(), L.max()))
 
 def ljcheck(res_repo):
