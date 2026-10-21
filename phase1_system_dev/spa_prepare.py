@@ -295,16 +295,22 @@ def step_block(step, base, gb, check):
 def alt_block(step, gb):
     return ("PY prep \"$RD\" {step} || {{ echo SP_{step}_FAIL; quit 1; }}\n"
             "alternate {step} {gb}\n").format(step=step, gb=gb)
+# SP_AMENDMENT3.txt (21 October 2026) A3.2: the memory column. job_ts keeps 250 (it measured 197.28 GiB at 8 A and
+# 174.74 at 6 A, and its %maxcore 12000 on 16 cores allows about 188 GiB). The other seven asked for 180 or 250 and
+# measured under 4.11 GiB at both region sizes, which starved the first wave of nodes it did not need, so they ask for
+# 64: 15.6x the largest memory any of them used and 3.05x the largest virtual memory. %maxcore is NOT changed by that
+# amendment, so the ORCA ceiling still sits above the request; a frame that needed more would be killed by PBS and
+# re-run under A2.2.
 JOBS = [  # job, memory GB, [(step, ORCA basename, free GB, check command)]; basename None: an alternation
     ("job_ts", 250, [("ts", None, 20, None)]),
-    ("job_ts_freq_irc", 250, [("ts_freq", "freq", 3, 'check_freq "$RD" ts_freq ts'),
-                              ("irc", "irc", 5, 'check_irc "$RD"')]),
-    ("job_r_irc", 180, [("r_irc", None, 20, None)]),
-    ("job_r_irc_freq", 180, [("r_irc_freq", "freq", 3, 'check_freq "$RD" r_irc_freq min')]),
-    ("job_p_irc", 180, [("p_irc", None, 20, None)]),
-    ("job_p_irc_freq", 180, [("p_irc_freq", "freq", 3, 'check_freq "$RD" p_irc_freq min')]),
-    ("job_r0", 180, [("r0", None, 20, None)]),
-    ("job_r0_freq", 180, [("r0_freq", "freq", 3, 'check_freq "$RD" r0_freq min')])]
+    ("job_ts_freq_irc", 64, [("ts_freq", "freq", 3, 'check_freq "$RD" ts_freq ts'),
+                             ("irc", "irc", 5, 'check_irc "$RD"')]),
+    ("job_r_irc", 64, [("r_irc", None, 20, None)]),
+    ("job_r_irc_freq", 64, [("r_irc_freq", "freq", 3, 'check_freq "$RD" r_irc_freq min')]),
+    ("job_p_irc", 64, [("p_irc", None, 20, None)]),
+    ("job_p_irc_freq", 64, [("p_irc_freq", "freq", 3, 'check_freq "$RD" p_irc_freq min')]),
+    ("job_r0", 64, [("r0", None, 20, None)]),
+    ("job_r0_freq", 64, [("r0_freq", "freq", 3, 'check_freq "$RD" r0_freq min')])]
 SHORT = {"job_ts": "ts", "job_ts_freq_irc": "fi", "job_r_irc": "r", "job_r_irc_freq": "rf", "job_p_irc": "p",
          "job_p_irc_freq": "pf", "job_r0": "r0", "job_r0_freq": "r0f"}
 SUBMIT = """#!/bin/bash
