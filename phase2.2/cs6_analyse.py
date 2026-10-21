@@ -26,7 +26,11 @@ CHECKS, every one a stop
       energy, and the echoed coordinates equal to combined.xyz within 1e-5 A;
   (b) the number of MM point charges ORCA reports equals the number of spheres the arrangement has - so a design
       whose force field was misread cannot pass unnoticed. The control must report no QM/MM section at all;
-  (c) every job.engrad holds exactly the 24 QM atoms, and its energy equals job.out's final energy to 1e-9 Eh;
+  (c) every job.engrad holds exactly the 24 QM atoms PLUS that arrangement's spheres - an EnGrad job writes the
+      whole system, unlike the Opt job WP4 left behind, which writes only the atoms it optimised - and which rows
+      are the substrate is read from the engrad's own atom block rather than assumed: its atomic numbers must be
+      the substrate's in order, the rows after them must be nitrogen, its coordinates must equal combined.xyz, and
+      its energy must equal job.out's QM/MM total;
   (d) every input file is unchanged since it was generated (relax/INPUT_CHECKSUMS.sha256);
   (e) the control's two energies equal the in vacuo energies the A-matrix job already computed for this frame at
       these geometries (cs_stage6/A_REPORT.txt), within 1e-6 Eh. That is an independent check: the A column's
@@ -52,6 +56,9 @@ BOHR = 0.5291772083                     # A per bohr
 GCONV = H / BOHR                        # kcal/mol/A per Eh/bohr
 NQM = 24
 NEL = 118
+NAMES = "C1 H1 H2 C2 C3 O1 O2 O3 C4 H3 C5 H4 C6 C7 H5 C8 H6 C9 H7 O4 H8 C10 O5 O6".split()
+ELS = [n.rstrip("0123456789") for n in NAMES]
+ZS = [{"C": 6, "H": 1, "O": 8}[e] for e in ELS]
 STATES = ("R", "TS")
 
 
@@ -70,14 +77,27 @@ def read_xyz(p):
 
 
 def read_engrad(p):
-    """(natoms, energy in Eh, gradient (N,3) in Eh/bohr)"""
+    """(natoms, energy in Eh, gradient (N,3) in Eh/bohr, atomic numbers, coordinates in Bohr (N,3)).
+
+    ORCA's .engrad ends with "# The atomic numbers and current coordinates in Bohr", one row per atom. That block
+    is what makes the file self-describing: it says which row is which atom, so the substrate's rows can be
+    identified from the file itself instead of assumed from the order combined.xyz happens to use."""
     v = [l.strip() for l in Path(p).read_text().splitlines() if l.strip() and not l.strip().startswith("#")]
+    if len(v) < 2:
+        stop("%s is too short to be an engrad" % p)
     n = int(v[0])
     e = float(v[1])
-    g = np.array([float(x) for x in v[2:2 + 3 * n]], dtype=float).reshape(n, 3)
     if len(v) < 2 + 3 * n:
         stop("%s has fewer gradient values than %d atoms need" % (p, n))
-    return n, e, g
+    g = np.array([float(x) for x in v[2:2 + 3 * n]], dtype=float).reshape(n, 3)
+    rest = [r.split() for r in v[2 + 3 * n:]]
+    rows = [r for r in rest if len(r) == 4]
+    if len(rows) != n:
+        stop("%s: its atom block has %d rows, not the %d atoms it declares - this reader needs that block to tell"
+             " which rows are the substrate" % (p, len(rows), n))
+    Z = [int(float(r[0])) for r in rows]
+    X = np.array([[float(x) for x in r[1:4]] for r in rows], dtype=float)
+    return n, e, g, Z, X
 
 
 def read_run(d, nsph):
@@ -144,9 +164,28 @@ def read_run(d, nsph):
             stop("%s: ORCA reports no MM point charges, but this arrangement has %d sphere(s)" % (d, nsph))
         if int(mm.group(1)) != nsph:
             stop("%s: ORCA read %s MM point charges, the arrangement has %d sphere(s)" % (d, mm.group(1), nsph))
-    n, ee, g = read_engrad(eg)
-    if n != NQM:
-        stop("%s: job.engrad holds %d atoms, expected the %d QM atoms" % (d, n, NQM))
+    n, ee, g, Z, Xb = read_engrad(eg)
+    # An EnGrad job writes the gradient of EVERY atom in the system - the 24 QM atoms and the MM spheres - so the
+    # count is 24 + the sphere count. WP4's committed engrad holds 24 because it is an Opt job, where ORCA writes
+    # only the atoms it was optimising; that file verified the format but not this, and the difference is the job
+    # type, which is why this is checked against the arrangement rather than against WP4.
+    if n != NQM + nsph:
+        stop("%s: job.engrad holds %d atoms, expected %d (the %d QM atoms and %d sphere(s))"
+             % (d, n, NQM + nsph, NQM, nsph))
+    # WHICH rows are the substrate is read from the engrad's own atom block, not assumed: its atomic numbers must be
+    # the substrate's, in order, and its coordinates must be combined.xyz's to within rounding. That identifies the
+    # rows and re-checks the geometry at the same time, at the engrad's own precision.
+    if Z[:NQM] != ZS:
+        stop("%s: the first %d rows of job.engrad are not the substrate's atoms.\n   got      %s\n   expected %s"
+             % (d, NQM, " ".join(map(str, Z[:NQM])), " ".join(map(str, ZS))))
+    if nsph and any(z != 7 for z in Z[NQM:]):
+        stop("%s: the rows after the substrate are not the spheres (expected nitrogen, 7): %s"
+             % (d, " ".join(map(str, Z[NQM:]))))
+    Xall = read_xyz(d / "combined.xyz")
+    dx = float(np.abs(Xb * BOHR - Xall).max())
+    if dx > 1e-6:
+        stop("%s: job.engrad's coordinates differ from combined.xyz by %.1e A" % (d, dx))
+    g = g[:NQM]
     if abs(ee - e_tot) > 1e-9:
         stop("%s: job.engrad's energy %.9f differs from job.out's total %.9f" % (d, ee, e_tot))
     return e_tot, e_mm, g
@@ -258,7 +297,8 @@ def frozen(relax, root, out_p):
     say("(a,b,c) all %d frozen single points of %d arrangements read: terminated normally, SCF converged, %d"
         % (2 * len(done), len(done), NEL))
     say("        electrons, coordinates echoed as generated, the MM point-charge count equal to the sphere count,")
-    say("        and job.engrad holding the %d QM atoms with an energy matching job.out" % NQM)
+    say("        and each job.engrad holding the %d QM atoms plus its own spheres, identified by its own atom" % NQM)
+    say("        block, with coordinates matching combined.xyz and an energy matching job.out's QM/MM total")
     if pending:
         say("        STILL RUNNING, so not read: %s" % " ".join(sorted(pending)))
 
