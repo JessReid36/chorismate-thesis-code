@@ -81,7 +81,7 @@ def read_engrad(p):
 
 
 def read_run(d, nsph):
-    """the checks of (a), (b) and (c); returns (energy Eh, gradient (24,3) Eh/bohr)"""
+    """the checks of (a), (b) and (c); returns (total energy Eh, MM part Eh, gradient (24,3) Eh/bohr)"""
     d = Path(d)
     eg = d / "job.engrad"
     # job.out is committed compressed, as WP4's outputs are, so a committed tree can be re-analysed without hpc1.
@@ -100,11 +100,33 @@ def read_run(d, nsph):
     m = re.search(r"Number of Electrons\s+NEL\s+\.\.\.\.\s+(\d+)", t)
     if not m or int(m.group(1)) != NEL:
         stop("%s: %s electrons in the QM region, expected %d" % (d, m.group(1) if m else "no count", NEL))
-    # ORCA writes "FINAL SINGLE POINT ENERGY (QM/MM)" for a QM/MM job and "FINAL SINGLE POINT ENERGY" for a plain
-    # one, so the suffix is optional here. cs5_amatrix.py's pattern has no suffix because its runs are never QM/MM.
-    e = re.findall(r"FINAL SINGLE POINT ENERGY(?:\s+\(QM/MM\))?\s+(-?\d+\.\d+)", t)
-    if len(e) != 1:
-        stop("%s: %d final energies, expected 1" % (d, len(e)))
+    # A QM/MM job prints THREE energy lines per evaluation and a plain job one, so the three are read separately:
+    #   FINAL SINGLE POINT ENERGY (MM)      the molecular-mechanics part - here the sphere's Lennard-Jones energy
+    #   FINAL SINGLE POINT ENERGY           the QM energy, with the MM point charges already embedded in it
+    #   FINAL SINGLE POINT ENERGY (QM/MM)   their sum, which is the total and what job.engrad holds
+    # Taking the QM/MM total is forced, not a preference: the score this is measured against contains L, the
+    # sphere's Lennard-Jones energy at TS minus at R, so the measurement must contain it too. Checked against WP4's
+    # committed armb_freecart/job.out, where bare + (MM) equals (QM/MM) exactly and the engrad energy is the total.
+    # A pattern with an OPTIONAL "(QM/MM)" suffix matches the bare line and the total both, which is why this reads
+    # the three apart rather than allowing the suffix.
+    qm = re.findall(r"FINAL SINGLE POINT ENERGY\s+(-?\d+\.\d+)", t)
+    mm = re.findall(r"FINAL SINGLE POINT ENERGY \(MM\)\s+(-?\d+\.\d+)", t)
+    tot = re.findall(r"FINAL SINGLE POINT ENERGY \(QM/MM\)\s+(-?\d+\.\d+)", t)
+    if nsph == 0:
+        if mm or tot:
+            stop("%s: the control reports MM or QM/MM energies; it is meant to be a plain QM job" % d)
+        if len(qm) != 1:
+            stop("%s: %d final energies, expected 1" % (d, len(qm)))
+        e_mm, e_tot = 0.0, float(qm[0])
+    else:
+        if not (len(qm) == len(mm) == len(tot) == 1):
+            stop("%s: %d bare, %d (MM) and %d (QM/MM) final energies, expected one of each for a single point"
+                 % (d, len(qm), len(mm), len(tot)))
+        e_mm, e_tot = float(mm[0]), float(tot[0])
+        if abs(float(qm[0]) + e_mm - e_tot) > 1e-9:
+            stop("%s: the QM energy plus the MM energy is not the QM/MM total (%.12f + %.12f != %.12f)"
+                 % (d, float(qm[0]), e_mm, e_tot))
+    e = [e_tot]
     k = t.find("CARTESIAN COORDINATES (ANGSTROEM)")
     if k < 0:
         stop("%s: no echoed coordinates" % d)
@@ -125,9 +147,9 @@ def read_run(d, nsph):
     n, ee, g = read_engrad(eg)
     if n != NQM:
         stop("%s: job.engrad holds %d atoms, expected the %d QM atoms" % (d, n, NQM))
-    if abs(ee - float(e[0])) > 1e-9:
-        stop("%s: job.engrad's energy %.9f differs from job.out's %.9f" % (d, ee, float(e[0])))
-    return float(e[0]), g
+    if abs(ee - e_tot) > 1e-9:
+        stop("%s: job.engrad's energy %.9f differs from job.out's total %.9f" % (d, ee, e_tot))
+    return e_tot, e_mm, g
 
 
 def read_arrangements(p):
@@ -217,7 +239,7 @@ def frozen(relax, root, out_p):
         % len((relax / "INPUT_CHECKSUMS.sha256").read_text().splitlines()))
 
     # read every frozen single point
-    E, G, pending = {}, {}, []
+    E, MM, G, pending = {}, {}, {}, []
     for name, d in sorted(arr.items()):
         folders = [relax / name / ("%s_sp" % st) for st in STATES]
         for f in folders:
@@ -231,7 +253,7 @@ def frozen(relax, root, out_p):
             pending.append(name)
             continue
         for st, f in zip(STATES, folders):
-            E[(name, st)], G[(name, st)] = read_run(f, d["n"])
+            E[(name, st)], MM[(name, st)], G[(name, st)] = read_run(f, d["n"])
     done = [k for k in arr if k not in pending]
     say("(a,b,c) all %d frozen single points of %d arrangements read: terminated normally, SCF converged, %d"
         % (2 * len(done), len(done), NEL))
@@ -263,7 +285,11 @@ def frozen(relax, root, out_p):
     # the measurements
     say("WHAT EACH ARRANGEMENT GIVES, at the fixed geometries")
     say("  ddE(frozen) negative lowers the barrier. 'score' is the MILP's linear estimate, sum a*q + sum L.")
-    say("  %-18s %5s %12s %12s %10s   %10s %10s" % ("", "n", "ddE(frozen)", "score", "difference", "G_add,R", "G_add,TS"))
+    say("  The LJ columns are ORCA's own MM energy difference against the score's L term: cs5_grid.py defines")
+    say("  L[i] as the sphere's Lennard-Jones energy at TS minus at R, and a QM/MM run reports exactly that as its")
+    say("  (MM) energy, so the two are the same quantity measured and estimated. The control has no MM region.")
+    say("  %-18s %5s %12s %12s %10s   %9s %9s   %9s %9s" % ("", "n", "ddE(frozen)", "score", "difference",
+                                                            "LJ meas.", "sum L", "G_add,R", "G_add,TS"))
     res = {}
     for name in sorted(arr, key=lambda k: (k.startswith("ADD-"), arr[k]["n"], k)):
         d = arr[name]
@@ -273,9 +299,22 @@ def frozen(relax, root, out_p):
         gr = g_add(G[(name, "R")], G[("S6-C", "R")])
         gt = g_add(G[(name, "TS")], G[("S6-C", "TS")])
         sc = d["aq"] + d["sl"]
-        res[name] = {"ddE": dd, "score": sc, "GR": gr, "GTS": gt}
-        say("  %-18s %5d %+12.4f %+12.4f %+10.4f   %10.4f %10.4f" % (name, d["n"], dd, sc, dd - sc, gr, gt))
+        lj = (MM[(name, "TS")] - MM[(name, "R")]) * H
+        res[name] = {"ddE": dd, "score": sc, "GR": gr, "GTS": gt, "lj": lj, "sl": d["sl"]}
+        say("  %-18s %5d %+12.4f %+12.4f %+10.4f   %+9.4f %+9.4f   %9.4f %9.4f"
+            % (name, d["n"], dd, sc, dd - sc, lj, d["sl"], gr, gt))
     say("")
+    wl = [(n, r["lj"] - r["sl"]) for n, r in res.items() if arr[n]["n"] and not arr[n]["bare"]]
+    if wl:
+        w = max(wl, key=lambda t: abs(t[1]))
+        say("")
+        say("  THE L MATRIX, MEASURED: across the %d sphere arrangements the measured Lennard-Jones contribution"
+            % len(wl))
+        say("  differs from the score's sum L by at most %+.4f kcal/mol (%s). cs5_grid.py computes L classically"
+            % (w[1], w[0]))
+        say("  from the same Amber N parameters ORCA uses here, so agreement is a check of the grid's own")
+        say("  arithmetic and of the force field it was handed, not of any physics.")
+        say("")
     say("  G_add is an RMS over all %d Cartesian components of the added gradient, in kcal/mol/A. For scale only,"
         % (3 * NQM))
     say("  and not as a bound: a relaxed GOCAT design reaches about 1 kcal/mol/A and Dittner's frozen-path designs")
@@ -311,11 +350,12 @@ def frozen(relax, root, out_p):
     out.mkdir(parents=True)
     (out / "FROZEN_REPORT.txt").write_text("\n".join(rep) + "\n")
     with open(out / "frozen.tsv", "w") as fh:
-        fh.write("design\tn\tddE_frozen_kcal\tscore_kcal\tdifference_kcal\tG_add_R\tG_add_TS\n")
+        fh.write("design\tn\tddE_frozen_kcal\tscore_kcal\tdifference_kcal\tLJ_measured_kcal\tsum_L_kcal\tG_add_R\tG_add_TS\n")
         for name in sorted(res, key=lambda k: (k.startswith("ADD-"), arr[k]["n"], k)):
             r = res[name]
-            fh.write("%s\t%d\t%.6f\t%.6f\t%.6f\t%.6f\t%.6f\n"
-                     % (name, arr[name]["n"], r["ddE"], r["score"], r["ddE"] - r["score"], r["GR"], r["GTS"]))
+            fh.write("%s\t%d\t%.6f\t%.6f\t%.6f\t%.6f\t%.6f\t%.6f\t%.6f\n"
+                     % (name, arr[name]["n"], r["ddE"], r["score"], r["ddE"] - r["score"],
+                        r["lj"], r["sl"], r["GR"], r["GTS"]))
     print("\nwrote %s/FROZEN_REPORT.txt and frozen.tsv" % out)
     return 0
 
