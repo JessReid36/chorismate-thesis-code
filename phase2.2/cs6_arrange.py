@@ -410,6 +410,22 @@ def arrange(frame_dir, sites_p, L_p, A_p, prms_p, out_p, hpc_dir):
                  sol.get("strategy", "full"), sol.get("certified_gap", float("nan")), sol.get("wall", 0.0)))
     designs.append(("S6-C", [], [], True, None, False))
     designs.append(("S6-P", [top], [1.0], False, None, False))
+    # The one-sphere runs STAGE6_CRITERIA.txt's "first-order additivity at fixed geometry" needs: the sum of the
+    # one-sphere effects against the measured effect of S6-2 and S6-3. S6-P cannot serve as one of them, being a
+    # BARE charge with no Lennard-Jones wall. Each is one LJ sphere at a site and charge S6-2 or S6-3 already fixed,
+    # so nothing is chosen here; site 678 appears twice because S6-3 re-optimised its charge, and the linearity in q
+    # is part of what the test checks. Single points only, as the criteria says: no relaxation.
+    seen = []
+    for nm in ("S6-2", "S6-3"):
+        src = [d for d in designs if d[0] == nm][0]
+        for i, qv in zip(src[1], src[2]):
+            if (i, round(qv, 6)) in seen:
+                continue
+            seen.append((i, round(qv, 6)))
+            tag = "ADD-s%d_q%s%05d" % (i, "p" if qv >= 0 else "m", round(abs(qv) * 10000))
+            designs.append((tag, [i], [qv], True, None, False))
+    print("   %-5s %d one-sphere single points for the additivity check: %s"
+          % ("ADD", len(seen), "  ".join("site %d q %+.4f" % t for t in seen)))
     print("   %-5s no spheres (the control, and the g(0)/E(0) reference)" % "S6-C")
     print("   %-5s site %d, bare +1, no LJ wall (S6-2's first site: %s)"
           % ("S6-P", top, "yes" if designs[0][1][0] == top else "NO"))
@@ -525,7 +541,8 @@ def write_all(out, G, grid, cfg, designs, top, prms_p, frame_dir, sites_p, L_p, 
                     stop("%s at %s puts a sphere %.3f A from %s, below the 1.2 A collapse threshold"
                          % (name, side, dmin, closest[1]))
                 rec.append("     %s: closest sphere-to-substrate %.4f A (to %s)" % (side, dmin, closest[1]))
-            for kind in ("sp", "opt"):
+            kinds = ("sp",) if name.startswith("ADD-") else ("sp", "opt")
+            for kind in kinds:
                 d = out / name / ("%s_%s" % (side, kind))
                 d.mkdir(parents=True)
                 inp = job_inp_text(kind, side, len(pos))
@@ -536,7 +553,7 @@ def write_all(out, G, grid, cfg, designs, top, prms_p, frame_dir, sites_p, L_p, 
                     (d / "site.ORCAFF.prms").write_text(prms_text(sub_rows, [(qv, lj) for qv in q]))
                 remote = "%s/%s/%s_%s" % (hpc_dir.rstrip("/"), name, side, kind) if hpc_dir else \
                          "CHANGE_ME/%s/%s_%s" % (name, side, kind)
-                (d / "job.pbs").write_text(job_pbs_text("cm_s6_%s_%s_%s" % (name.replace("S6-", ""), side, kind),
+                (d / "job.pbs").write_text(job_pbs_text("cm_s6_%s_%s_%s" % (name.replace("S6-", "").replace("ADD-s", "a"), side, kind),
                                                         remote,
                                                         SP_WALLTIME if kind == "sp" else OPT_WALLTIME))
                 written.append(d)
@@ -545,8 +562,10 @@ def write_all(out, G, grid, cfg, designs, top, prms_p, frame_dir, sites_p, L_p, 
     for name, sel, q, lj, sol, full in designs:
         if not sel:
             continue
-        a = (out / name / "R_opt" / "combined.xyz").read_text().splitlines()[2 + NQM:]
-        b = (out / name / "TS_opt" / "combined.xyz").read_text().splitlines()[2 + NQM:]
+        sub = "R_sp" if name.startswith("ADD-") else "R_opt"
+        sub2 = "TS_sp" if name.startswith("ADD-") else "TS_opt"
+        a = (out / name / sub / "combined.xyz").read_text().splitlines()[2 + NQM:]
+        b = (out / name / sub2 / "combined.xyz").read_text().splitlines()[2 + NQM:]
         if a != b:
             stop("%s does not use the same sphere coordinates at R and TS" % name)
     print("== (f,h,i) every input written and read back: spheres clear 1.2 A, the same positions at R and TS,")
