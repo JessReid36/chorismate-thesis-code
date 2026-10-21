@@ -87,6 +87,8 @@ NQM, QM0 = 24, 6207
 SPHERE_RSTAR, SPHERE_EPS = 1.824, 0.170            # cs5_grid.py line 74, the Amber N quasi-atom
 GEOMS = [("R", "reactant_qm.xyz"), ("TS", "transition_state_qm.xyz")]
 BUDGET_DEFAULT = 2.0
+SP_WALLTIME = "02:00:00"            # the frozen single points: about 5 minutes each, so this is already generous
+OPT_WALLTIME = "168:00:00"          # the relaxations: WP4's own request; armb_freecart took 6 h 42 m
 
 HEAD_COMMON = ("%maxcore 3000\n"
                "%pal nprocs 8 end\n"
@@ -257,11 +259,17 @@ def job_inp_text(kind, side, nsph):
     return s
 
 
-def job_pbs_text(name, remote):
+def job_pbs_text(name, remote, walltime):
+    """8 cores and 24 GB are what STAGE6_CRITERIA.txt fixes and what WP4 measured for this exact job, so neither is
+    a guess and neither changes. The WALLTIME is not pre-registered, and asking for a week for a job that takes
+    minutes is the same mistake as over-requesting memory: PBS routes by walltime, so an honest request reaches a
+    shorter queue instead of sitting behind week-queue work. The frozen single points are 24-atom EnGrad jobs - the
+    A-matrix job ran 16 of them in about 75 minutes, so roughly 5 minutes each - and get SP_WALLTIME; the
+    relaxations keep OPT_WALLTIME, WP4's own request, whose armb_freecart took 6 h 42 m."""
     return ("#!/bin/bash\n"
             "#PBS -N %s\n"
             "#PBS -l select=1:ncpus=8:mem=24gb\n"
-            "#PBS -l walltime=168:00:00\n"
+            "#PBS -l walltime=%s\n"
             "#PBS -m ae\n"
             "#PBS -M 18660916@sun.ac.za\n"
             "#PBS -j oe\n"
@@ -276,7 +284,7 @@ def job_pbs_text(name, remote):
             'echo "orca_exit=$? end=$(date)"\n'
             "grep -c 'GEOMETRY OPTIMIZATION CYCLE' job.out || true\n"
             "grep -E 'THE OPTIMIZATION HAS CONVERGED|ORCA TERMINATED NORMALLY' job.out | tail -2 || true\n"
-            "rm -f job.gbw job*.tmp 2>/dev/null || true\n" % (name, remote, remote))
+            "rm -f job.gbw job*.tmp 2>/dev/null || true\n" % (name, walltime, remote, remote))
 
 
 def check_inp(text, kind, nsph=1):
@@ -529,7 +537,8 @@ def write_all(out, G, grid, cfg, designs, top, prms_p, frame_dir, sites_p, L_p, 
                 remote = "%s/%s/%s_%s" % (hpc_dir.rstrip("/"), name, side, kind) if hpc_dir else \
                          "CHANGE_ME/%s/%s_%s" % (name, side, kind)
                 (d / "job.pbs").write_text(job_pbs_text("cm_s6_%s_%s_%s" % (name.replace("S6-", ""), side, kind),
-                                                        remote))
+                                                        remote,
+                                                        SP_WALLTIME if kind == "sp" else OPT_WALLTIME))
                 written.append(d)
 
     # (h) the same sphere coordinates at both geometries
@@ -672,6 +681,18 @@ def selftest():
     say(abs(q2[0] - 1.0) < 1e-6 and abs(q2[1] - 1.0) < 1e-6,
         "and at B = 2.00 the budget does not bind at two sites: q = %s, exactly the range bound"
         % ["%+.3f" % v for v in q2])
+
+    print("\n6. the PBS requests: cores and memory fixed, walltime honest")
+    sp = job_pbs_text("cm_s6_2_R_sp", "/x/y", SP_WALLTIME)
+    op = job_pbs_text("cm_s6_2_R_opt", "/x/y", OPT_WALLTIME)
+    say("#PBS -l select=1:ncpus=8:mem=24gb" in sp and "#PBS -l select=1:ncpus=8:mem=24gb" in op,
+        "both ask for 8 cores and 24 GB, as STAGE6_CRITERIA.txt fixes and WP4 measured")
+    say(("#PBS -l walltime=%s" % SP_WALLTIME) in sp, "the frozen single point asks for %s" % SP_WALLTIME)
+    say(("#PBS -l walltime=%s" % OPT_WALLTIME) in op, "the relaxation asks for %s" % OPT_WALLTIME)
+    say("168" not in sp, "no week-long request survives in a single point's script")
+    import re as _re
+    say(len(_re.findall(r"^#PBS -l walltime=", sp, _re.M)) == 1,
+        "exactly one walltime line per script")
 
     print("\n%s" % ("ALL PASS" if ok else "SOMETHING FAILED"))
     return 0 if ok else 1
