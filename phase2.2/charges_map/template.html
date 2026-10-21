@@ -1,0 +1,592 @@
+<title>Chorismate Optimal Charges</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Sibling of the site-effect map: same tokens, same two-row lab figure. Left, where the charges sit; right, what
+   each one buys. Diverging red/blue for charge sign, which the effect map does not use, so the two never clash. */
+:root {
+  --bg: #f4f6f4;
+  --surface: #ffffff;
+  --ink: #1b221e;
+  --muted: #59645d;
+  --rule: #dce2de;
+  --accent: #1f5c58;
+  --band: rgba(31, 92, 88, 0.14);
+  --atom-c: #4a524d;
+  --atom-h: #b9c0bb;
+  --atom-o: #3d6fb0;
+  --atom-n: #2a8c8c;
+  --bond: #7b847e;
+  --pos: #a3231c;
+  --neg: #2d5fa8;
+  --grid-dot: rgba(89, 100, 93, 0.30);
+  --res: #7a3fd0;
+  --res-dim: rgba(122, 63, 208, 0.42);
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111513; --surface: #181d1a; --ink: #e4eae6; --muted: #9aa59e; --rule: #2a322d;
+    --accent: #7cc2ba; --band: rgba(124, 194, 186, 0.16);
+    --atom-c: #aab3ad; --atom-h: #5d665f; --atom-o: #7fa6e0; --atom-n: #6cc6c0; --bond: #8a948d;
+    --pos: #e4705f; --neg: #76a7e8; --grid-dot: rgba(154, 165, 158, 0.20);
+    --res: #b48cff; --res-dim: rgba(180, 140, 255, 0.45);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111513; --surface: #181d1a; --ink: #e4eae6; --muted: #9aa59e; --rule: #2a322d;
+  --accent: #7cc2ba; --band: rgba(124, 194, 186, 0.16);
+  --atom-c: #aab3ad; --atom-h: #5d665f; --atom-o: #7fa6e0; --atom-n: #6cc6c0; --bond: #8a948d;
+  --pos: #e4705f; --neg: #76a7e8; --grid-dot: rgba(154, 165, 158, 0.20);
+  --res: #b48cff; --res-dim: rgba(180, 140, 255, 0.45);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 40px; margin: 0;
+}
+.wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: 22px; }
+header { display: grid; gap: 8px; }
+.eyebrow { font-family: var(--font-data); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+h1 { margin: 0; font-size: clamp(22px, 3.2vw, 30px); font-weight: 600; line-height: 1.2; text-wrap: balance; }
+.lede { margin: 0; max-width: 74ch; color: var(--muted); }
+.lede b { color: var(--ink); font-weight: 500; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; padding: 10px 14px; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; }
+.ctl { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ctl-label { font-size: 13px; color: var(--muted); }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.seg button { font: 500 13px var(--font-body); color: var(--ink); background: transparent; border: 0; padding: 6px 11px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--rule); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+.seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.symkey { font-size: 13px; color: var(--muted); display: inline-flex; gap: 8px; align-items: center; }
+.swatch { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-data); font-size: 11.5px; color: var(--ink); }
+.swatch i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+.nw { white-space: nowrap; }
+.reskey { display: inline-flex; gap: 6px; align-items: center; }
+.rk { display: inline-flex; align-items: center; gap: 3px; font-family: var(--font-data); font-size: 11px; color: var(--ink); }
+.rk i { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+section.row { display: grid; gap: 12px; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; }
+.row-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 18px; }
+.row-head h2 { margin: 0; font-size: 18px; font-weight: 600; }
+.facts { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 13px; color: var(--muted); justify-content: flex-end; }
+.facts b { font-family: var(--font-data); font-weight: 500; color: var(--ink); }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.panel { min-width: 0; display: grid; gap: 4px; }
+.panel-cap { font-size: 12.5px; color: var(--muted); }
+.plot { width: 100%; height: 460px; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); }
+.plot.short { height: 330px; }
+.notes { display: grid; gap: 6px; font-size: 13px; color: var(--muted); max-width: 94ch; }
+.notes p { margin: 0; }
+.notes ul { margin: 0; padding-left: 20px; display: grid; gap: 3px; }
+.notes b { color: var(--ink); font-weight: 500; }
+code { font-family: var(--font-data); font-size: 12px; overflow-wrap: anywhere; }
+.prov { font-family: var(--font-data); font-size: 11.5px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 3px 16px; }
+@media (max-width: 860px) {
+  .pair { grid-template-columns: 1fr; }
+  .plot { height: 400px; }
+  .plot.short { height: 300px; }
+  .facts { justify-content: flex-start; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Phase 2.2 · Stage 6 · frame 42436 · placed by rule, not by a barrier</div>
+    <h1>The charges the optimiser places, and what each one buys</h1>
+    <p class="lede">Seven pre-registered arrangements on frame 42436's own grid. Each sphere's first-order effect on the barrier is <b>q × a + L</b>, with <b>a = V<sub>TS</sub> − V<sub>R</sub></b> the substrate's own potential difference at that point and <b>L</b> the sphere's Lennard-Jones energy at the transition state minus at the reactant. Negative lowers the barrier. Every design spends the same budget, <b>Σq² ≤ 2.0 e²</b>, so more spheres means thinner charges — which is the whole story on the right.</p>
+  </header>
+
+  <div class="controls" role="group" aria-label="View settings">
+    <div class="ctl"><span class="ctl-label" id="lbl-d">Arrangement</span>
+      <div class="seg" role="group" aria-labelledby="lbl-d" id="seg-d"></div></div>
+    <div class="ctl"><span class="ctl-label" id="lbl-g">Substrate</span>
+      <div class="seg" role="group" aria-labelledby="lbl-g">
+        <button type="button" id="g-R" aria-pressed="true">Reactant</button><button type="button" id="g-TS" aria-pressed="false">Transition state</button>
+      </div></div>
+    <div class="ctl"><span class="ctl-label" id="lbl-r">Catalytic residues</span>
+      <div class="seg" role="group" aria-labelledby="lbl-r">
+        <button type="button" id="r-off" aria-pressed="false">Hidden</button><button type="button" id="r-cen" aria-pressed="false">Charge centres</button><button type="button" id="r-all" aria-pressed="true">Ball and stick</button>
+      </div></div>
+    <div class="ctl"><span class="ctl-label" id="lbl-c">Grid behind</span>
+      <div class="seg" role="group" aria-labelledby="lbl-c">
+        <button type="button" id="c-off" aria-pressed="true">Hidden</button><button type="button" id="c-on" aria-pressed="false">All 2626 sites</button>
+      </div></div>
+    <span class="symkey">
+      <span class="swatch"><i style="background:var(--pos)"></i> q &gt; 0</span>
+      <span class="swatch"><i style="background:var(--neg)"></i> q &lt; 0</span>
+      <span style="font-size:12.5px">area ∝ |q|</span>
+    </span>
+    <span class="symkey" aria-label="Residue colour: literature rank of catalytic importance, 1 most to 6 least">
+      <span class="nw">catalytic rank, 1 = most</span> <span class="reskey" id="res-key"></span></span>
+  </div>
+
+  <section class="row">
+    <div class="row-head">
+      <h2 id="r1h">Where the charges go, and what each one buys</h2>
+      <div class="facts" id="r1f"></div>
+    </div>
+    <div class="pair">
+      <div class="panel">
+        <div class="plot" id="p3d"></div>
+        <p class="panel-cap">Real coordinates, frame 42436's aligned frame. The design's spheres are the large ringed markers, red for positive and blue for negative; the residues are drawn as the substrate is, with their carbons and sticks coloured by catalytic rank, so rank 1 shares the ramp's red. Dashed: the bond that breaks (O3–C4) and the one that forms (C1–C6). Drag to rotate; hover anything for its numbers.</p>
+      </div>
+      <div class="panel">
+        <div class="plot" id="pbar"></div>
+        <p class="panel-cap">Each sphere's first-order contribution, strongest at the top. Where the total fits on the same scale it is drawn as a dashed line; for the larger designs it is in the heading instead.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="row">
+    <div class="row-head">
+      <h2>What n buys, and what it costs in charge</h2>
+      <div class="facts"><span>budget <b>Σq² ≤ 2.0 e²</b></span><span>spacing <b>≥ 3.25 Å</b></span></div>
+    </div>
+    <div class="pair">
+      <div class="panel">
+        <div class="plot short" id="pn"></div>
+        <p class="panel-cap">The frozen score against the number of spheres, split into the electrostatic part Σq·a and the Lennard-Jones part ΣL.</p>
+      </div>
+      <div class="panel">
+        <div class="plot short" id="pm"></div>
+        <p class="panel-cap">What each added sphere buys, and the charge each design can afford once the budget is shared.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="row">
+    <div class="row-head">
+      <h2>Against the enzyme's own charged residues</h2>
+      <div class="facts"><span>ranked by <b>Szefczyk 2004</b>, Table 1</span></div>
+    </div>
+    <div class="pair">
+      <div class="panel">
+        <div class="plot short" id="pres"></div>
+        <p class="panel-cap">What the literature says each residue is worth, and how far the selected design's nearest sphere sits from that residue's charge centre. Bars to the left lower the barrier.</p>
+      </div>
+      <div class="panel">
+        <div class="plot short" id="pagree"></div>
+        <p class="panel-cap">The distance from each residue's charge centre to the nearest sphere of the selected design, and whether that sphere carries the same sign as the residue.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="row">
+    <div class="row-head"><h2>Reading this honestly</h2></div>
+    <div class="notes" id="notes"></div>
+    <div class="prov" id="prov"></div>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script>
+const D = __DATA__;
+const css = k => getComputedStyle(document.documentElement).getPropertyValue(k).trim();
+let sel = "S6-2", geom = "R", showGrid = false, resMode = "all";
+const byName = {}; D.designs.forEach(d => byName[d.name] = d);
+const ORDER = ["S6-P", "S6-2", "S6-3", "S6-5", "S6-10", "S6-20", "S6-C"];
+const designs = ORDER.filter(n => byName[n]).map(n => byName[n]);
+
+/* ---------- the arrangement selector ---------- */
+const seg = document.getElementById("seg-d");
+designs.forEach(d => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.textContent = d.name === "S6-C" ? "S6-C (none)" : d.name;
+  b.setAttribute("aria-pressed", d.name === sel ? "true" : "false");
+  b.onclick = () => { sel = d.name; [...seg.children].forEach(c => c.setAttribute("aria-pressed", c === b ? "true" : "false")); draw(); };
+  seg.appendChild(b);
+});
+function pair(aId, bId, set) {
+  const a = document.getElementById(aId), b = document.getElementById(bId);
+  a.onclick = () => { set(true); a.setAttribute("aria-pressed", "true"); b.setAttribute("aria-pressed", "false"); draw(); };
+  b.onclick = () => { set(false); b.setAttribute("aria-pressed", "true"); a.setAttribute("aria-pressed", "false"); draw(); };
+}
+pair("g-R", "g-TS", v => geom = v ? "R" : "TS");
+function triple(ids, vals) {
+  const bs = ids.map(i => document.getElementById(i));
+  bs.forEach((b, k) => b.onclick = () => { resMode = vals[k]; bs.forEach(o => o.setAttribute("aria-pressed", o === b ? "true" : "false")); draw(); });
+}
+triple(["r-off", "r-cen", "r-all"], ["off", "cen", "all"]);
+pair("c-off", "c-on", v => showGrid = !v);
+
+/* ---------- the residue colouring, ported verbatim from site_effect_map/template.html ---------- */
+const SCALE = [[0, "#9fd39a"], [0.38, "#e4cb52"], [0.68, "#e47d2e"], [1, "#a3231c"]];
+const ASIZE = { C: 11, H: 7, O: 12, N: 12 };
+const STATE = { R: "reactant", TS: "transition state" };
+const NRANK = D.res.length;
+function atomColours() { return { C: css("--atom-c"), H: css("--atom-h"), O: css("--atom-o"), N: css("--atom-n") }; }
+function rampAt(t) {      // colour at t (0..1) on SCALE, linear in RGB between its stops
+  for (let k = 1; k < SCALE.length; k++) if (t <= SCALE[k][0]) {
+    const [t0, c0] = SCALE[k - 1], [t1, c1] = SCALE[k], f = (t - t0) / (t1 - t0);
+    const a = [1, 3, 5].map(m => parseInt(c0.substr(m, 2), 16)), b = [1, 3, 5].map(m => parseInt(c1.substr(m, 2), 16));
+    return "#" + a.map((v, m) => Math.round(v + (b[m] - v) * f).toString(16).padStart(2, "0")).join("");
+  }
+  return SCALE[SCALE.length - 1][1];
+}
+const rankColour = r => rampAt((NRANK - r.rank) / (NRANK - 1));
+function litLine(r) {
+  return "literature rank " + r.rank + " of " + NRANK + ": Szefczyk 2004 MP2 " + (r.szef > 0 ? "+" : "\u2212")
+    + Math.abs(r.szef).toFixed(2) + " kcal/mol" + (r.szef > 0 ? " (raises the barrier)" : "")
+    + "; Claeyssens 2011 " + (r.clae ? (r.clae[0] < 0 ? "\u2212" : "") + Math.abs(r.clae[0]).toFixed(1)
+        + " \u00b1 " + r.clae[1].toFixed(1) + " kcal/mol TS stabilisation" : "not reported");
+}
+function hoverAtom(r, k, d) {
+  const n = r.names[k], near = geom === "R" ? r.nearR : r.nearTS;
+  let h = r.lab + " " + n + " \u00b7 chain " + r.chain + ", residue " + r.seq + " in the system"
+        + "<br>frame " + D.frame + ", " + STATE[geom] + "<br>" + litLine(r);
+  if (n === r.centre) {
+    h += "<br>charge centre (" + (r.q > 0 ? "+1" : "\u22121") + "): nearest substrate atom " + near[0]
+       + " at " + near[1].toFixed(2) + " \u00c5"
+       + "<br>moves " + r.moveCentre.toFixed(2) + " \u00c5 from R to TS (largest side-chain atom "
+       + r.moveMax.toFixed(2) + " \u00c5)";
+    const v = d && d.vsres ? d.vsres[geom].res[r.lab] : null;
+    if (v) h += "<br>nearest sphere of " + d.name + ": site " + v[0] + ", q " + (v[1] > 0 ? "+" : "") + v[1].toFixed(2)
+              + " e at " + v[2].toFixed(2) + " \u00c5, <b>" + (v[3] ? "same sign" : "opposite sign") + "</b>";
+  }
+  return h;
+}
+
+/* ---------- shared plot furniture ---------- */
+const font = () => ({ family: getComputedStyle(document.body).fontFamily, size: 12, color: css("--muted") });
+const base = () => ({
+  paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
+  font: font(), margin: { l: 56, r: 14, t: 16, b: 40 }, showlegend: false, hovermode: "closest",
+});
+const axis = () => ({ gridcolor: css("--rule"), zerolinecolor: css("--rule"), linecolor: css("--rule"),
+                      tickfont: { family: css("--font-data"), size: 11, color: css("--muted") } });
+
+/* ---------- row 1 left: the 3D map ---------- */
+function draw3d() {
+  const X = D[geom], d = byName[sel];
+  const bonds = geom === "R" ? D.bR : D.bT;
+  const bx = [], by = [], bz = [];
+  bonds.forEach(([i, j]) => { bx.push(X[i][0], X[j][0], null); by.push(X[i][1], X[j][1], null); bz.push(X[i][2], X[j][2], null); });
+  const traces = [];
+  if (showGrid) {
+    traces.push({
+      type: "scatter3d", mode: "markers", x: D.grid.map(g => g[0]), y: D.grid.map(g => g[1]), z: D.grid.map(g => g[2]),
+      marker: { size: 1.8, color: css("--grid-dot") }, hoverinfo: "skip", name: "grid",
+    });
+  }
+  traces.push({ type: "scatter3d", mode: "lines", x: bx, y: by, z: bz,
+                line: { color: css("--bond"), width: 6 }, hoverinfo: "skip" });
+  [["breaking", "O3–C4 breaking"], ["forming", "C1–C6 forming"]].forEach(([k, lab]) => {
+    const px = [], py = [], pz = [];
+    D[k].forEach(([i, j]) => { px.push(X[i][0], X[j][0], null); py.push(X[i][1], X[j][1], null); pz.push(X[i][2], X[j][2], null); });
+    traces.push({ type: "scatter3d", mode: "lines", x: px, y: py, z: pz,
+                  line: { color: css("--accent"), width: 6, dash: "dash" }, hovertext: lab, hoverinfo: "text" });
+  });
+  const colEl = { C: css("--atom-c"), H: css("--atom-h"), O: css("--atom-o") };
+  traces.push({
+    type: "scatter3d", mode: "markers", x: X.map(p => p[0]), y: X.map(p => p[1]), z: X.map(p => p[2]),
+    marker: { size: D.el.map(e => e === "H" ? 4.2 : 7.6), color: D.el.map(e => colEl[e]) },
+    text: D.names, hovertemplate: "%{text}<extra></extra>",
+  });
+  if (resMode !== "off") {
+    // The six charged residues, drawn exactly as the substrate is - same frame, same state, same balls and sticks -
+    // with each residue's carbons and sticks taking its literature rank colour on the page's own ramp, 1 red (most
+    // catalytic) to 6 green (least). This is site_effect_map/template.html's coding, kept identical so the two
+    // pages mean the same thing by the same colour.
+    const ax = [], ay = [], az = [], ac = [], asz = [], at = [], col = atomColours();
+    D.res.forEach(r => {
+      const X = r[geom], rc = rankColour(r);
+      if (resMode === "all") {
+        const bx = [], by = [], bz = [];
+        r.bonds.forEach(([i, j]) => { bx.push(X[i][0], X[j][0], null); by.push(X[i][1], X[j][1], null); bz.push(X[i][2], X[j][2], null); });
+        traces.push({ type: "scatter3d", mode: "lines", x: bx, y: by, z: bz,
+                      line: { color: rc, width: 6 }, hoverinfo: "skip" });
+      }
+      const ks = resMode === "all" ? X.map((_p, k) => k) : [r.ci];
+      ks.forEach(k => {
+        ax.push(X[k][0]); ay.push(X[k][1]); az.push(X[k][2]);
+        ac.push(r.el[k] === "C" ? rc : col[r.el[k]]);
+        asz.push(ASIZE[r.el[k]]);
+        at.push(hoverAtom(r, k, d));
+      });
+    });
+    traces.push({ type: "scatter3d", mode: "markers", x: ax, y: ay, z: az,
+                  marker: { size: asz, color: ac, line: { width: 0 } },
+                  text: at, hovertemplate: "%{text}<extra></extra>" });
+  }
+  if (d.sph.length) {
+    const sx = [], sy = [], sz = [], sc = [], ss = [], st = [];
+    d.sph.forEach((s, k) => {
+      const g = D.grid[s[0]];
+      sx.push(g[0]); sy.push(g[1]); sz.push(g[2]);
+      sc.push(s[1] > 0 ? css("--pos") : css("--neg"));
+      ss.push(11 + 18 * Math.sqrt(Math.abs(s[1])));
+      const nr = d.near[geom][k];
+      st.push("site " + s[0] + "<br>q " + (s[1] > 0 ? "+" : "") + s[1].toFixed(3) + " e"
+            + "<br>a " + (s[2] > 0 ? "+" : "") + s[2].toFixed(3) + "  L " + (s[3] > 0 ? "+" : "") + s[3].toFixed(3)
+            + "<br><b>" + (s[4] > 0 ? "+" : "") + s[4].toFixed(3) + " kcal/mol</b>"
+            + "<br>nearest " + nr[1] + " at " + nr[0].toFixed(2) + " Å");
+    });
+    traces.push({
+      type: "scatter3d", mode: "markers", x: sx, y: sy, z: sz,
+      marker: { size: ss, color: sc, opacity: 0.92, line: { color: css("--surface"), width: 2 } },
+      text: st, hovertemplate: "%{text}<extra></extra>",
+    });
+  }
+  // fit the cube to what is actually drawn - the substrate plus this design's spheres - with a small margin, and
+  // use one half-extent on all three axes so aspectmode "cube" does not distort the geometry.
+  // with the grid shown the view has to hold the whole admitted shell, which makes the substrate smaller - that is
+  // what the context view is for, and the plot can be zoomed.
+  const all = X.concat(d.sph.map(s => D.grid[s[0]].slice(0, 3)))
+               .concat(showGrid ? D.grid.map(g => g.slice(0, 3)) : [])
+               .concat(resMode !== "off" ? D.res.map(r => r[geom][r.ci]) : []);
+  const ctr = [0, 1, 2].map(i => { const v = all.map(p => p[i]); return (Math.min(...v) + Math.max(...v)) / 2; });
+  const half = Math.max(2.0, ...[0, 1, 2].map(i => {
+    const v = all.map(p => p[i]); return (Math.max(...v) - Math.min(...v)) / 2;
+  })) + 1.4;
+  const rng = i => [ctr[i] - half, ctr[i] + half];
+  const sc3 = { showbackground: false, gridcolor: css("--rule"), zerolinecolor: css("--rule"),
+                tickfont: { size: 9, color: css("--muted") }, title: { text: "" } };
+  const resLabels = resMode === "off" ? [] : D.res.map(r => {
+    const p_ = r[geom][r.ci];
+    return { x: p_[0], y: p_[1], z: p_[2], text: r.lab + " (" + r.rank + ")", showarrow: false,
+             xanchor: "left", xshift: 10, font: { family: getComputedStyle(document.body).fontFamily, size: 11, color: css("--ink") } };
+  });
+  Plotly.react("p3d", traces, Object.assign(base(), {
+    margin: { l: 0, r: 0, t: 0, b: 0 },
+    scene: { xaxis: Object.assign({ range: rng(0) }, sc3), yaxis: Object.assign({ range: rng(1) }, sc3),
+             zaxis: Object.assign({ range: rng(2) }, sc3), aspectmode: "cube",
+             camera: { eye: { x: 1.5, y: 1.3, z: 0.9 } }, annotations: resLabels },
+  }), { displayModeBar: false, responsive: true });
+}
+
+/* ---------- row 1 right: per-sphere contribution ---------- */
+function drawBars() {
+  const d = byName[sel];
+  if (!d.sph.length) {
+    Plotly.react("pbar", [], Object.assign(base(), {
+      xaxis: { visible: false }, yaxis: { visible: false },
+      annotations: [{ text: "S6-C is the control: no spheres, and so no contribution.<br>It is the reference every other design's Loss is measured against.",
+                      showarrow: false, font: { size: 13, color: css("--muted") }, x: 0.5, y: 0.5, xref: "paper", yref: "paper" }],
+    }), { displayModeBar: false, responsive: true });
+    return;
+  }
+  const s = d.sph.slice().sort((a, b) => b[4] - a[4]);
+  const tot = s.reduce((t, x) => t + x[4], 0);
+  Plotly.react("pbar", [{
+    type: "bar", orientation: "h",
+    y: s.map(x => "site " + x[0]), x: s.map(x => x[4]),
+    marker: { color: s.map(x => x[1] > 0 ? css("--pos") : css("--neg")) },
+    text: s.map(x => (x[4] > 0 ? "+" : "") + x[4].toFixed(2)),
+    textposition: "outside", outsidetextfont: { family: css("--font-data"), size: 10, color: css("--muted") },
+    hovertemplate: s.map(x => "site " + x[0] + "<br>q " + (x[1] > 0 ? "+" : "") + x[1].toFixed(3)
+                             + " e<br>a " + x[2].toFixed(3) + "  L " + x[3].toFixed(3)
+                             + "<br><b>" + x[4].toFixed(3) + " kcal/mol</b><extra></extra>"),
+    width: s.length <= 3 ? 0.42 : undefined,
+  }], Object.assign(base(), (() => {
+    // The total belongs on this panel only while it can share an axis with the bars. Once the design is large the
+    // total is many times the biggest single contribution, and drawing it squashes every bar into the margin - so
+    // past that point the line is dropped and the total is read from the score in the row heading instead.
+    const big = Math.max(...s.map(x => Math.abs(x[4])));
+    const showTotal = Math.abs(tot) <= 1.8 * big;
+    const lo = (showTotal ? Math.min(tot, ...s.map(x => x[4])) : Math.min(...s.map(x => x[4]))) * 1.18;
+    const lay = {
+      margin: { l: 72, r: 46, t: 10, b: 42 },
+      xaxis: Object.assign({ title: { text: "contribution to the barrier, kcal/mol", font: { size: 11.5 } },
+                             range: [lo, Math.max(0.35, ...s.map(x => x[4])) * 1.3] }, axis()),
+      yaxis: Object.assign({ automargin: true }, axis()),
+      bargap: 0.28,
+    };
+    if (showTotal) {
+      lay.shapes = [{ type: "line", x0: tot, x1: tot, y0: -0.5, y1: s.length - 0.5,
+                      line: { color: css("--accent"), width: 1.5, dash: "dash" } }];
+      lay.annotations = [{ x: tot, y: s.length - 0.5, yanchor: "bottom", text: "total " + tot.toFixed(2),
+                           showarrow: false, font: { family: css("--font-data"), size: 11, color: css("--accent") } }];
+    }
+    return lay;
+  })()), { displayModeBar: false, responsive: true });
+}
+
+/* ---------- row 2: what n buys ---------- */
+const withSph = designs.filter(d => d.sph.length && d.score !== null);
+function drawN() {
+  const n = withSph.map(d => d.sph.length);
+  Plotly.react("pn", [
+    { type: "bar", name: "Σq·a", x: n.map(String), y: withSph.map(d => d.aq), marker: { color: css("--accent") },
+      hovertemplate: "n %{x}<br>Σq·a %{y:.3f} kcal/mol<extra></extra>" },
+    { type: "bar", name: "ΣL", x: n.map(String), y: withSph.map(d => d.sl), marker: { color: css("--pos") },
+      hovertemplate: "n %{x}<br>ΣL %{y:+.3f} kcal/mol<extra></extra>" },
+    { type: "scatter", mode: "markers+lines", name: "score", x: n.map(String), y: withSph.map(d => d.score),
+      marker: { size: 7, color: css("--ink") }, line: { color: css("--ink"), width: 1.4 },
+      hovertemplate: "n %{x}<br>score %{y:.3f} kcal/mol<extra></extra>" },
+  ], Object.assign(base(), {
+    barmode: "relative", showlegend: true,
+    legend: { orientation: "h", y: 1.14, x: 0, font: { size: 11.5 } },
+    margin: { l: 56, r: 12, t: 34, b: 44 },
+    xaxis: Object.assign({ title: { text: "spheres in the design (n)", font: { size: 11.5 } }, type: "category" }, axis()),
+    yaxis: Object.assign({ title: { text: "kcal/mol", font: { size: 11.5 } } }, axis()),
+  }), { displayModeBar: false, responsive: true });
+}
+function drawMarginal() {
+  const pts = withSph.map(d => [d.sph.length, d.score]);
+  const mx = [], my = [], mt = [];
+  for (let i = 1; i < pts.length; i++) {
+    const dn = pts[i][0] - pts[i - 1][0];
+    mx.push(pts[i - 1][0] + " → " + pts[i][0]);
+    my.push((pts[i][1] - pts[i - 1][1]) / dn);
+    mt.push("adding " + dn + " sphere" + (dn > 1 ? "s" : "") + " buys " + (pts[i][1] - pts[i - 1][1]).toFixed(2)
+            + " kcal/mol<br><b>" + ((pts[i][1] - pts[i - 1][1]) / dn).toFixed(3) + " per sphere</b>");
+  }
+  Plotly.react("pm", [
+    { type: "bar", x: mx, y: my, marker: { color: css("--accent") }, yaxis: "y",
+      text: my.map(v => v.toFixed(2)), textposition: "outside",
+      outsidetextfont: { family: css("--font-data"), size: 10, color: css("--muted") },
+      hovertemplate: mt.map(t => t + "<extra></extra>") },
+    { type: "scatter", mode: "markers+lines", x: mx,
+      y: withSph.slice(1).map(d => Math.sqrt(d.ssq / d.sph.length)), yaxis: "y2",
+      marker: { size: 6, color: css("--neg") }, line: { color: css("--neg"), width: 1.4, dash: "dot" },
+      hovertemplate: "r.m.s. |q| %{y:.3f} e<extra></extra>" },
+  ], Object.assign(base(), {
+    margin: { l: 56, r: 54, t: 34, b: 44 },
+    xaxis: Object.assign({ title: { text: "spheres added", font: { size: 11.5 } }, type: "category" }, axis()),
+    yaxis: Object.assign({ title: { text: "kcal/mol per added sphere", font: { size: 11.5 } } }, axis()),
+    yaxis2: Object.assign({ title: { text: "r.m.s. |q|, e", font: { size: 11.5, color: css("--neg") } },
+                            overlaying: "y", side: "right", tickfont: { size: 10, color: css("--neg") },
+                            gridcolor: "rgba(0,0,0,0)", rangemode: "tozero" }, {}),
+  }), { displayModeBar: false, responsive: true });
+}
+
+/* ---------- row 3: the residues ---------- */
+const resOrd = D.res.slice().sort((a, b) => a.rank - b.rank);
+function drawRes() {
+  Plotly.react("pres", [
+    { type: "bar", orientation: "h", name: "Szefczyk 2004 (MP2)",
+      y: resOrd.map(r => r.lab), x: resOrd.map(r => r.szef),
+      marker: { color: resOrd.map(rankColour) },
+      text: resOrd.map(r => r.szef.toFixed(2)), textposition: "outside",
+      outsidetextfont: { family: css("--font-data"), size: 10, color: css("--muted") },
+      hovertemplate: resOrd.map(r => "<b>" + r.lab + "</b> " + r.res + " " + r.seq + r.chain
+        + ", q " + (r.q > 0 ? "+" : "") + r.q + "<br>" + litLine(r) + "<extra></extra>"),
+    },
+  ], Object.assign(base(), {
+    margin: { l: 78, r: 56, t: 10, b: 44 },
+    xaxis: Object.assign({ title: { text: "differential TS stabilisation, kcal/mol", font: { size: 11.5 } },
+                           // room for the value labels at both ends, which otherwise collide with the axis
+                           range: [Math.min(...resOrd.map(r => r.szef)) * 1.34,
+                                   Math.max(...resOrd.map(r => r.szef)) * 2.6] }, axis()),
+    yaxis: Object.assign({ automargin: true, autorange: "reversed" }, axis()),
+    bargap: 0.32,
+  }), { displayModeBar: false, responsive: true });
+}
+function drawAgree() {
+  const d = byName[sel];
+  if (!d.sph.length || !d.vsres) {
+    Plotly.react("pagree", [], Object.assign(base(), {
+      xaxis: { visible: false }, yaxis: { visible: false },
+      annotations: [{ text: "S6-C has no spheres, so there is nothing to compare<br>against the residues.",
+                      showarrow: false, font: { size: 13, color: css("--muted") }, x: 0.5, y: 0.5, xref: "paper", yref: "paper" }],
+    }), { displayModeBar: false, responsive: true });
+    return;
+  }
+  const v = resOrd.map(r => d.vsres[geom].res[r.lab]);
+  Plotly.react("pagree", [{
+    type: "bar", orientation: "h",
+    y: resOrd.map(r => r.lab), x: v.map(x => x[2]),
+    marker: { color: v.map(x => x[3] ? css("--accent") : css("--muted")) },
+    text: v.map((x, k) => x[2].toFixed(2) + " Å  " + (x[1] > 0 ? "+" : "") + x[1].toFixed(2) + " e"),
+    textposition: "outside", outsidetextfont: { family: css("--font-data"), size: 10, color: css("--muted") },
+    hovertemplate: resOrd.map((r, k) => "<b>" + r.lab + "</b> q " + (r.q > 0 ? "+" : "") + r.q
+      + " (rank " + r.rank + ")<br>nearest sphere: site " + v[k][0] + ", q " + (v[k][1] > 0 ? "+" : "") + v[k][1].toFixed(3)
+      + " e<br>distance " + v[k][2].toFixed(2) + " Å<br><b>" + (v[k][3] ? "same sign as the residue" : "opposite sign")
+      + "</b><extra></extra>"),
+  }], Object.assign(base(), {
+    margin: { l: 78, r: 92, t: 10, b: 44 },
+    xaxis: Object.assign({ title: { text: "distance to the nearest sphere, Å", font: { size: 11.5 } },
+                           range: [0, Math.max(...v.map(x => x[2])) * 1.42], rangemode: "tozero" }, axis()),
+    yaxis: Object.assign({ automargin: true, autorange: "reversed" }, axis()),
+    bargap: 0.32,
+  }), { displayModeBar: false, responsive: true });
+}
+
+/* ---------- facts and notes ---------- */
+function facts() {
+  const d = byName[sel];
+  const f = document.getElementById("r1f");
+  if (!d.sph.length) { f.innerHTML = "<span>the control: <b>no spheres</b></span>"; return; }
+  const parts = [
+    "<span>n <b>" + d.sph.length + "</b></span>",
+    "<span>Σq² <b>" + d.ssq.toFixed(4) + "</b> of 2.0</span>",
+    "<span>r.m.s. |q| <b>" + Math.sqrt(d.ssq / d.sph.length).toFixed(3) + " e</b></span>",
+    "<span>closest contact <b>" + d.close[geom][0].toFixed(2) + " Å</b> to " + d.close[geom][1] + "</span>",
+  ];
+  if (d.score !== null) parts.unshift("<span>score <b>" + d.score.toFixed(3) + " kcal/mol</b></span>");
+  else parts.unshift("<span>first-order effect <b>" + d.aq.toFixed(3) + " kcal/mol</b></span>");
+  f.innerHTML = parts.join("");
+  document.getElementById("r1h").textContent =
+    d.name === "S6-P" ? "A bare +1 charge, with no Lennard-Jones wall" : "Where the charges go, and what each one buys";
+}
+document.getElementById("notes").innerHTML = `
+<p><b>These are first-order estimates, not barriers.</b> Every number here is the linear score the optimiser
+minimises, <b>Σq·a + ΣL</b>, built from the substrate's own in-vacuo potential difference. Nothing on this page is a
+barrier, and none of it is quoted as a result. Stage 6 exists to measure what survives a fuller treatment: the
+frozen single points give the real effect with polarisation, and the relaxations give what is left once the
+substrate is allowed to move.</p>
+<ul>
+  <li><b>B = 2.0 e² is a code-test value, not the calibrated budget.</b> It is why the designs with many spheres
+      carry thin charges: at n = 20 the r.m.s. charge is about 0.32 e. The production budget comes from the
+      electronic screens and is not this.</li>
+  <li><b>The ranking rule picks one pocket, then leaves it.</b> All twenty of the best single sites lie within
+      3.25 Å of the best one — one dense cluster of 192 sites — so the spacing rule skips the whole pocket and the
+      second sphere of S6-2 is 9.63 Å away, in a pocket of the opposite sign. That is the rule working as
+      pre-registered, not an optimisation: S6-2 and S6-3 are placed by rule and are not the best pairs or triples
+      on the grid.</li>
+  <li><b>S6-20 carries passengers.</b> Six of its twenty spheres contribute less than 0.30 kcal/mol each,
+      −1.18 kcal/mol between them, because the cardinality rule asks for exactly twenty and the budget is already
+      spent. Each still brings a full Lennard-Jones wall and a full steric body, so S6-20 is the design most
+      exposed on the geometry criterion.</li>
+  <li><b>The Lennard-Jones term is small, and for the sparse designs it works against you.</b> ΣL runs from
+      +0.62 kcal/mol at n = 2 to −0.14 at n = 20, against Σq·a of −11.8 to −19.5. These designs are essentially
+      electrostatic.</li>
+  <li><b>S6-P's L is not shown, on purpose.</b> ARRANGEMENTS.txt prints site 1690's L in the S6-P block, which is
+      true of the site but not of the arrangement: a bare point charge has all four Lennard-Jones fields zeroed, so
+      its effect here is Σq·a alone. Nothing is computed from that printed L anywhere.</li>
+  <li><b>S6-20's certified gap is 0.559 kcal/mol</b> on a score of −19.654, so the best n = 20 design this score
+      and these rules admit anywhere on the grid could be as good as −20.21. The other designs closed their gap to
+      zero.</li>
+  <li><b>The optimiser does put positive charge where Arg90 is, and that is the most interesting thing here.</b>
+      Every arrangement places a positive sphere within 1.2–2.0 Å of Arg90's charge centre, and S6-20 also puts
+      +0.15 e within 1.33 Å of Arg7's. Those are ranks 1 and 2 of the six by Szefczyk's MP2 differential
+      stabilisation, and in both cases the sphere carries the residue's own sign. Where the designs disagree with
+      the enzyme they disagree at the weak end: negative charge near Arg63′ (rank 5), and nothing within 5.5 Å of
+      Lys60′ (rank 6, and the one residue Szefczyk found <i>raises</i> the barrier).</li>
+  <li><b>But read that carefully.</b> A sphere within 1.2 Å of a CZ atom is not an arginine: the sphere is a point
+      charge with one Lennard-Jones wall, the residue is a guanidinium group spread over several atoms, and CZ is
+      only the charge centre Stage 4d defines for it. The grid was built around the substrate, so "the optimiser
+      finds the Arg90 pocket" says the best electrostatic position for a point charge coincides with where
+      evolution put an arginine — which is the finding — and is not independent evidence about the grid, the A
+      column or the score. It is one frame. And the sign test compares a residue's formal charge with a sphere's,
+      which ignores that the field at any point is the sum of the whole protein's.</li>
+  <li><b>The two literature sources do not agree in detail.</b> The ranking here is Szefczyk 2004's Table 1 (MP2).
+      Claeyssens 2011's Table 3, over 16 B3LYP/CHARMM27 pathways, gives 6.0, 3.1, 2.1, 1.0 and −0.6 kcal/mol for
+      the first five and does not report Lys60′ at all. Both are in the hover for each residue; neither was
+      measured on this frame, or on this enzyme structure.</li>
+  <li><b>No design starts near collapse.</b> The closest sphere-to-substrate distances are 2.85–2.96 Å across all
+      seven, against the 1.2 Å collapse threshold, and close to where WP4's free-Cartesian sphere actually settled
+      (2.54 Å) — so the grid floors put the spheres near their own Lennard-Jones equilibrium.</li>
+</ul>`;
+document.getElementById("prov").innerHTML =
+  ["frame " + D.frame, "sites " + D.sha.sites, "L " + D.sha.L, "A " + D.sha.A, "arrangements " + D.sha.arr,
+   "residues from the f42436_r8_a1 archives, same structure as the substrate"]
+  .map(s => "<span>" + s + "</span>").join("");
+
+function resKey() {
+  document.getElementById("res-key").innerHTML = D.res.slice().sort((a, b) => a.rank - b.rank).map(r =>
+    '<span class="rk" title="' + r.lab + '"><i style="background:' + rankColour(r) + '"></i>' + r.rank + "</span>").join("");
+}
+function draw() { draw3d(); drawBars(); drawAgree(); facts(); }
+resKey(); draw(); drawN(); drawMarginal(); drawRes();
+const mq = window.matchMedia("(prefers-color-scheme: dark)");
+mq.addEventListener && mq.addEventListener("change", () => { resKey(); draw(); drawN(); drawMarginal(); drawRes(); });
+</script>
