@@ -22,9 +22,20 @@ NO GEOMETRY MOVES. NO OPTIMISATION. Sixteen single points on the committed D1 ge
 
   generate   build the 16 input directories from committed files only
   measure    read the 16 outputs and write DIAGNOSTIC10_RESULT.txt
+  stage      copy the outputs and the result into the results repo for committing
 
 usage: cs10_cpcm.py generate <results-repo> <out-dir>
        cs10_cpcm.py measure  <run-dir> <results-repo> <out-dir>
+       cs10_cpcm.py stage    <run-dir> <results-repo> <out-dir>
+
+CORRECTED 27 October 2026, see STAGE6_DIAGNOSTIC10_ERRATUM1_20261027.txt. The first version of
+this script summed the L column of ARRANGEMENTS.txt for every design. L is a property of a SITE,
+and a design that deploys a site WITHOUT a Lennard-Jones wall does not pay it. S6-P is such a
+design - ARRANGEMENTS.txt's own header says "BARE point charge, no LJ wall" and its committed
+site.ORCAFF.prms carries zero epsilon and zero sigma - so its sum L is zero and the old gate
+subtracted +0.56294 kcal/mol that was never there. sum L is now read from the deployed force
+field, which is the only authority for what actually ran, and ARRANGEMENTS.txt's bare flag is
+cross-checked against it in both directions. No measured number changed.
 """
 import sys, os, re, math, hashlib
 from pathlib import Path
@@ -51,19 +62,62 @@ def one(root, name):
 
 
 def read_arrangements(p):
-    """Per design: list of (site, q, x, y, z, a, L). Straight from the committed file."""
+    """Per design: {"bare": bool, "sites": [(site, q, x, y, z, a, L), ...]}.
+
+    The header line carries more than a count. S6-P's reads
+
+        S6-P   1 sphere(s), BARE point charge, no LJ wall
+
+    and that clause is the file telling us the L listed underneath is the site's property and not
+    a term this design deploys. It is captured here rather than ignored.
+    """
     out, cur = {}, None
     for l in Path(p).read_text(errors="replace").splitlines():
-        m = re.match(r"\s{2}(S6-\S+)\s+(\d+) sphere", l)
+        m = re.match(r"\s{2}(S6-\S+)\s+(\d+) sphere\(s\)(.*)$", l)
         if m:
-            cur = m.group(1); out[cur] = []
+            cur = m.group(1)
+            out[cur] = {"bare": "no LJ wall" in m.group(3), "sites": []}
             continue
         m = re.match(r"\s+site\s+(\d+)\s+q\s+([-+]\d+\.\d+)\s+at\s+([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)"
                      r"\s+a\s+([-+]\d+\.\d+)\s+L\s+([-+]\d+\.\d+)", l)
         if m and cur:
-            out[cur].append((int(m.group(1)), float(m.group(2)), float(m.group(3)),
-                             float(m.group(4)), float(m.group(5)), float(m.group(6)), float(m.group(7))))
+            out[cur]["sites"].append(
+                (int(m.group(1)), float(m.group(2)), float(m.group(3)),
+                 float(m.group(4)), float(m.group(5)), float(m.group(6)), float(m.group(7))))
     return out
+
+
+def deployed_L(A, arr, lj):
+    """sum L as the FORCE FIELD deploys it, with ARRANGEMENTS.txt cross-checked both ways.
+
+    A sphere whose four Lennard-Jones numbers are all zero is a bare point charge: it has no wall,
+    so it contributes nothing to the offset between a QMMM run and a %pointcharges run. A sphere
+    with a wall contributes the L that ARRANGEMENTS.txt lists for its site.
+
+    The two records must agree. If ARRANGEMENTS.txt says a design is bare and any sphere carries
+    Lennard-Jones parameters, or if it does not say bare and any sphere carries none, this stops.
+    Disagreement between the arrangement file and the force field that ran is not something to
+    resolve by preferring one of them.
+    """
+    rec = A.get(arr)
+    if rec is None:
+        stop("%s is not in ARRANGEMENTS.txt" % arr)
+    sites = rec["sites"]
+    if len(sites) != len(lj):
+        stop("%s: ARRANGEMENTS lists %d sites, the force field has %d spheres"
+             % (arr, len(sites), len(lj)))
+    tot, walled = 0.0, 0
+    for site, p in zip(sites, lj):
+        if any(v != 0.0 for v in p):
+            tot += site[6]
+            walled += 1
+    if rec["bare"] and walled:
+        stop("%s: ARRANGEMENTS.txt says 'no LJ wall' but %d of %d spheres carry Lennard-Jones "
+             "parameters in site.ORCAFF.prms" % (arr, walled, len(sites)))
+    if not rec["bare"] and walled != len(sites):
+        stop("%s: ARRANGEMENTS.txt does not say 'no LJ wall' but %d of %d spheres carry none in "
+             "site.ORCAFF.prms" % (arr, len(sites) - walled, len(sites)))
+    return tot, walled
 
 
 def read_d1_inputs(diff, arr, geom):
@@ -77,7 +131,7 @@ def read_d1_inputs(diff, arr, geom):
     for l in body[24:]:
         f = l.split()
         sph.append((float(f[1]), float(f[2]), float(f[3])))
-    q = []
+    q, lj = [], []
     pr = d / "site.ORCAFF.prms"
     if sph and not pr.is_file():
         stop("%s has %d spheres but no site.ORCAFF.prms" % (d, len(sph)))
@@ -86,9 +140,12 @@ def read_d1_inputs(diff, arr, geom):
         k = prms.index("$atoms")
         for l in prms[k + 2: k + 2 + n]:
             f = l.split()
+            if len(f) < 7:
+                stop("%s: malformed $atoms row: %s" % (pr, l.strip()))
             q.append(float(f[2]))
-        q = q[24:]
-    return atoms, sph, q, d
+            lj.append(tuple(float(x) for x in f[3:7]))   # eps1 sig1 eps2 sig2
+        q, lj = q[24:], lj[24:]
+    return atoms, sph, q, lj, d
 
 
 def generate(res, out):
@@ -100,7 +157,7 @@ def generate(res, out):
     man, made = [], 0
     for arr in ARR:
         for geom in GEOM:
-            atoms, sph, q, src = read_d1_inputs(diff, arr, geom)
+            atoms, sph, q, lj, src = read_d1_inputs(diff, arr, geom)
             if len(atoms) != 24:
                 stop("%s %s: expected 24 QM atoms, found %d" % (arr, geom, len(atoms)))
             if len(sph) != len(q):
@@ -110,10 +167,11 @@ def generate(res, out):
                 ref = A.get(arr)
                 if ref is None:
                     stop("%s is not in %s" % (arr, arrp))
-                if len(ref) != len(sph):
+                if len(ref["sites"]) != len(sph):
                     stop("%s: ARRANGEMENTS lists %d spheres, the D1 input has %d"
-                         % (arr, len(ref), len(sph)))
-                for (s_, qa, x, y, z, a_, L_), (px, py, pz), qp in zip(ref, sph, q):
+                         % (arr, len(ref["sites"]), len(sph)))
+                deployed_L(A, arr, lj)          # stops if the two records disagree
+                for (s_, qa, x, y, z, a_, L_), (px, py, pz), qp in zip(ref["sites"], sph, q):
                     if abs(qa - qp) > 1e-6:
                         stop("%s: charge %.6f in ARRANGEMENTS, %.6f in the D1 input" % (arr, qa, qp))
                     if max(abs(x - px), abs(y - py), abs(z - pz)) > 1e-4:
@@ -145,8 +203,10 @@ def generate(res, out):
         if arr == "S6-C":
             print("     %-6s control, no spheres" % arr)
         else:
-            L = sum(r[6] for r in A[arr])
-            print("     %-6s %2d sphere(s)   sum L = %+.5f kcal/mol" % (arr, len(A[arr]), L))
+            _, _, _, lj, _ = read_d1_inputs(diff, arr, "R")
+            L, walled = deployed_L(A, arr, lj)
+            print("     %-6s %2d sphere(s), %2d walled   sum L = %+.5f kcal/mol"
+                  % (arr, len(A[arr]["sites"]), walled, L))
 
 
 RE_E = re.compile(r"FINAL SINGLE POINT ENERGY\s+(-?\d+\.\d+)")
@@ -199,10 +259,53 @@ def d1_values(res):
 
 def measure(run, res, out):
     run, res, out = Path(run), Path(res), Path(out)
-    if str(out.resolve()).startswith(str(res.resolve())):
-        stop("refusing to write inside the results repo: %s" % out)
+    # The first version refused any out-dir under the results repo. That fired wrongly on the HPC,
+    # where the run directory sits under the same root, and it is the wrong test anyway: writing a
+    # result into the repo is what `stage` is for and is deliberate when it happens. The thing
+    # actually worth refusing is writing into the directory being read.
+    if str(out.resolve()) == str(run.resolve()) or \
+       str(out.resolve()).startswith(str(run.resolve()) + os.sep):
+        stop("refusing to write inside the run directory being read: %s" % out)
     A = read_arrangements(one(res, "ARRANGEMENTS.txt"))
     ctl1, dd1 = d1_values(res)
+    diff = one(res, "DIAGNOSTIC1_RESULT.txt").parent
+
+    # GATE 0. The sixteen runs must be the sixteen committed inputs, byte for byte. The committed
+    # MANIFEST.sha256 is the authority. Added 27 October 2026; it can only withhold a verdict,
+    # never produce one.
+    # Seven MANIFEST.sha256 files live in this repo, so name alone will not do. The one that
+    # belongs to this diagnostic is the one sitting beside this diagnostic's run directories.
+    cand = [m for m in Path(res).rglob("MANIFEST.sha256")
+            if ".git" not in m.parts and (m.parent / "S6-C_R_vac").is_dir()]
+    if len(cand) != 1:
+        stop("expected exactly one MANIFEST.sha256 beside the D10 run directories, found %d"
+             % len(cand))
+    man = cand[0]
+    bad = []
+    for l in man.read_text().splitlines():
+        if not l.strip():
+            continue
+        want, rel = l.split(None, 1)
+        f = run / rel.strip()
+        if not f.is_file():
+            bad.append("%s is missing from the run directory" % rel.strip())
+        elif hashlib.sha256(f.read_bytes()).hexdigest() != want:
+            bad.append("%s does not match the committed input" % rel.strip())
+    if bad:
+        stop("the runs are not the committed inputs:\n   " + "\n   ".join(bad))
+    n_checked = len([l for l in man.read_text().splitlines() if l.strip()])
+
+    # sum L per design, from the force field that actually ran.
+    SUML, WALLED = {}, {}
+    for arr in ARR:
+        if arr == "S6-C":
+            continue
+        ljs = {}
+        for geom in GEOM:
+            _, _, _, ljs[geom], _ = read_d1_inputs(diff, arr, geom)
+        if ljs["R"] != ljs["TS"]:
+            stop("%s: the R and TS force fields deploy different Lennard-Jones parameters" % arr)
+        SUML[arr], WALLED[arr] = deployed_L(A, arr, ljs["R"])
 
     R = {}
     for arr in ARR:
@@ -226,6 +329,16 @@ def measure(run, res, out):
          "Measured by cs10_cpcm.py from sixteen single points on the committed Diagnostic 1 geometries.",
          "NO GEOMETRY MOVED. The verdict rule is STAGE6_DIAGNOSTIC10_20261026.txt D10.3, fixed before",
          "the runs went in and applied here unchanged. STAGE6_CRITERIA.txt is untouched.",
+         "",
+         "GATE 0: THE SIXTEEN RUNS MUST BE THE SIXTEEN COMMITTED INPUTS",
+         "",
+         "   Every job.inp, substrate.xyz and pc.pc in the run directory is checked, byte for byte,",
+         "   against cpcm/MANIFEST.sha256, which was committed before anything ran. What was measured",
+         "   is therefore what was pre-registered, and not something edited on the cluster.",
+         "",
+         "   %d files checked, all match." % n_checked,
+         "",
+         "   GATE 0 PASSED",
          "",
          "GATE 1: THE CONTROL MUST REPRODUCE DIAGNOSTIC 1'S OWN ENERGIES",
          "",
@@ -252,19 +365,22 @@ def measure(run, res, out):
     O += ["GATE 2: THE VACUUM ARM MUST DIFFER FROM D1 BY EXACTLY sum L", "",
           "   Finding 4: at fixed geometry a bare point charge and an LJ sphere differ by exactly L.",
           "   So ddE(pointcharge) must equal D1's ddE(QMMM) minus sum L, to %.2f kcal/mol." % GATE2_KCAL,
+          "   sum L counts only spheres that carry a Lennard-Jones wall in the committed",
+          "   site.ORCAFF.prms. A bare charge has no wall and pays nothing - see ERRATUM1.",
           "",
-          "   design   ddE vac    D1 ddE(ma)   sum L      expected   diff      "]
+          "   design  walls    ddE vac    D1 ddE(ma)   sum L      expected   diff      "]
     g2 = True
     for arr in ARR:
         if arr == "S6-C":
             continue
-        L = sum(r[6] for r in A[arr])
+        L = SUML[arr]
         exp = dd1[arr][0] - L
         got = ddE(arr, "vac")
         ok = abs(got - exp) <= GATE2_KCAL
         g2 &= ok
-        O.append("   %-7s %9.4f  %10.4f  %+8.5f  %9.4f  %+8.4f  %s"
-                 % (arr, got, dd1[arr][0], L, exp, got - exp, "OK" if ok else "FAIL"))
+        O.append("   %-7s %5s  %9.4f  %10.4f  %+8.5f  %9.4f  %+8.4f  %s"
+                 % (arr, "%d/%d" % (WALLED[arr], len(A[arr]["sites"])), got, dd1[arr][0], L, exp,
+                    got - exp, "OK" if ok else "FAIL"))
     O += ["", "   GATE 2 %s" % ("PASSED" if g2 else "FAILED"), ""]
     if not g2:
         O += ["   Nothing further is reported. Finding 4 says a bare point charge and an LJ sphere",
@@ -336,11 +452,55 @@ def measure(run, res, out):
     print("\n".join(O))
 
 
+KEEP = ("job.out",)      # the inputs are already committed and gate 0 proved they still match
+
+
+def stage(run, res, out):
+    """Copy each run's job.out and the result into the results repo, ready to commit.
+
+    Nothing else is copied. job.inp, pc.pc and substrate.xyz are already committed and gate 0
+    has verified the run used exactly those bytes, so re-copying them could only introduce a
+    difference. ORCA's scratch - job.cpcm, job.cpcm_corr, job.densitiesinfo, job.bibtex - is
+    several hundred kilobytes per run and is not evidence of anything.
+    """
+    run, res, out = Path(run), Path(res), Path(out)
+    dest = res / "phase2.2" / "cs_stage6" / "cpcm"
+    if not dest.is_dir():
+        stop("not found: %s" % dest)
+    r = out / "DIAGNOSTIC10_RESULT.txt"
+    if not r.is_file():
+        stop("no DIAGNOSTIC10_RESULT.txt in %s - run measure first" % out)
+    lines, got = [], 0
+    for arr in ARR:
+        for geom in GEOM:
+            for cond in COND:
+                name = "%s_%s_%s" % (arr, geom, cond)
+                src, dst = run / name, dest / name
+                if not dst.is_dir():
+                    stop("%s is not a committed input directory" % dst)
+                for f in KEEP:
+                    if not (src / f).is_file():
+                        stop("missing output: %s" % (src / f))
+                    dst.joinpath(f).write_bytes((src / f).read_bytes())
+                    lines.append("%s  %s/%s"
+                                 % (hashlib.sha256((dst / f).read_bytes()).hexdigest(), name, f))
+                got += 1
+    (dest / "DIAGNOSTIC10_RESULT.txt").write_bytes(r.read_bytes())
+    lines.append("%s  DIAGNOSTIC10_RESULT.txt"
+                 % hashlib.sha256((dest / "DIAGNOSTIC10_RESULT.txt").read_bytes()).hexdigest())
+    (dest / "OUTPUTS.sha256").write_text("\n".join(lines) + "\n")
+    print("   staged %d job.out files and the result into %s" % (got, dest))
+    print("   MANIFEST.sha256 (the inputs) is untouched; OUTPUTS.sha256 is new.")
+
+
 if __name__ == "__main__":
     if len(sys.argv) >= 2 and sys.argv[1] == "generate" and len(sys.argv) == 4:
         generate(sys.argv[2], sys.argv[3])
     elif len(sys.argv) >= 2 and sys.argv[1] == "measure" and len(sys.argv) == 5:
         measure(sys.argv[2], sys.argv[3], sys.argv[4])
+    elif len(sys.argv) >= 2 and sys.argv[1] == "stage" and len(sys.argv) == 5:
+        stage(sys.argv[2], sys.argv[3], sys.argv[4])
     else:
         stop("usage: cs10_cpcm.py generate <results-repo> <out-dir>\n"
-             "       cs10_cpcm.py measure  <run-dir> <results-repo> <out-dir>")
+             "       cs10_cpcm.py measure  <run-dir> <results-repo> <out-dir>\n"
+             "       cs10_cpcm.py stage    <run-dir> <results-repo> <out-dir>")
