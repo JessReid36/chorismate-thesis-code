@@ -30,6 +30,7 @@ R_GAP = 0.5      #        and also less than half its own control's gap, so a ba
 R_CYC = 2.0      #        SCF cycles over control that count as convergence difficulty
 MM_NPC = 200     #        above this the point charges are an MM environment in a QM/MM run, not a design
 METALS = {"Na", "K", "Mg", "Ca", "Li", "Zn", "Fe", "Cl", "Br", "I"}
+ECP_SYMBOL = "Q"   # how ORCA labels an inline ECP centre in the Loewdin block
 
 
 def stop(m):
@@ -72,14 +73,28 @@ def read(s):
             mm = re.match(r"\s*\d+\s+([A-Za-z]{1,2})\s*:\s*(-?\d+\.\d+)", l)
             if not mm:
                 break
-            if mm.group(1) not in METALS:
+            # ORCA prints an inline ECP centre (Ne>) in this block under the symbol Q, carrying the
+            # charge ASSIGNED to it, not a population. Those rows are not atoms of the substrate and
+            # must not enter max|Loewdin|: a walled design whose largest charge exceeds the control
+            # median by D_LW fires the MOVED test on its own input. Excluded by symbol rather than by
+            # truncating the list, because this script audits the whole corpus, including QM/MM runs
+            # whose QM region is not the 24-atom substrate.
+            if mm.group(1) not in METALS and mm.group(1) != ECP_SYMBOL:
                 q.append(abs(float(mm.group(2))))
+    # When TRAH-SCF runs with the level shift on, the ORBITAL ENERGIES table prints the SHIFTED
+    # orbital energies, so LUMO - HOMO reads as the shift floor (0.1 Eh) and not the converged gap.
+    # TRAH reports the gap itself; prefer it where it exists.
+    trah = re.findall(r"HOMO - LUMO gap\s*:\s*(-?\d+\.\d+)", s)
+    trah_gap = float(trah[-1]) * EV if trah else None
+
     bas = re.search(r"^\|\s*\d+>\s*!.*?(def2-SVPD|ma-def2-SVP|def2-SVP|def2-TZVPD|def2-TZVP)", s, re.M | re.I)
     if not bas:   # a composite method names no basis of its own; use the method keyword instead
         bas = re.search(r"^\|\s*\d+>\s*!\s*(?:QMMM\s+)?(\S*-3c|\S*3c)\b", s, re.M | re.I)
     return dict(nb=int(nb.group(1)) if nb else None, npc=int(pc.group(1)) if pc else 0,
                 cyc=int(cy[-1]) if cy else None, dip=float(dp[-1]) if dp else None,
-                gap=(vir[0] - occ[-1]) * EV if vir else None, homo=occ[-1] * EV,
+                gap=(trah_gap if trah_gap is not None else ((vir[0] - occ[-1]) * EV if vir else None)),
+                gap_table=(vir[0] - occ[-1]) * EV if vir else None, gap_trah=trah_gap,
+                homo=occ[-1] * EV,
                 maxlw=max(q) if q else None, E=float(en[-1]),
                 nopt=len(re.findall(r"GEOMETRY OPTIMIZATION CYCLE", s)),
                 bas=bas.group(1) if bas else "?",
