@@ -167,34 +167,52 @@ def read_fod(p):
 
 
 def read_stab(p):
-    """ORCA's printed wording is not quoted in the documentation this was written against.
-    Several spellings are tried; if none matches, this STOPS and shows what is there."""
+    """ORCA's own format, read from the output rather than guessed at.
+
+    NOTE 1 (31 October 2026) replaces the first version of this function, which searched a
+    4000-character window from the first match of "stability analysis" and took the most
+    negative float in it as the eigenvalue. That window runs past the stability block into the
+    energy sections, so it reported total energies as eigenvalues, and it never noticed that
+    ORCA restarts and re-analyses when it finds an instability.
+
+    What ORCA actually prints, per analysis:
+        WAVEFUNCTION STABILITY ANALYSIS
+        The eigenvalues of the stability matrix:
+           E( 0) =   0.05617271 Eh
+        The stability analysis shows that the wavefunction is stable
+    or  The stability analysis indicates that the wavefunction is unstable
+
+    Returns (analyses, tot, fsp): analyses is [(verdict, [eigenvalues]), ...] in order, one per
+    analysis ORCA performed - two if it found an instability and reconverged, one if stable.
+    """
     t = Path(p).read_text(errors="replace")
     if "ORCA TERMINATED NORMALLY" not in t:
         stop("%s: ORCA did not terminate normally" % p)
-    low = t.lower()
-    if "stability analysis" not in low:
-        stop("%s: no stability-analysis section. Was STABPerform honoured?" % p)
-    k = low.find("stability analysis")
-    blk = t[k:k + 4000]
-    unstable = bool(re.search(r"\bis unstable\b|\bunstable\b|instabilit", blk, re.I))
-    stable = bool(re.search(r"\bis stable\b|\bwavefunction is stable\b", blk, re.I))
-    eig = [float(x) for x in re.findall(r"(-?\d+\.\d{3,})", blk)]
-    if not (unstable or stable or eig):
-        stop("%s: the stability section was found but neither a verdict nor an eigenvalue could "
-             "be read from it. THIS IS A PARSER PROBLEM, NOT A RUN PROBLEM - the run is kept and "
-             "re-reading costs nothing. The section reads:\n%s" % (p, blk[:1500]))
-    lowest = min(eig) if eig else None
-    if unstable and not stable:
-        v = "UNSTABLE"
-    elif stable and not unstable:
-        v = "STABLE"
-    elif lowest is not None:
-        v = "UNSTABLE" if lowest < 0 else "STABLE"
-    else:
-        stop("%s: the stability section is ambiguous and carries no eigenvalue:\n%s"
-             % (p, blk[:1500]))
-    return v, lowest
+    heads = [m.start() for m in re.finditer(r"WAVEFUNCTION STABILITY ANALYSIS", t)]
+    if not heads:
+        stop("%s: no WAVEFUNCTION STABILITY ANALYSIS section. Was STABPerform honoured?" % p)
+    verdicts = re.findall(
+        r"The stability analysis (?:shows|indicates) that the wavefunction is (stable|unstable)", t)
+    if len(verdicts) != len(heads):
+        stop("%s: %d stability sections but %d verdict lines. ORCA's wording may have changed; "
+             "this is a PARSER problem, not a run problem, and re-reading costs nothing."
+             % (p, len(heads), len(verdicts)))
+    out = []
+    for i, k in enumerate(heads):
+        end = heads[i + 1] if i + 1 < len(heads) else len(t)
+        blk = t[k:end]
+        m = re.search(r"The eigenvalues of the stability matrix:", blk)
+        if not m:
+            stop("%s: stability section %d prints no eigenvalue block" % (p, i + 1))
+        eig = [float(x) for x in
+               re.findall(r"E\(\s*\d+\)\s*=\s*(-?\d+\.\d+)\s*Eh", blk[m.start():])]
+        if not eig:
+            stop("%s: stability section %d has no E( n ) = ... Eh lines" % (p, i + 1))
+        out.append((verdicts[i].upper(), eig))
+    tot = [float(x) for x in
+           re.findall(r"Total energy after final integration\s*:\s*(-?\d+\.\d+)", t)]
+    fsp = [float(x) for x in re.findall(r"FINAL SINGLE POINT ENERGY\s+(-?\d+\.\d+)", t)]
+    return out, tot, fsp
 
 
 def analyse(root, runs, outdir):
@@ -227,11 +245,21 @@ def analyse(root, runs, outdir):
     w("Stage 6, DIAGNOSTIC 19 RESULT.")
     w("Read by cs6_d19.py against STAGE6_DIAGNOSTIC19_20261030.txt. Criteria as pre-registered.")
     w("")
+    def stabline(lam, st):
+        an, tot, fsp = S[(lam, st)]
+        for i, (v, eig) in enumerate(an):
+            w("   stab_%s_%-2s  analysis %d of %d  %-8s  E(0..2) %s"
+              % (TAG[lam], st, i + 1, len(an), v,
+                 "  ".join("%+.8f" % x for x in eig[:3])))
+        if len(an) > 1:
+            w("      ORCA found an instability, transformed the orbitals and reconverged.")
+            if len(tot) >= 2:
+                w("      total energy %.9f -> %.9f Eh  (%+.4f kcal/mol)"
+                  % (tot[0], tot[-1], (tot[-1] - tot[0]) * TR.H))
     w("GATE 1, the zero-field stability controls")
-    g1 = all(S[(0.00, st)][0] == "STABLE" for st in Q13.GEOM)
+    g1 = all(S[(0.00, st)][0][0][0] == "STABLE" for st in Q13.GEOM)
     for st in Q13.GEOM:
-        v, e = S[(0.00, st)]
-        w("   stab_lam000_%-2s  %-9s lowest eigenvalue %s" % (st, v, "%.6f" % e if e is not None else "n/a"))
+        stabline(0.00, st)
     if not g1:
         w("   GATE 1 FAILED. A charge-free closed-shell substrate reports an instability, so the")
         w("   indicator is not measuring what it is meant to and nothing below is readable.")
@@ -264,12 +292,21 @@ def analyse(root, runs, outdir):
     w("   VERDICT: %s" % v1)
     w("")
     w("READING 2, is the production wavefunction stable at full field?")
+    w("   The verdict is on the FIRST analysis, which is the solution the production runs use:")
+    w("   D19.2 B adds STABPerform to the committed production head and changes nothing else.")
     for st in Q13.GEOM:
-        v, e = S[(1.00, st)]
-        w("   stab_lam100_%-2s  %-9s lowest eigenvalue %s" % (st, v, "%.6f" % e if e is not None else "n/a"))
-    v2 = "UNSTABLE AT FULL FIELD" if any(S[(1.00, st)][0] == "UNSTABLE" for st in Q13.GEOM) \
+        stabline(1.00, st)
+    v2 = "UNSTABLE AT FULL FIELD" if any(S[(1.00, st)][0][0][0] == "UNSTABLE" for st in Q13.GEOM) \
          else "STABLE AT FULL FIELD"
     w("   VERDICT: %s" % v2)
+    if any(len(S[(1.00, st)][0]) > 1 for st in Q13.GEOM):
+        w("")
+        w("   D19.3 states of the restart that the reconverged energy \"is not the production")
+        w("   energy, is not compared with one, and is used for nothing but this verdict\". It is")
+        w("   therefore NOT compared with one here. That a lower stable solution exists at full")
+        w("   field, and what it does to any barrier, is left to a diagnostic pre-registered for")
+        w("   it. The energies above are reported because they were printed, not because this")
+        w("   diagnostic licenses a claim from them.")
     w("")
     w("READING 3, do the two indicators agree?")
     if v1 == "RISES WITH FIELD" and v2 == "UNSTABLE AT FULL FIELD":
