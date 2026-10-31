@@ -391,15 +391,25 @@ def analyse(root, runs, outdir):
         w("   No run found an instability, so there is no correction to measure.")
         v2 = "CORRECTION NEGLIGIBLE"
     else:
-        w("   %-10s %-7s %14s %14s %14s %9s" % ("basis", "lambda", "ddE(first)", "ddE(stable)",
-                                                "correction", "% budget"))
+        # NOTE 1 (31 October 2026). The first version of this reading computed ONE tolerance
+        # across both bases, from the largest correction anywhere. D20.1 and D20.3 both state
+        # that the bases are never pooled, so the tolerance is per basis. Pooled, def2-SVP's
+        # 0.4092 kcal/mol fell under a tolerance set by def2-SVPD's 9.5558.
+        tolb = {}
+        for bb in sorted({b for b, _ in corr}):
+            tolb[bb] = max(Q13.SHIELD_REL * max(abs(c) for (b2, _), (_, _, c) in corr.items()
+                                                if b2 == bb), Q13.SHIELD_ABS)
+        w("   %-10s %-7s %14s %14s %14s %9s %s" % ("basis", "lambda", "ddE(first)", "ddE(stable)",
+                                                   "correction", "% budget", "vs its tol"))
         for (basis, lam), (a, b, c) in sorted(corr.items()):
-            w("   %-10s %-7.2f %14.4f %14.4f %14.4f %9.1f"
-              % (basis, lam, a, b, c, 100.0 * abs(c) / 1.067))
-        tol = max(Q13.SHIELD_REL * max(abs(c) for _, _, c in corr.values()), Q13.SHIELD_ABS)
-        w("   tol = max(%.2f x largest |correction|, %.2f) = %.4f kcal/mol"
-          % (Q13.SHIELD_REL, Q13.SHIELD_ABS, tol))
-        v2 = "CORRECTION MATERIAL" if any(abs(c) > tol for _, _, c in corr.values()) \
+            w("   %-10s %-7.2f %14.4f %14.4f %14.4f %9.1f %s"
+              % (basis, lam, a, b, c, 100.0 * abs(c) / 1.067,
+                 "exceeds" if abs(c) > tolb[basis] else "under"))
+        for bb in sorted(tolb):
+            w("   tol(%s) = max(%.2f x its own largest |correction|, %.2f) = %.4f kcal/mol"
+              % (bb, Q13.SHIELD_REL, Q13.SHIELD_ABS, tolb[bb]))
+        w("   The tolerance is PER BASIS, never pooled across them (D20.1, D20.3; NOTE 1).")
+        v2 = "CORRECTION MATERIAL" if any(abs(c) > tolb[b] for (b, _), (_, _, c) in corr.items()) \
              else "CORRECTION NEGLIGIBLE"
     w("   VERDICT: %s" % v2)
     over = [(b, l, c) for (b, l), (_, _, c) in corr.items() if abs(c) > 1.067]
