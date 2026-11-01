@@ -294,8 +294,8 @@ def analyse(root, runs, outdir):
     below = [(nm, st, f) for nm, st, f in unstable if f < LADDER_STABLE_TO]
     if not unstable:
         v3 = "ONSET TRANSFERS"
-        w("   Nine arrangements at four charge counts (n = 2, 3, 5, 10, 20) and three fields")
-        w("   are all stable, as one arrangement's onset predicted.")
+        w("   Nine arrangements, at charge counts n = 2, 3, 5, 10 and 20 and three fields, are")
+        w("   all stable, as one arrangement's onset predicted.")
     else:
         v3 = "ONSET DOES NOT TRANSFER" if below else "ONSET TRANSFERS"
         if below:
