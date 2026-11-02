@@ -17,6 +17,10 @@ NOTHING ALREADY COMMITTED IS RETYPED OR RE-RUN.
                   READING 4 takes the bare leg's energies from D21.gate_targets, so they are
                   the same numbers D21 itself gated against its own pre-registration.
 
+ERRATUM 1 (2 November 2026) is implemented here: two of D22.2's nine conditions carry no
+readable Dset, so READING 2 labels them separately and the ALL ARMS VERIFIED text names the
+seven that do. No gate, tolerance, arithmetic or verdict rule is changed by it.
+
 Every job.inp is COPIED VERBATIM from the committed run it measures, with exactly one
 substitution - the production head swapped for the stability head - and gated to reduce back to
 that run's committed input BYTE FOR BYTE. D21 rebuilt its inputs from parts; a walled input
@@ -76,6 +80,16 @@ TARGETS = {
 
 # The two sources D22.2 names as the replicate pair: same position set, byte-identical input.
 REPLICATE = ("additivity/def2-SVPD/n10_wall0", "d16/def2-SVPD/S6-10_wall0")
+
+# STAGE6_DIAGNOSTIC22_ERRATUM1_20261102.txt E22.1: two of D22.2's nine conditions carry NO
+# readable Dset. Their own diagnostics report them NOT READABLE because the bare arm at R is
+# STRAINED under D6.3 - an electronic-health failure, which is a DIFFERENT test from the one
+# this diagnostic applies. Stable arms do not make their d_shield quotable (E22.2). The verdict
+# RULE of D22.4 is unchanged; only the label and the printed text below change (E22.3).
+NO_DSET = {
+    "S6-2_D16": "DIAGNOSTIC 16 READING 1: NOT READABLE, bare R STRAINED, gap 0.567 eV",
+    "S6-5_D17": "DIAGNOSTIC 17 READING 2: NOT READABLE, bare R STRAINED, gap 0.880 eV",
+}
 
 
 def stop(m):
@@ -384,14 +398,27 @@ def analyse(root, runs, outdir):
                  S[(w0src, "R")][0][0][0], S[(w0src, "TS")][0][0][0]]
         ok = all(c == "STABLE" for c in cells)
         audit[nm] = ok
+        if nm in NO_DSET:
+            lbl = "ARMS STABLE, NO READABLE Dset" if ok else "NOT VERIFIED"
+        else:
+            lbl = "ARMS VERIFIED" if ok else "NOT VERIFIED"
         w("   %-13s %-8s %-8s %-10s %-10s %-9s %-9s %s"
-          % (nm, cells[0], cells[1], cells[2], cells[3], cells[4], cells[5],
-             "ARMS VERIFIED" if ok else "NOT VERIFIED"))
+          % (nm, cells[0], cells[1], cells[2], cells[3], cells[4], cells[5], lbl))
+        if nm in NO_DSET:
+            w("      %s" % NO_DSET[nm])
     v2 = "ALL ARMS VERIFIED" if all(audit.values()) else "ARMS NOT VERIFIED"
     w("   VERDICT: %s" % v2)
+    read = [nm for nm, _, _, _, _ in COND if nm not in NO_DSET]
     if all(audit.values()):
-        w("   Every readable d_shield in this project now rests on verified-stable solutions in")
-        w("   all four legs: control, bare, walled and wall-at-zero.")
+        w("   The %d conditions that HAVE a readable d_shield now rest on verified-stable"
+          % len(read))
+        w("   solutions in all four legs - control, bare, walled and wall-at-zero:")
+        w("      %s" % ", ".join(read))
+        w("   The other %d have stable arms and NO readable Dset, per ERRATUM 1 E22.1. Their"
+          % len(NO_DSET))
+        w("   arms being minima does not make a quantity quotable that D6.3 withheld:")
+        for nm in sorted(NO_DSET):
+            w("      %-13s %s" % (nm, NO_DSET[nm]))
     w("")
 
     w("READING 3, the replicate: two committed runs with byte-identical input")
@@ -459,6 +486,10 @@ def analyse(root, runs, outdir):
         for nm, f, a0, a1, dd, lbl in rows:
             w("   %-13s %11.4f %11.4f %11.4f %11.4f %9.1f %s"
               % (nm, a0, a1, dd, BUDGET, 100.0 * abs(dd) / BUDGET, lbl))
+            if nm in NO_DSET:
+                w("      ERRATUM 1 E22.3(c): this correction applies to a quantity that is "
+                  "already")
+                w("      NOT READABLE, so it bounds nothing this project quotes.")
         for nm in withheld:
             w("   %-13s withheld, GATE 2 failed on one of its arms" % nm)
         if not rows and not withheld:
