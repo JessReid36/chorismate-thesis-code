@@ -129,7 +129,9 @@ def present(doi, lib, libsq):
         if suf in squash(n):
             return n
     for n, t in libsq.items():
-        if t and doi in t:
+        # squash(doi) not doi: t is SQUASHED text, so a raw DOI could never match and this
+        # branch never fired. See CITECHECK_FALLBACK_BUG_20261104.md.
+        if t and squash(doi) in t:
             return n + " (in text)"
     return None
 
