@@ -39,6 +39,20 @@ def sha(p):
     return h.hexdigest()
 
 
+def load_audit(code_root):
+    """the COMMITTED classifier, by explicit path, for the Loewdin and dipole definitions.
+    Erratum 1: these were promised in D28.4 and left unpopulated. They are taken from
+    cs6_audit.py's own read() rather than reimplemented here."""
+    import importlib.util
+    p = Path(code_root) / "phase2.2" / "cs6_audit.py"
+    spec = importlib.util.spec_from_file_location("_cs6_audit", p)
+    mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
+    return mod, sha(p)
+
+
+AUDIT = [None, None]          # (module, sha256), set in main()
+
+
 def read_out(path):
     """Everything D28 needs from one output, with the TRAH question answered explicitly."""
     t = Path(path).read_text(errors="replace")
@@ -91,6 +105,15 @@ def read_out(path):
     else:
         d["homo_raw"] = d["lumo_raw"] = d["gap_raw"] = None
     # --- and THEN the rule: a level-shifted run yields no quotable orbital energy
+    # Erratum 1: the two fields D28.4 promised to record, via the committed classifier
+    if AUDIT[0] is not None:
+        try:
+            c = AUDIT[0].read(t)
+            d["maxlw"], d["dip"] = c.get("maxlw"), c.get("dip")
+        except Exception:
+            d["maxlw"] = d["dip"] = None
+    else:
+        d["maxlw"] = d["dip"] = None
     usable = (d["homo_raw"] is not None) and (not d["shifted"])
     d["orbitals_usable"] = usable
     d["homo"] = d["homo_raw"] if usable else None
@@ -103,9 +126,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tree", required=True); ap.add_argument("--out", required=True)
     ap.add_argument("--d27", required=True)
+    ap.add_argument("--code", required=True, help="the code repository, for the committed classifier")
     a = ap.parse_args()
     tree, out, d27 = Path(a.tree), Path(a.out), Path(a.d27)
     out.mkdir(parents=True, exist_ok=True)
+    AUDIT[0], AUDIT[1] = load_audit(a.code)
     g = Gates()
     NEW = ["wB97X-D3", "CAM-B3LYP"]
 
@@ -226,7 +251,9 @@ def main():
                "shifted": ["|".join(map(str, k)) for k in tr],
                "warn_before_conv": ["|".join(map(str, k)) for k in wb],
                "cycles": dict(("|".join(map(str, k)), v["cycles"]) for k, v in R.items()),
-               "maxlw_dip": dict(("|".join(map(str, k)), None) for k in R),
+               "audit_sha": AUDIT[1],
+               "maxlw": dict(("|".join(map(str, k)), v["maxlw"]) for k, v in R.items()),
+               "dip": dict(("|".join(map(str, k)), v["dip"]) for k, v in R.items()),
                "gates_failed": g.failed}
     (out / "d28_values.json").write_text(json.dumps(payload, indent=1, sort_keys=True))
     with open(out / "d28.tsv", "w") as f:
