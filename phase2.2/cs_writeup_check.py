@@ -68,6 +68,24 @@ SIX CHECKS ADDED ON 11 NOVEMBER 2026, when the write-up was revised for DIAGNOST
  16 posthoc      Every block that discusses C3 (the sign or the size of the positive charge against relocation) carries
                  the words "post hoc".
 
+THE SCOPED REPORT (added 11 November 2026).  With --scoped <report> --scoped-dir <its directory> the script validates
+the second report, WRITEUP_SCOPED_<date>.md, and leaves the checks above alone.  Its eight checks:
+
+  S1 numbers       as check 1, against the scoped report's own source table and scoped/derived.tsv
+  S2 quotes        as check 2
+  S3 citations     every key of the source table resolves to a tracked file, or to a table in the scoped directory
+  S4 regeneration  scoped/make_scoped.py, re-run here, reproduces every .tsv of the scoped directory byte for byte
+  S5 heads         the report names the two HEAD hashes it refers to, and nothing but its own files has changed since
+  S6 levels        every block of the sections that hold claims (what is established, what must be remeasured, the
+                   conclusions and hypotheses) carries a [level: ...] tag.  A tag names the level or levels of theory the
+                   claim rests on; each must also stand in the sentence itself, and must be a level the sweep of committed
+                   inputs finds in a directory the block's sources were measured in.  [level: comparison] is for claims
+                   whose content is a comparison of methods and requires two levels in the sentence; [level: independent]
+                   is for facts about the record.  So no claim drawn at one level can be stated without it.
+  S7 d34           the report's statement about DIAGNOSTIC 34's two arms and the old level is recomputed here from the
+                   raw outputs (d34_recompute, the same code as check 13 to 15) and must agree
+  S8 conditional   the title and the first page say the report is conditional on D36 and that the level is not a decision
+
 --selftest then proves each check fires: it perturbs a number, a quotation, a count, a citation, a withdrawn figure,
 a self-label, a figure's .tsv, a HEAD hash and the not-tested list, and then, for the six added checks, the stated
 commit, a DIAGNOSTIC 34 number, a raw control output, a recorded frozen ddE, an arm 1 leg, a claim's number, a rejected
@@ -451,6 +469,238 @@ def d34_recompute(ctx):
         shutil.rmtree(tmp, ignore_errors=True)
     ctx.d34cache[key] = D
     return D
+
+
+# ===================================================================== the scoped report (11 November 2026)
+LEVEL_RE = re.compile(r"(?:DLPNO-CCSD\(T\)|CAM-B3LYP-D3BJ|B3LYP-D3BJ|wB97X-D3|CAM-B3LYP|B3LYP|MP2|HF)/(?:ma-def2-SVP|def2-TZVPD|def2-SVPD|def2-SVP|6-31G\(d\))")
+SCOPED_LEVEL_SECTIONS = ("3.", "4.", "7.")
+SCOPED_ORDER = ["numbers", "quotes", "citations", "regeneration", "heads", "levels", "d34", "conditional"]
+
+
+def scoped_sources(doc):
+    """The scoped report's source table: | key | repo | path | measured in |.  Returns key -> (repo, path, [directories])."""
+    src = {}
+    for m in re.finditer(r"^\|\s*([A-Z0-9]+)\s*\|\s*([RCW])\s*\|\s*(\S+)\s*\|\s*([^|\n]*?)\s*\|\s*$", doc, re.M):
+        src[m.group(1)] = (m.group(2), m.group(3), [d.strip() for d in m.group(4).split(",") if d.strip() not in ("", "-")])
+    return src
+
+
+def run_scoped(doc, sdir, ctx):
+    F = {k: [] for k in SCOPED_ORDER}
+    st = dict(sourced=0, derived=0, quotes=0, keys=0, tsv=0, blocks=0, tagged=0, d34=0)
+    sdir = Path(sdir)
+    src = scoped_sources(doc)
+    st["keys"] = len(src)
+    dv = {}
+    if (sdir / "derived.tsv").is_file():
+        for l in (sdir / "derived.tsv").read_text().splitlines():
+            f = l.split("\t")
+            if len(f) > 1 and not l.startswith("#") and f[0] != "id":
+                dv[f[0]] = f
+    # S4: regenerate, and read the sweep for S6
+    tmp = Path(tempfile.mkdtemp(prefix="cswu_scoped_"))
+    levels_in = {}
+    try:
+        r = subprocess.run([sys.executable, str(sdir / "make_scoped.py"), "--res", str(ctx.res), "--out", str(tmp)], capture_output=True, text=True)
+        if r.returncode != 0:
+            F["regeneration"].append("make_scoped.py exited %d: %s" % (r.returncode, (r.stderr or r.stdout).strip().replace("\n", " | ")[-200:]))
+        for q in sorted(sdir.glob("*.tsv")):
+            st["tsv"] += 1
+            if not (tmp / q.name).is_file():
+                F["regeneration"].append("%s is not produced when make_scoped.py is re-run here" % q.name)
+            elif (tmp / q.name).read_bytes() != q.read_bytes():
+                F["regeneration"].append("%s differs from the file regenerated from the committed sources" % q.name)
+        if (tmp / "S1_inputs_by_directory.tsv").is_file():
+            for l in (tmp / "S1_inputs_by_directory.tsv").read_text().splitlines():
+                f = l.split("\t")
+                if len(f) == 5 and not l.startswith("#") and f[0] != "directory":
+                    levels_in[f[0]] = set(re.sub(r" \d+$", "", x) for x in f[4].split("; "))
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    # S3
+    for k, (repo, path, dirs) in sorted(src.items()):
+        if repo == "W":
+            if not (sdir / path).is_file():
+                F["citations"].append("%s: %s is not in the scoped directory" % (k, path))
+        elif path not in ctx.tracked[repo]:
+            F["citations"].append("%s: %s is not tracked by git in the %s repository" % (k, path, "results" if repo == "R" else "code"))
+        for d in dirs:
+            if levels_in and d not in levels_in:
+                F["citations"].append("%s: 'measured in' names %s, which holds no committed input" % (k, d))
+    # S1, S2, S6, block by block
+    for sec, b in blocks_of(doc):
+        if b.startswith("#") or "| key | repo | path |" in b or "HEAD this document refers to" in b:
+            continue
+        keys, dvs = tags(b)
+        lt = re.search(r"\[level:([^\]]*)\]", b)
+        prose = re.sub(r"\[(?:src|dv|level):[^\]]*\]", " ", b)
+        st["blocks"] += 1
+        for k in keys:
+            if k not in src:
+                F["citations"].append("section '%s': [src: %s] is not in the source table" % (sec, k))
+        for d in dvs:
+            if d not in dv:
+                F["numbers"].append("section '%s': [dv: %s] is not a row of scoped/derived.tsv" % (sec, d))
+        texts = [t for t in (ctx.text(src[k][0], src[k][1], sdir) for k in keys if k in src) if t]
+        dvals = set(dv[d][1].lstrip("+-") for d in dvs if d in dv)
+        for w, kind, cand in numerals_of(re.sub(r"\[level:[^\]]*\]", " ", b))[0]:
+            if kind in ("range", "ident") and any(w in x for x in texts):
+                st["sourced"] += 1
+                continue
+            if kind == "ident":
+                F["numbers"].append("section '%s': '%s' is not verbatim in any [src:] file of its block (%s)" % (sec, w, ", ".join(keys) or "no src tag"))
+                continue
+            for c in cand:
+                if c in dvals:
+                    st["derived"] += 1
+                elif any(occurs(c, x) for x in texts):
+                    st["sourced"] += 1
+                else:
+                    F["numbers"].append("section '%s': %s is in no [src:] file of its block (%s) and is no [dv:] value (%s): ...%s..."
+                                        % (sec, c, ", ".join(keys) or "no src tag", ", ".join(dvs) or "no dv tag", norm(b)[max(0, norm(b).find(c) - 50):norm(b).find(c) + 30]))
+        for q in re.findall(r"“([^”]+)”", b):
+            st["quotes"] += 1
+            if not any(norm(q) in norm(x) for x in texts):
+                F["quotes"].append("section '%s': not verbatim in any [src:] file of its block (%s): “%s”" % (sec, ", ".join(keys) or "no src tag", q[:70]))
+        if sec.startswith(SCOPED_LEVEL_SECTIONS):
+            if not lt:
+                F["levels"].append("section '%s': a block carries no [level:] tag: %s..." % (sec, norm(b)[:80]))
+                continue
+            st["tagged"] += 1
+            named = [x.strip() for x in lt.group(1).split(";") if x.strip()]
+            inprose = set(LEVEL_RE.findall(prose))
+            if named == ["independent"]:
+                continue
+            if named == ["comparison"]:
+                if len(inprose) < 2:
+                    F["levels"].append("section '%s': tagged a comparison but names fewer than two levels in the sentence: %s..." % (sec, norm(b)[:70]))
+                continue
+            cited = [d for k in keys if k in src for d in src[k][2]]
+            union = set().union(*[levels_in.get(d, set()) for d in cited]) if cited else set()
+            for lv in named:
+                if not LEVEL_RE.fullmatch(lv):
+                    F["levels"].append("section '%s': [level: %s] is not a functional/basis the script knows" % (sec, lv))
+                elif lv not in inprose:
+                    F["levels"].append("section '%s': %s is named in the tag but not in the sentence: %s..." % (sec, lv, norm(b)[:70]))
+                elif cited and lv not in union:
+                    F["levels"].append("section '%s': %s is not a level of any directory its sources were measured in (%s): %s..."
+                                       % (sec, lv, ", ".join(sorted(set(cited))), norm(b)[:60]))
+            for k in keys:
+                if k in src and src[k][2]:
+                    have = set().union(*[levels_in.get(d, set()) for d in src[k][2]])
+                    if have and not (have & set(named)):
+                        F["levels"].append("section '%s': cites %s, measured in %s, and names none of its levels (%s)"
+                                           % (sec, k, ", ".join(src[k][2]), "; ".join(sorted(have))[:120]))
+    # S5
+    own = {"chorismate-thesis-results": re.compile(r"^phase2\.2/cs_stage6/(WRITEUP_SCOPED_\d{8}\.md|scoped/.*)$"),
+           "chorismate-thesis-code": re.compile(r"^phase2\.2/cs_writeup_check\.py$")}
+    for name, repo in (("chorismate-thesis-results", ctx.res), ("chorismate-thesis-code", ctx.code)):
+        m = re.search(r"\|\s*%s\s*\|[^|]*\|\s*`([0-9a-f]{40})`" % re.escape(name), doc)
+        head = git(repo, "rev-parse", "HEAD").stdout.strip()
+        if not m:
+            F["heads"].append("the report records no HEAD for %s" % name)
+            continue
+        if m.group(1) != head:
+            anc = git(repo, "merge-base", "--is-ancestor", m.group(1), head).returncode == 0
+            changed = git(repo, "diff", "--name-only", m.group(1), head).stdout.split() if anc else None
+            if not anc or any(not own[name].match(c) for c in changed):
+                F["heads"].append("%s: the report records %s and HEAD is %s" % (name, m.group(1), head))
+        for l in git(repo, "status", "--porcelain", "--untracked-files=all").stdout.splitlines():
+            if not own[name].match(l[3:].strip()):
+                F["heads"].append("%s: the working tree holds a change that is not the report's own: %s" % (name, l.strip()))
+    # S7
+    try:
+        D = d34_recompute(ctx)
+        for sv, d in (("SV60", "DV113"), ("SV61", "DV115"), ("SV62", "DV117"), ("SV63", "DV118"), ("SV67", "DV116")):
+            st["d34"] += 1
+            if sv not in dv or dv[sv][1] != D["dv"][d]:
+                F["d34"].append("%s is %s in scoped/derived.tsv; recomputed here from the raw outputs: %s" % (sv, dv[sv][1] if sv in dv else "absent", D["dv"][d]))
+    except (SystemExit, Exception) as e:
+        F["d34"].append("DIAGNOSTIC 34 could not be recomputed: %s" % str(e)[:200])
+    # S8
+    title = doc.split("\n", 1)[0]
+    first = doc.split("\n## ", 1)[0]
+    if "conditional on D36" not in title:
+        F["conditional"].append("the title does not say the report is conditional on D36")
+    for need in ("conditional on D36", "not a decision", "no amendment"):
+        if need not in first:
+            F["conditional"].append("the first page does not say '%s'" % need)
+    return F, st
+
+
+def report_scoped(F, st, out=sys.stdout):
+    note = {"numbers": "%d sourced in a named committed file, %d derived (scoped/derived.tsv)" % (st["sourced"], st["derived"]),
+            "quotes": "%d quotations" % st["quotes"], "citations": "%d keys in the source table" % st["keys"],
+            "regeneration": "%d tables regenerated" % st["tsv"], "heads": "two repositories",
+            "levels": "%d blocks carry a level tag" % st["tagged"], "d34": "%d values recomputed from raw outputs" % st["d34"],
+            "conditional": "title and first page"}
+    bad = 0
+    for i, k in enumerate(SCOPED_ORDER, 1):
+        print("S%d %-12s %s   (%s)" % (i, k, "PASS" if not F[k] else "FAIL %2d" % len(F[k]), note[k]), file=out)
+        for m in F[k][:40]:
+            print("      - " + m, file=out)
+        bad += len(F[k])
+    print("RESULT: %s" % ("ALL EIGHT SCOPED CHECKS PASS" if not bad else "%d FAILURE(S)" % bad), file=out)
+    return bad
+
+
+def selftest_scoped(doc, sdir, ctx):
+    def sub(a, b):
+        def f(d, sd):
+            if a not in d:
+                raise RuntimeError("selftest target not found: %s" % a[:60])
+            return d.replace(a, b, 1), sd
+        return f
+
+    def tsv(name, a, b):
+        def f(d, sd):
+            q = Path(sd) / name
+            t = q.read_text()
+            if a not in t:
+                raise RuntimeError("selftest target not found in %s: %s" % (name, a[:60]))
+            q.write_text(t.replace(a, b, 1))
+            return d, sd
+        return f
+    def swap_rsafe(d, sd):
+        a1 = "It was measured by D11 along one axis from one site at B3LYP-D3BJ/ma-def2-SVP"
+        a2 = "[dv: SV10] [level: B3LYP-D3BJ/ma-def2-SVP]"
+        if a1 not in d or a2 not in d:
+            raise RuntimeError("selftest target not found: r_safe")
+        return d.replace(a1, a1.replace("B3LYP-D3BJ/ma-def2-SVP", "CAM-B3LYP-D3BJ/def2-SVPD"), 1).replace(a2, "[dv: SV10] [level: CAM-B3LYP-D3BJ/def2-SVPD]", 1), sd
+    tests = [
+        ("a number", "numbers", "26.8348", sub("**The reference barrier is 26.8248 kcal/mol", "**The reference barrier is 26.8348 kcal/mol")),
+        ("a quotation", "quotes", "not verbatim", sub("“the production functional is NOT changed by this document”", "“the production functional is not changed by this document”")),
+        ("a regenerated table", "regeneration", "S1_inputs_by_directory.tsv", tsv("S1_inputs_by_directory.tsv", "d34\t44\t44\t", "d34\t44\t43\t")),
+        ("a HEAD hash", "heads", "records", sub("`133e212c", "`233e212c")),
+        ("a conclusion stripped of its level tag", "levels", "carries no [level:] tag",
+         sub("it is the number every lowering at this level is quoted against. [src: D33A] [level: CAM-B3LYP-D3BJ/def2-SVPD]",
+             "it is the number every lowering at this level is quoted against. [src: D33A]")),
+        ("a level left in the tag but taken out of the sentence", "levels", "named in the tag but not in the sentence",
+         sub("**The reference barrier is 26.8248 kcal/mol at CAM-B3LYP-D3BJ/def2-SVPD.**", "**The reference barrier is 26.8248 kcal/mol.**")),
+        ("r_safe restated at a level it was not measured at", "levels", "is not a level of any directory its sources were measured in", swap_rsafe),
+        ("a comparison that names one level", "levels", "fewer than two levels",
+         sub("nearer B3LYP-D3BJ/def2-TZVPD than CAM-B3LYP-D3BJ/def2-TZVPD, D28's direction", "nearer B3LYP than CAM-B3LYP, D28's direction")),
+        ("the arm 1 count", "d34", "SV60", tsv("derived.tsv", "SV60\t7\t", "SV60\t6\t")),
+        ("the condition in the title", "conditional", "title", sub("a scoped report, conditional on D36", "a scoped report")),
+    ]
+    lines, fired = ["NEGATIVE TESTS (scoped report)"], 0
+    for name, check, reason, fn in tests:
+        tmp = Path(tempfile.mkdtemp(prefix="cswu_sneg_"))
+        try:
+            sd = tmp / "scoped"
+            shutil.copytree(sdir, sd, ignore=shutil.ignore_patterns("__pycache__"))
+            d2, _ = fn(doc, sd)
+            if d2 == doc and not any((sd / q.name).read_bytes() != q.read_bytes() for q in Path(sdir).glob("*.tsv")):
+                raise RuntimeError("selftest '%s' changed nothing" % name)
+            F, _s = run_scoped(d2, sd, ctx)
+            hit = [m for m in F[check] if reason in m]
+            fired += bool(hit)
+            lines.append("   %-52s -> check '%s' %s%s" % (name, check, "FIRED" if hit else "DID NOT FIRE", (": " + hit[0][:100]) if hit else ""))
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+    lines.append("   %d of %d negative tests fired" % (fired, len(tests)))
+    print("\n".join(lines))
+    return fired == len(tests), lines
 
 
 def run_checks(doc, figdir, ctx, docpath=None, mode="pre"):
@@ -1006,13 +1256,44 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--res", required=True)
     ap.add_argument("--code", required=True)
-    ap.add_argument("--doc", required=True)
-    ap.add_argument("--figures", required=True)
+    ap.add_argument("--doc")
+    ap.add_argument("--figures")
+    ap.add_argument("--scoped", help="validate the scoped report at this path, and not the consolidated write-up")
+    ap.add_argument("--scoped-dir", help="the scoped report's own directory of tables (scoped/)")
     ap.add_argument("--full", action="store_true", help="also re-run sweep_pass2.py (about four minutes)")
     ap.add_argument("--selftest", action="store_true", help="run the negative tests after the clean run")
     ap.add_argument("--provenance", help="write the provenance record to this file")
     a = ap.parse_args()
     ctx = Ctx(a.res, a.code, a.full)
+    if a.scoped:
+        if not a.scoped_dir:
+            ap.error("--scoped needs --scoped-dir")
+        sdoc = Path(a.scoped).read_text()
+        F, st = run_scoped(sdoc, a.scoped_dir, ctx)
+        print("cs_writeup_check.py --scoped on %s" % Path(a.scoped).name)
+        ok = report_scoped(F, st) == 0
+        neg = []
+        if a.selftest:
+            okn, neg = selftest_scoped(sdoc, a.scoped_dir, ctx)
+            ok = okn and ok
+        if a.provenance:
+            import io
+            buf = io.StringIO()
+            report_scoped(F, st, buf)
+            lines = ["PROVENANCE of %s" % Path(a.scoped).name, "",
+                     "chorismate-thesis-results  main           HEAD %s" % git(ctx.res, "rev-parse", "HEAD").stdout.strip(),
+                     "chorismate-thesis-code     tier1-realism  HEAD %s" % git(ctx.code, "rev-parse", "HEAD").stdout.strip(), "",
+                     "sha256 of every script used",
+                     "   %s  scoped/make_scoped.py" % sha(Path(a.scoped_dir) / "make_scoped.py"),
+                     "   %s  code: phase2.2/cs_writeup_check.py" % sha(Path(__file__).resolve())]
+            lines += ["   %s  code: phase2.2/%s  (committed reader, imported)" % (sha(ctx.code / "phase2.2" / n), n) for n in ("cs6_analyse.py", "cs6_audit.py", "cs6_d33b.py")]
+            lines += ["", "validation output", ""] + ["   " + l for l in buf.getvalue().rstrip().splitlines()]
+            if neg:
+                lines += [""] + ["   " + l for l in neg]
+            Path(a.provenance).write_text("\n".join(lines) + "\n")
+        return 0 if ok else 1
+    if not a.doc or not a.figures:
+        ap.error("--doc and --figures are needed unless --scoped is given")
     doc = Path(a.doc).read_text()
     F, stats = run_checks(doc, a.figures, ctx, a.doc)
     print("cs_writeup_check.py on %s" % Path(a.doc).name)
