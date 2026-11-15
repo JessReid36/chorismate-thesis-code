@@ -45,8 +45,9 @@ THE TEN CHECKS (the numbering is the brief's)
 
 SIX CHECKS ADDED ON 11 NOVEMBER 2026, when the write-up was revised for DIAGNOSTIC 34
 
- 11 exp_heads    The write-up was rebuilt from results 4af2afa and code 1e47614 (the revision of 15 November 2026 for
-                 DIAGNOSTICS 35 to 38; before that, f461bd1 and 23c2500).  The document states both, and each
+ 11 exp_heads    The write-up was rebuilt from results 21d631b and code 512eead (the revision of the evening of 15
+                 November 2026 for DIAGNOSTICS 40 and 41 and DIAGNOSTIC 37's Amendment 1; before that 4af2afa and
+                 1e47614, and before that f461bd1 and 23c2500).  The document states both, and each
                  repository's HEAD is that commit (or, once the write-up is committed, a descendant of it with nothing
                  but the write-up's own files changed since).
  12 d34_numbers  A block that cites DIAGNOSTIC 34 (a [src:] tag naming its result, its erratum, d34.tsv, or the tables
@@ -90,6 +91,34 @@ FOUR CHECKS ADDED ON 15 NOVEMBER 2026, when the write-up was revised for DIAGNOS
 Check 8 was also widened on 15 November 2026: a name is refused on the not-tested list if any ORCA keyword that
 requests it under another spelling (M062X for M06-2X, RI-PWPB95 for PWPB95, ...) stands on a keyword line.
 
+FOUR CHECKS ADDED ON THE EVENING OF 15 NOVEMBER 2026, when the write-up was revised for DIAGNOSTICS 40 and 41 and
+for DIAGNOSTIC 37's Amendment 1
+
+ 21 benchmark_sv DIAGNOSTIC 41's DLPNO-CCSD(T)/def2-SVPD barrier and its three parts are recomputed here from the raw
+                 outputs of d38/N (the reactant leg, as committed) and d41/T, by code in this file, and must equal the
+                 [dv:] rows that hold them, the barrier of d41.tsv and the number the document states.  The shift from
+                 def2-SVPD to def2-TZVPD is recomputed from those two and DIAGNOSTIC 36's two, and must equal its row.
+ 22 detachment   Every detachment energy of DIAGNOSTIC 40 is recomputed here from the raw outputs: the monoanion of
+                 d40/<run> minus the committed dianion run that d40.tsv names as its source, each read by code in this
+                 file (the (QM/MM) total for a QM/MM run, the last final energy otherwise).  Each must equal d40.tsv and
+                 the row of figures/T12 or T13 that holds it, and in T13 the word must be the one the sign gives:
+                 BOUND above zero, METASTABLE at or below it.
+ 23 metastable   DIAGNOSTIC 40 names five lowerings that Probe 2's sentence reaches: a ddE measured where the dianion
+                 is METASTABLE "is not a barrier effect and must not be reported as one".  D40 withdraws none of them,
+                 so check 4 does not apply; until an erratum decides, every block of the document that quotes one of
+                 the five carries the word METASTABLE.
+ 24 d39_held     DIAGNOSTIC 39's result is committed and is NOT ENTERED in this revision, at the author's instruction.
+                 The document says so; no raw output or table of D39 is a source; no table of the figures directory
+                 other than the file census and the two run counts reads a D39 output; and a block that cites D39's
+                 result or amendment may hold no number that is not in another of its sources or a [dv:] row, so that
+                 no number of D39 can be quoted under cover of the citation.
+
+Two older checks changed with them.  Check 5: the self-label of revDSD-PBEP86-D4 was NOT MEASURED, which is DIAGNOSTIC
+37's label for it; Amendment 1 has measured it, so the label that must stand wherever it is named is now Amendment 1.
+Check 20: the def2-SVPD distance of revDSD-PBEP86-D4 from DIAGNOSTIC 41's benchmark, and the distances of def2-SVPD
+barriers from the def2-TZVPD benchmark, are this write-up's own comparisons, and a block that quotes one of those
+used here carries the words "post hoc".
+
 THE SCOPED REPORT (added 11 November 2026).  With --scoped <report> --scoped-dir <its directory> the script validates
 the second report, WRITEUP_SCOPED_<date>.md, and leaves the checks above alone.  Its eight checks:
 
@@ -113,8 +142,10 @@ a self-label, a figure's .tsv, a HEAD hash and the not-tested list, and then, fo
 commit, a DIAGNOSTIC 34 number, a raw control output, a recorded frozen ddE, an arm 1 leg, a claim's number, a rejected
 claim and the post hoc label, and, for the four checks of 15 November 2026, the benchmark's derived value, the
 denial beside the experimental number, the label of run A1, the post hoc label of a distance, the data-only label
-of an orbital energy and a method listed as not tested under another spelling, one at a time, on a copy, and
-requires the right check to fail for the right reason.
+of an orbital energy and a method listed as not tested under another spelling, and, for the four checks of that
+evening, the derived value of the def2-SVPD benchmark, a detachment energy of a table, the word METASTABLE beside a
+reached lowering, a number of DIAGNOSTIC 39 quoted under its citation and the post hoc label of a distance at
+def2-SVPD, one at a time, on a copy, and requires the right check to fail for the right reason.
 """
 import argparse
 import hashlib
@@ -157,12 +188,13 @@ SELF_LABELS = [
     (r"24\.826057|24\.8261|21\.816364|21\.8164", "STRAINED", "E3", "their barriers must not be quoted without that said in the same sentence"),
     (r"24\.826057|24\.8261", "PROVISIONAL", "D20", "must be quoted as provisional or not quoted"),
     # added 15 November 2026
-    (r"revDSD", "NOT MEASURED", "D37R", "revDSD-PBEP86-D4   NOT MEASURED"),
+    # changed on the evening of 15 November 2026: D37's label for it was NOT MEASURED; Amendment 1 has measured it
+    (r"revDSD", "Amendment 1", "D37A1R", "revDSD-PBEP86-D4, which D37 could not run, run two ways."),
     (r"reaches the correlat|REACHES THE CORRELATION", "mechanism", "D38R", "A MECHANISM TEST. One geometry, the reactant only, no transition state, no ddE,"),
 ]
 
 # ---- the revision of 11 November 2026 (DIAGNOSTIC 34): checks 11 to 16
-EXPECTED_HEADS = {"chorismate-thesis-results": "4af2afa", "chorismate-thesis-code": "1e47614"}   # f461bd1, 23c2500 for the text committed on 11 November
+EXPECTED_HEADS = {"chorismate-thesis-results": "21d631b", "chorismate-thesis-code": "512eead"}   # 4af2afa, 1e47614 on the morning of 15 November; f461bd1, 23c2500 on 11 November
 D34_RECORD = ("D34R", "D34T")                           # the committed result and its table: where a D34 number must stand
 D34_TAGS = ("D34R", "D34T", "D34E1", "T3D", "T4W")      # a block tagged with any of these is a block about D34
 D34_REF = "26.8248"                                     # the corrected reference barrier, kcal/mol
@@ -187,8 +219,9 @@ C4_NUMBERS = ("-0.0926", "+0.0002", "+3.9642", "+0.0195")   # q = -1 at dref and
 # ---- the revision of 15 November 2026 (DIAGNOSTICS 35 to 38): checks 17 to 20
 H2K = 627.5094740631
 # check 8: the ORCA keywords, in upper case, that request a name under another spelling
-KW_ALIAS = {"M06-2X": ["M062X"], "PWPB95": ["RI-PWPB95"], "REVDSD-PBEP86": ["RI-REVDSD-PBEP86-D4/2021"],
-            "REVDSD-PBEP86-D4": ["RI-REVDSD-PBEP86-D4/2021"], "D4": ["RI-REVDSD-PBEP86-D4/2021"], "VV10": ["WB97M-V", "WB97X-V"]}
+KW_ALIAS = {"M06-2X": ["M062X"], "PWPB95": ["RI-PWPB95"], "REVDSD-PBEP86": ["RI-REVDSD-PBEP86-D4/2021", "REVDSD-PBEP86-D4/2021"],
+            "REVDSD-PBEP86-D4": ["RI-REVDSD-PBEP86-D4/2021", "REVDSD-PBEP86-D4/2021"],
+            "D4": ["RI-REVDSD-PBEP86-D4/2021", "REVDSD-PBEP86-D4/2021"], "VV10": ["WB97M-V", "WB97X-V"]}
 # check 17: the [dv:] rows that hold DIAGNOSTIC 36's barrier and its parts, and DIAGNOSTIC 38's two shifts for run B1
 BENCH_DV = {"DV220": "E(CCSD(T))", "DV221": "E(0)", "DV222": "E(CCSD)", "DV223": "Triples Correction (T)"}
 D38_DV = {"DV250": "E(0)", "DV251": "E(CORR)(corrected)"}
@@ -196,10 +229,24 @@ D38_DV = {"DV250": "E(0)", "DV251": "E(CORR)(corrected)"}
 A1_NUMBERS = (r"831\.648351321", r"2\.598042111", r"834\.351462380", r"0\.183558659", r"0\.001632748", r"0\.181542852",
               r"0\.016858947", r"\+0\.3539")
 # check 20: DIAGNOSTIC 37's five distances from the benchmark and what is built on them; the orbital energies of T9
-POSTHOC_LEVEL = (r"-2\.5196", r"-2\.9008", r"\+3\.5321", r"\+4\.5400", r"\+5\.8962", r"\b12\.45\b", r"\b53 per cent")
+POSTHOC_LEVEL = (r"-2\.5196", r"-2\.9008", r"\+3\.5321", r"\+4\.5400", r"\+5\.8962", r"\b12\.45\b", r"\b53 per cent",
+                 # added on the evening of 15 November 2026: revDSD-PBEP86-D4 at def2-SVPD against DIAGNOSTIC 41's benchmark,
+                 # and def2-SVPD barriers against the def2-TZVPD benchmark; neither comparison is in a committed document
+                 r"-1\.0554", r"-1\.6572", r"-1\.7032", r"-2\.0189", r"\+2\.9645")
 T9_NUMBERS = (r"\+0\.7782", r"\+2\.4036", r"\+1\.3747", r"\+1\.6513", r"\+1\.6925", r"\+1\.3398", r"\+1\.1380")
 EXPERIMENT = r"(?<![\d.])24\.5(?![\d])"
 BENCHMARK = r"(?<![\d.])23\.86(?:03)?(?![\d])"
+
+# ---- the revision of the evening of 15 November 2026 (DIAGNOSTICS 40 and 41, DIAGNOSTIC 37's Amendment 1): checks 21 to 24
+EV = 27.211386245988                                    # eV per Eh, the constant DIAGNOSTIC 40 uses
+# check 21: the [dv:] rows that hold DIAGNOSTIC 41's barrier and its parts
+D41_DV = {"DV300": "E(CCSD(T))", "DV301": "E(0)", "DV302": "E(CCSD)", "DV303": "Triples Correction (T)"}
+# check 23: the five lowerings DIAGNOSTIC 40's R40.7 says Probe 2's sentence reaches
+REACHED = r"(?<![\d.])-(?:3\.3985|4\.1567|5\.3701|14\.3612|13\.0007)(?!\d)"
+# check 24: what of DIAGNOSTIC 39 is held.  Its result and its amendment may be cited for the statement that they exist;
+# its outputs and its table may not be sources at all
+D39_DOCS = r"cs_stage6/STAGE6_DIAGNOSTIC39_(?:RESULT|AMENDMENT)"
+D39_DATA = r"cs_stage6/(?:d39/|d39\.tsv$)"
 
 NUM = re.compile(r"^[+-]?\d+(?:\.\d+)?(?:e[+-]?\d+)?$", re.I)
 RANGE = re.compile(r"^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)$")
@@ -752,10 +799,12 @@ def selftest_scoped(doc, sdir, ctx):
 def run_checks(doc, figdir, ctx, docpath=None, mode="pre"):
     F = {k: [] for k in ("numbers", "quotes", "citations", "withdrawn", "selflabels", "controls", "counts", "not_tested",
                          "regeneration", "heads", "exp_heads", "d34_numbers", "d34_controls", "arm1_legs", "claims", "posthoc",
-                         "benchmark", "experiment", "d38_a1", "posthoc_lvl")}
+                         "benchmark", "experiment", "d38_a1", "posthoc_lvl",
+                         "benchmark_sv", "detachment", "metastable", "d39_held")}
     stats = dict(sourced=0, derived=0, estimated=0, exempt=0, quotes=0, files=0, controls=0, worst="", counts=0, names=0, tsv=0,
                  d34_blocks=0, d34_rec=0, d34_dv=0, d34_ctl="", legs=0, claim_dvs=0, c3_blocks=0,
-                 bench="", exp_blocks=0, a1_blocks=0, ph_blocks=0, t9_blocks=0)
+                 bench="", exp_blocks=0, a1_blocks=0, ph_blocks=0, t9_blocks=0,
+                 bench_sv="", vde=0, vde_neg=0, reached_blocks=0, d39_blocks=0)
     doc = doc.replace("−", "-")
     src = parse_sources(doc)
 
@@ -1237,13 +1286,152 @@ def run_checks(doc, figdir, ctx, docpath=None, mode="pre"):
             if not (re.search(r"post hoc", b, re.I) and re.search(r"data only|not the test", b, re.I)):
                 F["posthoc_lvl"].append("section '%s': a block quotes an orbital energy of a charged design (matched /%s/) without 'post hoc' and "
                                         "'data only': %s..." % (sec, hit, flat[:90]))
+
+    # ================================================================ the four checks of the evening of 15 November 2026
+    # ---------------------------------------------------------------- 21 the correlated barrier at def2-SVPD, recomputed here
+    p41 = {"R": ctx.res / S6 / "d38" / "N" / "job.out", "TS": ctx.res / S6 / "d41" / "T" / "job.out"}
+    d41 = {st: cc_read(q) if q.is_file() else None for st, q in p41.items()}
+    if not d41["R"] or not d41["TS"]:
+        F["benchmark_sv"].append("d38/N or d41/T is not a readable, normally terminated DLPNO-CCSD(T) output")
+    else:
+        for st, name in (("R", "d38/N"), ("TS", "d41/T")):
+            if abs(d41[st]["final"] - d41[st]["E(CCSD(T))"]) > 1e-9:
+                F["benchmark_sv"].append("%s: the last FINAL SINGLE POINT ENERGY is not its E(CCSD(T))" % name)
+        for did, lab in sorted(D41_DV.items()):
+            mine = "%.4f" % ((d41["TS"][lab] - d41["R"][lab]) * H2K)
+            if did not in dv or dv[did][1] != mine:
+                F["benchmark_sv"].append("%s (%s part of the def2-SVPD barrier) is %s in figures/derived.tsv; recomputed here from d38/N and d41/T: %s"
+                                         % (did, lab, dv[did][1] if did in dv else "absent", mine))
+        b41 = (d41["TS"]["E(CCSD(T))"] - d41["R"]["E(CCSD(T))"]) * H2K
+        if d36["R"] and d36["TS"]:
+            mine = "%+.4f" % ((d36["TS"]["E(CCSD(T))"] - d36["R"]["E(CCSD(T))"]) * H2K - b41)
+            if "DV305" not in dv or dv["DV305"][1] != mine:
+                F["benchmark_sv"].append("DV305 (the correlated barrier, def2-TZVPD minus def2-SVPD) is %s in figures/derived.tsv; recomputed here: %s"
+                                         % (dv["DV305"][1] if "DV305" in dv else "absent", mine))
+        t41 = ctx.res / S6 / "d41.tsv"
+        rec = [l.split("\t") for l in t41.read_text().splitlines() if l.startswith("E(CCSD(T))\t")] if t41.is_file() else []
+        if not rec or abs(float(rec[0][3]) - b41) > 6e-5:
+            F["benchmark_sv"].append("d41.tsv records %s for the def2-SVPD barrier; recomputed here: %.4f" % (rec[0][3] if rec else "nothing", b41))
+        if not re.search(r"(?<![\d.])" + re.escape("%.4f" % b41) + r"(?![\d])", doc):
+            F["benchmark_sv"].append("the document does not state the def2-SVPD correlated barrier %.4f" % b41)
+        stats["bench_sv"] = "%.4f" % b41
+
+    # ---------------------------------------------------------------- 22 every detachment energy of DIAGNOSTIC 40, recomputed here
+    def e_last(q, qmmm):
+        """The energy of one run by DIAGNOSTIC 40's rule: the (QM/MM) total of a QM/MM run, which must be printed once;
+        otherwise the last FINAL SINGLE POINT ENERGY.  None if the run did not terminate normally."""
+        if not q.is_file():
+            return None
+        x = q.read_text(errors="replace")
+        if "****ORCA TERMINATED NORMALLY****" not in x:
+            return None
+        if qmmm:
+            v = re.findall(r"FINAL SINGLE POINT ENERGY \(QM/MM\)\s+(-?\d+\.\d+)", x)
+            return float(v[0]) if len(v) == 1 else None
+        v = re.findall(r"FINAL SINGLE POINT ENERGY\s+(-?\d+\.\d+)", x)
+        return float(v[-1]) if v else None
+
+    def table(name, keycol):
+        q = Path(figdir) / name
+        rows, cols = {}, None
+        if q.is_file():
+            for l in q.read_text().splitlines():
+                if l.startswith("#") or not l.strip():
+                    continue
+                f = l.split("\t")
+                if cols is None:
+                    cols = f
+                    continue
+                r = dict(zip(cols, f))
+                rows[r[keycol]] = r
+        return rows
+    t12, t13 = table("T12_d40_bare_functionals.tsv", "run"), table("T13_d40_arrangements.tsv", "run")
+    t40 = ctx.res / S6 / "d40.tsv"
+    rows40 = []
+    if t40.is_file():
+        ls = t40.read_text().splitlines()
+        rows40 = [dict(zip(ls[0].split("\t"), l.split("\t"))) for l in ls[1:] if l.strip()]
+    if not rows40:
+        F["detachment"].append("d40.tsv is missing or empty")
+    for r in rows40:
+        rn, d_m, d_d = r["run"], ctx.res / S6 / "d40" / r["run"], ctx.res / S6 / r["source"]
+        qmmm = (d_m / "combined.xyz").is_file()
+        if qmmm != (d_d / "combined.xyz").is_file():
+            F["detachment"].append("%s and its source %s are not the same kind of run" % (rn, r["source"]))
+            continue
+        em, ed = e_last(d_m / "job.out", qmmm), e_last(d_d / "job.out", qmmm)
+        if em is None or ed is None:
+            F["detachment"].append("%s or its source %s is not a readable, normally terminated run" % (rn, r["source"]))
+            continue
+        vde = (em - ed) * EV
+        stats["vde"] += 1
+        stats["vde_neg"] += vde <= 0
+        if abs(vde - float(r["VDE_eV"])) > 6e-5:
+            F["detachment"].append("%s: d40.tsv records %s eV; recomputed here from the raw outputs: %+.4f" % (rn, r["VDE_eV"], vde))
+        tr = (t12 if r["part"] == "A" else t13).get(rn)
+        if tr is None:
+            F["detachment"].append("%s is in neither figures/T12 nor figures/T13" % rn)
+            continue
+        if tr["VDE_eV"] != "%+.4f" % vde:
+            F["detachment"].append("%s: the figures table says %s eV; recomputed here from the raw outputs: %+.4f" % (rn, tr["VDE_eV"], vde))
+        if r["part"] == "B":
+            word = "BOUND" if vde > 0 else "METASTABLE"
+            if tr.get("word") != word or r.get("word") != word:
+                F["detachment"].append("%s: the sign gives %s; figures/T13 says %s and d40.tsv says %s" % (rn, word, tr.get("word"), r.get("word")))
+    if rows40 and len(t12) + len(t13) != len(rows40):
+        F["detachment"].append("figures/T12 and T13 hold %d runs and d40.tsv %d" % (len(t12) + len(t13), len(rows40)))
+
+    # ---------------------------------------------------------------- 23 the five lowerings Probe 2's sentence reaches
+    for sec, b in blocks_of(doc):
+        if b.startswith("#") or not re.search(REACHED, b):
+            continue
+        stats["reached_blocks"] += 1
+        if "METASTABLE" not in b:
+            F["metastable"].append("section '%s': a block quotes a lowering that DIAGNOSTIC 40 reaches (matched %s) without the word METASTABLE: %s..."
+                                   % (sec, re.search(REACHED, b).group(0), norm(b)[:90]))
+
+    # ---------------------------------------------------------------- 24 DIAGNOSTIC 39 is committed and is not entered
+    held = set()
+    for k, (repo, path) in sorted(src.items()):
+        if repo == "R" and re.search(D39_DATA, path):
+            F["d39_held"].append("Appendix C names %s (%s): no output or table of DIAGNOSTIC 39 may be a source while it is not entered" % (k, path))
+        if repo == "R" and (re.search(D39_DOCS, path) or re.search(D39_DATA, path)):
+            held.add(k)
+    if not re.search(r"NOT ENTERED", doc):
+        F["d39_held"].append("the document does not say that DIAGNOSTIC 39's result is NOT ENTERED")
+    for q in sorted(Path(figdir).glob("*.tsv")):
+        if q.name == "derived.tsv" or re.match(r"T1[a-e]?_|T2_", q.name):
+            continue                                   # the two run counts, and the census of every committed file
+        if re.search(r"cs_stage6/d39/|(?<![\w.])d39/", q.read_text(errors="replace")):
+            F["d39_held"].append("figures/%s reads or names an output of DIAGNOSTIC 39" % q.name)
+    for sec, b in blocks_of(doc):
+        if b.startswith("#") or "| key | repo | path |" in b:
+            continue
+        keys, dvs = tags(b)
+        if not any(k in held for k in keys):
+            continue
+        stats["d39_blocks"] += 1
+        others = [ctx.text(src[k][0], src[k][1], figdir) or "" for k in keys if k in src and k not in held]
+        dvals = set(dv[x][1].lstrip("+-") for x in dvs if x in dv)
+        items, _ex = numerals_of(b)
+        for w, kind, cand in items:
+            if kind == "ident":
+                if not any(w in x for x in others):
+                    F["d39_held"].append("section '%s': '%s' stands in a block that cites DIAGNOSTIC 39's result or amendment and is in none of "
+                                         "the block's other sources" % (sec, w))
+                continue
+            for c in cand:
+                if c not in dvals and not any(occurs(c, x) for x in others):
+                    F["d39_held"].append("section '%s': %s stands in a block that cites DIAGNOSTIC 39's result or amendment and is in none of the "
+                                         "block's other sources; a number of D39 may not be quoted while it is NOT ENTERED" % (sec, c))
     return F, stats
 
 
 def report(F, stats, out=sys.stdout):
     order = ["numbers", "quotes", "citations", "withdrawn", "selflabels", "controls", "counts", "not_tested", "regeneration", "heads",
              "exp_heads", "d34_numbers", "d34_controls", "arm1_legs", "claims", "posthoc",
-             "benchmark", "experiment", "d38_a1", "posthoc_lvl"]
+             "benchmark", "experiment", "d38_a1", "posthoc_lvl",
+             "benchmark_sv", "detachment", "metastable", "d39_held"]
     notes = {
         "numbers": "%d sourced in a named committed file, %d derived (figures/derived.tsv), %d estimated; %d items not treated as numerals"
                    % (stats["sourced"], stats["derived"], stats["estimated"], stats["exempt"]),
@@ -1261,18 +1449,24 @@ def report(F, stats, out=sys.stdout):
         "benchmark": ("DLPNO-CCSD(T) barrier %s recomputed from d36a2/; two shifts recomputed from d38/" % stats["bench"]) if stats["bench"] else "not recomputed",
         "experiment": "%d blocks hold the experimental 24.5" % stats["exp_blocks"],
         "d38_a1": "%d blocks quote a number of run A1" % stats["a1_blocks"],
-        "posthoc_lvl": "%d blocks quote a post hoc distance; %d an orbital energy of a charged design" % (stats["ph_blocks"], stats["t9_blocks"])}
+        "posthoc_lvl": "%d blocks quote a post hoc distance; %d an orbital energy of a charged design" % (stats["ph_blocks"], stats["t9_blocks"]),
+        "benchmark_sv": ("DLPNO-CCSD(T)/def2-SVPD barrier %s recomputed from d38/N and d41/T" % stats["bench_sv"]) if stats["bench_sv"] else "not recomputed",
+        "detachment": "%d detachment energies recomputed from d40/ and their committed dianion runs; %d at or below zero" % (stats["vde"], stats["vde_neg"]),
+        "metastable": "%d blocks quote a lowering that DIAGNOSTIC 40 reaches" % stats["reached_blocks"],
+        "d39_held": "%d blocks cite DIAGNOSTIC 39's result or amendment; none quotes a number of it" % stats["d39_blocks"]}
     bad = 0
     for i, k in enumerate(order, 1):
         if i == 11:
             print("   -- added 11 November 2026 for DIAGNOSTIC 34", file=out)
         if i == 17:
             print("   -- added 15 November 2026 for DIAGNOSTICS 35 to 38", file=out)
+        if i == 21:
+            print("   -- added on the evening of 15 November 2026 for DIAGNOSTICS 40 and 41 and DIAGNOSTIC 37's Amendment 1", file=out)
         print("%2d %-12s %s   (%s)" % (i, k, "PASS" if not F[k] else "FAIL  %d" % len(F[k]), notes[k]), file=out)
         for msg in F[k][:40]:
             print("      - " + msg, file=out)
         bad += len(F[k])
-    print("RESULT: %s" % ("ALL TWENTY CHECKS PASS" if not bad else "%d FAILURE(S)" % bad), file=out)
+    print("RESULT: %s" % ("ALL TWENTY-FOUR CHECKS PASS" if not bad else "%d FAILURE(S)" % bad), file=out)
     return bad
 
 
@@ -1317,7 +1511,7 @@ def selftest(doc, figdir, ctx):
                   in_section("6. What", "Each item states", "A budget of 0.58 applies. Each item states")))
     tests.append(("a self-label", "selflabels", "PARTIAL", in_section("4. The approaches", "PARTIAL", "mixed")))
     tests.append(("a figure's tsv", "regeneration", "F5_distance_ladder.tsv", tsv("F5_distance_ladder.tsv", "+0.3994", "+0.3894")))
-    tests.append(("a HEAD hash", "heads", "records", sub("`1e476142", "`2e476142")))
+    tests.append(("a HEAD hash", "heads", "records", sub("`512eead9", "`612eead9")))
     tests.append(("the not-tested list", "not_tested", "CAM-B3LYP", sub("`PBE0`,", "`PBE0`, `CAM-B3LYP`,")))
 
     # ---- the six checks added on 11 November 2026
@@ -1340,7 +1534,7 @@ def selftest(doc, figdir, ctx):
         ctx.d34root = alt
         return d, fd
 
-    tests.append(("the commit the revision was built from", "exp_heads", "does not state", sub("`4af2afa0", "`5af2afa0")))
+    tests.append(("the commit the revision was built from", "exp_heads", "does not state", sub("`21d631b0", "`31d631b0")))
     tests.append(("a D34 number that another cited file holds", "d34_numbers", "14.3612",
                   sub("-4.1567 and -5.3701, all single negative spheres. Scope: inside r_safe; not a catalytic claim; no arrangement of more "
                       "than one sphere that the optimiser placed is quotable. [src: D34R, D34T]",
@@ -1372,13 +1566,27 @@ def selftest(doc, figdir, ctx):
     tests.append(("the data-only label of an orbital energy", "posthoc_lvl", "orbital energy of a charged design",
                   in_section("11. Hypotheses", "and, as data only and post hoc, orbital energies of", "and orbital energies of")))
     tests.append(("a method run under another spelling", "not_tested", "M06-2X", sub("`PBE0`,", "`PBE0`, `M06-2X`,")))
+    # ---- the four checks added on the evening of 15 November 2026, and the widening of check 20
+    tests.append(("the def2-SVPD benchmark's derived value", "benchmark_sv", "DV300", tsv("derived.tsv", "DV300\t22.8968\t", "DV300\t22.9068\t")))
+    tests.append(("a detachment energy in a table", "detachment", "B_ADD-s540_qm06500_R",
+                  tsv("T13_d40_arrangements.tsv", "\t-0.6414\tMETASTABLE\t", "\t+0.6414\tBOUND\t")))
+    tests.append(("the word METASTABLE beside a reached lowering", "metastable", "without the word METASTABLE",
+                  in_section("10. Conclusions", "D40 has since found the dianion METASTABLE with that sphere present.",
+                             "D40 has since measured the dianion with that sphere present.")))
+    tests.append(("a number of D39 quoted under its citation", "d39_held", "may not be quoted",
+                  sub("6 inputs and 6 outputs are in the repository (derived counts).",
+                      "6 inputs and 6 outputs are in the repository (derived counts), and its first route gives +1.7702 eV. [src: D39R]"), "numbers"))
+    tests.append(("the post hoc label of a distance at def2-SVPD", "posthoc_lvl", "post hoc distance",
+                  in_section("2. The reference barrier", "is post hoc, as are these counts: D41 named eight functionals and it is not one of them, and",
+                             "was not named by D41, and")))
     fired = 0
     lines = []
 
     def say(x):
         print(x)
         lines.append(x)
-    say("NEGATIVE TESTS")
+    say("NEGATIVE TESTS. Each line below is a fault planted on purpose, on a copy; nothing real is changed.")
+    say("   'caught' is the good outcome: the check named refused the planted fault.")
     d34root = ctx.d34root
     for name, check, reason, fn, *quiet in tests:
         tmp = Path(tempfile.mkdtemp(prefix="cswu_neg_"))
@@ -1390,13 +1598,13 @@ def selftest(doc, figdir, ctx):
             hit = [m for m in F[check] if reason in m]
             ok = bool(hit) and not any(F[q] for q in quiet)        # 'quiet' names a check that must not have caught it
             fired += ok
-            say("   %-44s -> check '%s' %s%s%s" % (name, check, "FIRED" if ok else "DID NOT FIRE",
+            say("   %-44s -> check '%s' %s%s%s" % (name, check, "caught" if ok else "NOT CAUGHT",
                                                     (": " + hit[0][:110]) if ok else "",
-                                                    ("  [check '%s' passed it]" % quiet[0]) if ok and quiet else ""))
+                                                    ("  [check '%s' let it through]" % quiet[0]) if ok and quiet else ""))
         finally:
             ctx.d34root = d34root
             shutil.rmtree(tmp, ignore_errors=True)
-    say("   %d of %d negative tests fired" % (fired, len(tests)))
+    say("   %d of %d planted faults were caught%s" % (fired, len(tests), ", as they should be" if fired == len(tests) else ": THE CHECKER HAS A FAULT"))
     return fired == len(tests), lines
 
 
