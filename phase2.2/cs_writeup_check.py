@@ -45,7 +45,8 @@ THE TEN CHECKS (the numbering is the brief's)
 
 SIX CHECKS ADDED ON 11 NOVEMBER 2026, when the write-up was revised for DIAGNOSTIC 34
 
- 11 exp_heads    The write-up was rebuilt from results f461bd1 and code 23c2500.  The document states both, and each
+ 11 exp_heads    The write-up was rebuilt from results 4af2afa and code 1e47614 (the revision of 15 November 2026 for
+                 DIAGNOSTICS 35 to 38; before that, f461bd1 and 23c2500).  The document states both, and each
                  repository's HEAD is that commit (or, once the write-up is committed, a descendant of it with nothing
                  but the write-up's own files changed since).
  12 d34_numbers  A block that cites DIAGNOSTIC 34 (a [src:] tag naming its result, its erratum, d34.tsv, or the tables
@@ -68,6 +69,27 @@ SIX CHECKS ADDED ON 11 NOVEMBER 2026, when the write-up was revised for DIAGNOST
  16 posthoc      Every block that discusses C3 (the sign or the size of the positive charge against relocation) carries
                  the words "post hoc".
 
+FOUR CHECKS ADDED ON 15 NOVEMBER 2026, when the write-up was revised for DIAGNOSTICS 35 to 38
+
+ 17 benchmark    DIAGNOSTIC 36's DLPNO-CCSD(T) barrier and its three parts are recomputed here from the raw outputs of
+                 d36a2/, by code in this file and not by make_figures.py, and must equal the [dv:] rows that hold them,
+                 the barrier of d36.tsv, and the number the document states.  DIAGNOSTIC 38's two energy shifts for its
+                 interpretable run are recomputed from d38/ in the same way.
+ 18 experiment   ERRATUM 7, E7.11: a computed barrier may stand beside an experimental one only if the sentence says
+                 which quantity is which.  Every block that holds the experimental 24.5 says that it is a free energy,
+                 and every block that holds it together with the correlated barrier also says that the two are not
+                 the same quantity or that the closeness is not agreement.
+ 19 d38_a1       Run A1 of DIAGNOSTIC 38 is NOT INTERPRETABLE by that diagnostic's pre-registered rule.  Every block
+                 that quotes one of A1's own numbers carries those words.
+ 20 posthoc_lvl  DIAGNOSTIC 36 labels the comparison of DIAGNOSTIC 37's five functionals with its benchmark POST HOC:
+                 every block that quotes one of those five distances, or the spread and position built on them,
+                 carries the words "post hoc".  The orbital energies of charged designs (figures/T9) are tabulated
+                 as data only, because the record holds that an orbital energy is not a test of binding: every
+                 block that quotes one carries "post hoc" and either "data only" or "not the test".
+
+Check 8 was also widened on 15 November 2026: a name is refused on the not-tested list if any ORCA keyword that
+requests it under another spelling (M062X for M06-2X, RI-PWPB95 for PWPB95, ...) stands on a keyword line.
+
 THE SCOPED REPORT (added 11 November 2026).  With --scoped <report> --scoped-dir <its directory> the script validates
 the second report, WRITEUP_SCOPED_<date>.md, and leaves the checks above alone.  Its eight checks:
 
@@ -89,7 +111,10 @@ the second report, WRITEUP_SCOPED_<date>.md, and leaves the checks above alone. 
 --selftest then proves each check fires: it perturbs a number, a quotation, a count, a citation, a withdrawn figure,
 a self-label, a figure's .tsv, a HEAD hash and the not-tested list, and then, for the six added checks, the stated
 commit, a DIAGNOSTIC 34 number, a raw control output, a recorded frozen ddE, an arm 1 leg, a claim's number, a rejected
-claim and the post hoc label, one at a time, on a copy, and requires the right check to fail for the right reason.
+claim and the post hoc label, and, for the four checks of 15 November 2026, the benchmark's derived value, the
+denial beside the experimental number, the label of run A1, the post hoc label of a distance, the data-only label
+of an orbital energy and a method listed as not tested under another spelling, one at a time, on a copy, and
+requires the right check to fail for the right reason.
 """
 import argparse
 import hashlib
@@ -112,11 +137,12 @@ XREF = (r"\b(?:sections?|Tables?|items?|Appendix|Figures?|Stages?|Phases?|Amendm
 WITHDRAWN = [
     (r"0\.58", "D29P", "A figure of Sigma q^2 <= 0.58 e^2 was"),
     (r"3\.4 times", "D29P", "is about 3.4 times too high"),
-    (r"0\.093", "D32E2", "+0.093 e IS IN NO OUTPUT AND NO RESULT."),
+    (r"0\.093(?!\d)", "D32E2", "+0.093 e IS IN NO OUTPUT AND NO RESULT."),      # the three-decimal figure, not a longer number that begins with it
     (r"factor of nine", "D32E2", "Both are WITHDRAWN."),
     (r"q_quad|0\.80 e\b", "E3", "q_quad = 0.80 e IS WITHDRAWN"),
     (r"5\.6165", "D27", "superseded for any future use by"),
     (r"110 conditions|16 controls", "D29E1", "The correct counts are 182 and 26."),
+    (r"\b11 MB\b", "D38E1", "11 MB must not be used"),      # added 15 November 2026: DIAGNOSTIC 38's result, Erratum 1
 ]
 
 # ---- check 5: the self-label registry.  (trigger in a section, label required there, key, the result's own sentence)
@@ -130,10 +156,13 @@ SELF_LABELS = [
     # added 11 November 2026: the old-level numbers of S6-20 and S6-10, which two committed documents restrict
     (r"24\.826057|24\.8261|21\.816364|21\.8164", "STRAINED", "E3", "their barriers must not be quoted without that said in the same sentence"),
     (r"24\.826057|24\.8261", "PROVISIONAL", "D20", "must be quoted as provisional or not quoted"),
+    # added 15 November 2026
+    (r"revDSD", "NOT MEASURED", "D37R", "revDSD-PBEP86-D4   NOT MEASURED"),
+    (r"reaches the correlat|REACHES THE CORRELATION", "mechanism", "D38R", "A MECHANISM TEST. One geometry, the reactant only, no transition state, no ddE,"),
 ]
 
 # ---- the revision of 11 November 2026 (DIAGNOSTIC 34): checks 11 to 16
-EXPECTED_HEADS = {"chorismate-thesis-results": "f461bd1", "chorismate-thesis-code": "23c2500"}
+EXPECTED_HEADS = {"chorismate-thesis-results": "4af2afa", "chorismate-thesis-code": "1e47614"}   # f461bd1, 23c2500 for the text committed on 11 November
 D34_RECORD = ("D34R", "D34T")                           # the committed result and its table: where a D34 number must stand
 D34_TAGS = ("D34R", "D34T", "D34E1", "T3D", "T4W")      # a block tagged with any of these is a block about D34
 D34_REF = "26.8248"                                     # the corrected reference barrier, kcal/mol
@@ -154,6 +183,23 @@ CLAIMS = [
       r"stability correction[^.\n]{0,160}(?:never|not) (?:before )?been measured"]),
 ]
 C4_NUMBERS = ("-0.0926", "+0.0002", "+3.9642", "+0.0195")   # q = -1 at dref and d450, then q = +1 at the same rungs
+
+# ---- the revision of 15 November 2026 (DIAGNOSTICS 35 to 38): checks 17 to 20
+H2K = 627.5094740631
+# check 8: the ORCA keywords, in upper case, that request a name under another spelling
+KW_ALIAS = {"M06-2X": ["M062X"], "PWPB95": ["RI-PWPB95"], "REVDSD-PBEP86": ["RI-REVDSD-PBEP86-D4/2021"],
+            "REVDSD-PBEP86-D4": ["RI-REVDSD-PBEP86-D4/2021"], "D4": ["RI-REVDSD-PBEP86-D4/2021"], "VV10": ["WB97M-V", "WB97X-V"]}
+# check 17: the [dv:] rows that hold DIAGNOSTIC 36's barrier and its parts, and DIAGNOSTIC 38's two shifts for run B1
+BENCH_DV = {"DV220": "E(CCSD(T))", "DV221": "E(0)", "DV222": "E(CCSD)", "DV223": "Triples Correction (T)"}
+D38_DV = {"DV250": "E(0)", "DV251": "E(CORR)(corrected)"}
+# check 19: numbers that belong to run A1 of DIAGNOSTIC 38 alone
+A1_NUMBERS = (r"831\.648351321", r"2\.598042111", r"834\.351462380", r"0\.183558659", r"0\.001632748", r"0\.181542852",
+              r"0\.016858947", r"\+0\.3539")
+# check 20: DIAGNOSTIC 37's five distances from the benchmark and what is built on them; the orbital energies of T9
+POSTHOC_LEVEL = (r"-2\.5196", r"-2\.9008", r"\+3\.5321", r"\+4\.5400", r"\+5\.8962", r"\b12\.45\b", r"\b53 per cent")
+T9_NUMBERS = (r"\+0\.7782", r"\+2\.4036", r"\+1\.3747", r"\+1\.6513", r"\+1\.6925", r"\+1\.3398", r"\+1\.1380")
+EXPERIMENT = r"(?<![\d.])24\.5(?![\d])"
+BENCHMARK = r"(?<![\d.])23\.86(?:03)?(?![\d])"
 
 NUM = re.compile(r"^[+-]?\d+(?:\.\d+)?(?:e[+-]?\d+)?$", re.I)
 RANGE = re.compile(r"^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)$")
@@ -705,9 +751,11 @@ def selftest_scoped(doc, sdir, ctx):
 
 def run_checks(doc, figdir, ctx, docpath=None, mode="pre"):
     F = {k: [] for k in ("numbers", "quotes", "citations", "withdrawn", "selflabels", "controls", "counts", "not_tested",
-                         "regeneration", "heads", "exp_heads", "d34_numbers", "d34_controls", "arm1_legs", "claims", "posthoc")}
+                         "regeneration", "heads", "exp_heads", "d34_numbers", "d34_controls", "arm1_legs", "claims", "posthoc",
+                         "benchmark", "experiment", "d38_a1", "posthoc_lvl")}
     stats = dict(sourced=0, derived=0, estimated=0, exempt=0, quotes=0, files=0, controls=0, worst="", counts=0, names=0, tsv=0,
-                 d34_blocks=0, d34_rec=0, d34_dv=0, d34_ctl="", legs=0, claim_dvs=0, c3_blocks=0)
+                 d34_blocks=0, d34_rec=0, d34_dv=0, d34_ctl="", legs=0, claim_dvs=0, c3_blocks=0,
+                 bench="", exp_blocks=0, a1_blocks=0, ph_blocks=0, t9_blocks=0)
     doc = doc.replace("−", "-")
     src = parse_sources(doc)
 
@@ -842,8 +890,8 @@ def run_checks(doc, figdir, ctx, docpath=None, mode="pre"):
             F["regeneration"].append("%s is regenerated but not present in the figures directory" % p.name)
         elif q.read_bytes() != p.read_bytes():
             F["regeneration"].append("%s differs from the file regenerated from committed sources" % p.name)
-    for stem in sorted(set(x.name.split(".")[0] for x in Path(figdir).glob("F[0-9]_*.png")) |
-                       set(x.name[:-4] for x in rd.glob("F[0-9]_*.tsv"))):
+    for stem in sorted(set(x.name.split(".")[0] for x in Path(figdir).glob("F[0-9]*_*.png")) |
+                       set(x.name[:-4] for x in rd.glob("F[0-9]*_*.tsv") if not x.name.startswith("F1b_"))):
         for ext in (".svg", ".png", ".tsv"):
             if not (Path(figdir) / (stem + ext)).is_file():
                 F["regeneration"].append("figure %s has no %s" % (stem, ext))
@@ -907,8 +955,11 @@ def run_checks(doc, figdir, ctx, docpath=None, mode="pre"):
     else:
         for name in re.findall(r"`([^`]+)`", m.group(1)):
             stats["names"] += 1
-            if tok.get(name.upper(), 0):
-                F["not_tested"].append("%s is listed as not tested and stands on %d keyword line(s)" % (name, tok[name.upper()]))
+            n_kw = tok.get(name.upper(), 0)
+            via = [a for a in KW_ALIAS.get(name.upper(), []) if tok.get(a, 0)]
+            if n_kw or via:
+                F["not_tested"].append("%s is listed as not tested and stands on %d keyword line(s)%s"
+                                       % (name, n_kw + sum(tok[a] for a in via), (" as " + ", ".join(via)) if via else ""))
 
     # ---------------------------------------------------------------- 10 heads
     own_res = re.compile(r"^phase2\.2/cs_stage6/(WRITEUP_CONSOLIDATED_\d{8}\.md|figures/.*)$")
@@ -1109,12 +1160,90 @@ def run_checks(doc, figdir, ctx, docpath=None, mode="pre"):
         if not re.search(r"post hoc", b, re.I):
             F["posthoc"].append("section '%s': a block discusses C3 (matched /%s/) without the words post hoc: %s..."
                                 % (sec, re.search(C3_TRIGGER, b).group(0), norm(b)[:90]))
+
+    # ================================================================ the four checks of 15 November 2026
+    # ---------------------------------------------------------------- 17 the correlated barrier, recomputed here
+    def cc_read(path):
+        """One DLPNO-CCSD(T) output, read by this file's own code.  A label printed with two values is refused."""
+        t = path.read_text(errors="replace")
+        if "****ORCA TERMINATED NORMALLY****" not in t:
+            return None
+        o = {}
+        for lab in ("E(0)", "E(CORR)(corrected)", "E(CCSD)", "Triples Correction (T)", "E(CCSD(T))"):
+            v = set(re.findall(r"^" + re.escape(lab) + r"\s+\.\.\.\s+(-?\d+\.\d+)", t, re.M))
+            if len(v) != 1:
+                return None
+            o[lab] = float(v.pop())
+        o["final"] = float(re.findall(r"FINAL SINGLE POINT ENERGY\s+(-?\d+\.\d+)", t)[-1])
+        return o
+    d36 = {st: cc_read(ctx.res / S6 / "d36a2" / ("B_%s" % st) / "job.out") if (ctx.res / S6 / "d36a2" / ("B_%s" % st) / "job.out").is_file()
+           else None for st in ("R", "TS")}
+    if not d36["R"] or not d36["TS"]:
+        F["benchmark"].append("d36a2/B_R or d36a2/B_TS is not a readable, normally terminated DLPNO-CCSD(T) output")
+    else:
+        for st in ("R", "TS"):
+            if abs(d36[st]["final"] - d36[st]["E(CCSD(T))"]) > 1e-9:
+                F["benchmark"].append("d36a2/B_%s: the last FINAL SINGLE POINT ENERGY is not its E(CCSD(T))" % st)
+        for did, lab in sorted(BENCH_DV.items()):
+            mine = "%.4f" % ((d36["TS"][lab] - d36["R"][lab]) * H2K)
+            if did not in dv or dv[did][1] != mine:
+                F["benchmark"].append("%s (%s part of the barrier) is %s in figures/derived.tsv; recomputed here from d36a2/: %s"
+                                      % (did, lab, dv[did][1] if did in dv else "absent", mine))
+        bench = "%.4f" % ((d36["TS"]["E(CCSD(T))"] - d36["R"]["E(CCSD(T))"]) * H2K)
+        t36 = ctx.res / S6 / "d36.tsv"
+        rec = [l.split("\t") for l in t36.read_text().splitlines() if l.startswith("B\t")] if t36.is_file() else []
+        if not rec or abs(float(rec[0][4]) - float(bench)) > 6e-5:
+            F["benchmark"].append("d36.tsv records %s for arm B; recomputed here: %s" % (rec[0][4] if rec else "nothing", bench))
+        if not re.search(r"(?<![\d.])" + re.escape(bench) + r"(?![\d])", doc):
+            F["benchmark"].append("the document does not state the correlated barrier %s" % bench)
+        stats["bench"] = bench
+    d38 = {rn: cc_read(ctx.res / S6 / "d38" / rn / "job.out") if (ctx.res / S6 / "d38" / rn / "job.out").is_file() else None for rn in ("N", "B1")}
+    if not d38["N"] or not d38["B1"]:
+        F["benchmark"].append("d38/N or d38/B1 is not a readable, normally terminated DLPNO-CCSD(T) output")
+    else:
+        for did, lab in sorted(D38_DV.items()):
+            mine = "%+.9f" % (d38["B1"][lab] - d38["N"][lab])
+            if did not in dv or dv[did][1] != mine:
+                F["benchmark"].append("%s (%s, run B1 minus run N) is %s in figures/derived.tsv; recomputed here from d38/: %s"
+                                      % (did, lab, dv[did][1] if did in dv else "absent", mine))
+
+    # ---------------------------------------------------------------- 18 to 20: labels that travel with a number
+    for sec, b in blocks_of(doc):
+        if b.startswith("#"):
+            continue
+        flat = norm(b)
+        if re.search(EXPERIMENT, b):
+            stats["exp_blocks"] += 1
+            if not re.search(r"free energy", b):
+                F["experiment"].append("section '%s': a block holds the experimental 24.5 and does not say it is a free energy: %s..." % (sec, flat[:90]))
+            if re.search(BENCHMARK, b) and not re.search(r"NOT AGREEMENT|not the same quantity|a different quantity", b):
+                F["experiment"].append("section '%s': a block sets the correlated barrier beside the experimental 24.5 without saying they are "
+                                       "different quantities: %s..." % (sec, flat[:90]))
+        hit = next((x for x in A1_NUMBERS if re.search(x, b)), None)
+        if hit:
+            stats["a1_blocks"] += 1
+            if "NOT INTERPRETABLE" not in b:
+                F["d38_a1"].append("section '%s': a block quotes a number of run A1 (matched /%s/) without the words NOT INTERPRETABLE: %s..."
+                                   % (sec, hit, flat[:90]))
+        hit = next((x for x in POSTHOC_LEVEL if re.search(x, b)), None)
+        if hit and not b.lstrip().startswith("|"):
+            stats["ph_blocks"] += 1
+            if not re.search(r"post hoc", b, re.I):
+                F["posthoc_lvl"].append("section '%s': a block quotes a post hoc distance from the benchmark (matched /%s/) without the words "
+                                        "post hoc: %s..." % (sec, hit, flat[:90]))
+        hit = next((x for x in T9_NUMBERS if re.search(x, b)), None)
+        if hit:
+            stats["t9_blocks"] += 1
+            if not (re.search(r"post hoc", b, re.I) and re.search(r"data only|not the test", b, re.I)):
+                F["posthoc_lvl"].append("section '%s': a block quotes an orbital energy of a charged design (matched /%s/) without 'post hoc' and "
+                                        "'data only': %s..." % (sec, hit, flat[:90]))
     return F, stats
 
 
 def report(F, stats, out=sys.stdout):
     order = ["numbers", "quotes", "citations", "withdrawn", "selflabels", "controls", "counts", "not_tested", "regeneration", "heads",
-             "exp_heads", "d34_numbers", "d34_controls", "arm1_legs", "claims", "posthoc"]
+             "exp_heads", "d34_numbers", "d34_controls", "arm1_legs", "claims", "posthoc",
+             "benchmark", "experiment", "d38_a1", "posthoc_lvl"]
     notes = {
         "numbers": "%d sourced in a named committed file, %d derived (figures/derived.tsv), %d estimated; %d items not treated as numerals"
                    % (stats["sourced"], stats["derived"], stats["estimated"], stats["exempt"]),
@@ -1128,16 +1257,22 @@ def report(F, stats, out=sys.stdout):
         "d34_controls": stats["d34_ctl"] or "not recomputed",
         "arm1_legs": "%d values recomputed from d34/a1_*" % stats["legs"],
         "claims": "%d numbers behind C1 to C6 recomputed" % stats["claim_dvs"],
-        "posthoc": "%d blocks discuss C3" % stats["c3_blocks"]}
+        "posthoc": "%d blocks discuss C3" % stats["c3_blocks"],
+        "benchmark": ("DLPNO-CCSD(T) barrier %s recomputed from d36a2/; two shifts recomputed from d38/" % stats["bench"]) if stats["bench"] else "not recomputed",
+        "experiment": "%d blocks hold the experimental 24.5" % stats["exp_blocks"],
+        "d38_a1": "%d blocks quote a number of run A1" % stats["a1_blocks"],
+        "posthoc_lvl": "%d blocks quote a post hoc distance; %d an orbital energy of a charged design" % (stats["ph_blocks"], stats["t9_blocks"])}
     bad = 0
     for i, k in enumerate(order, 1):
         if i == 11:
             print("   -- added 11 November 2026 for DIAGNOSTIC 34", file=out)
+        if i == 17:
+            print("   -- added 15 November 2026 for DIAGNOSTICS 35 to 38", file=out)
         print("%2d %-12s %s   (%s)" % (i, k, "PASS" if not F[k] else "FAIL  %d" % len(F[k]), notes[k]), file=out)
         for msg in F[k][:40]:
             print("      - " + msg, file=out)
         bad += len(F[k])
-    print("RESULT: %s" % ("ALL SIXTEEN CHECKS PASS" if not bad else "%d FAILURE(S)" % bad), file=out)
+    print("RESULT: %s" % ("ALL TWENTY CHECKS PASS" if not bad else "%d FAILURE(S)" % bad), file=out)
     return bad
 
 
@@ -1182,8 +1317,8 @@ def selftest(doc, figdir, ctx):
                   in_section("6. What", "Each item states", "A budget of 0.58 applies. Each item states")))
     tests.append(("a self-label", "selflabels", "PARTIAL", in_section("4. The approaches", "PARTIAL", "mixed")))
     tests.append(("a figure's tsv", "regeneration", "F5_distance_ladder.tsv", tsv("F5_distance_ladder.tsv", "+0.3994", "+0.3894")))
-    tests.append(("a HEAD hash", "heads", "records", sub("`23c2500f", "`33c2500f")))
-    tests.append(("the not-tested list", "not_tested", "CAM-B3LYP", sub("`M06-2X`,", "`M06-2X`, `CAM-B3LYP`,")))
+    tests.append(("a HEAD hash", "heads", "records", sub("`1e476142", "`2e476142")))
+    tests.append(("the not-tested list", "not_tested", "CAM-B3LYP", sub("`PBE0`,", "`PBE0`, `CAM-B3LYP`,")))
 
     # ---- the six checks added on 11 November 2026
     def raw_control(d, fd):
@@ -1205,7 +1340,7 @@ def selftest(doc, figdir, ctx):
         ctx.d34root = alt
         return d, fd
 
-    tests.append(("the commit the revision was built from", "exp_heads", "does not state", sub("`f461bd1a", "`e461bd1a")))
+    tests.append(("the commit the revision was built from", "exp_heads", "does not state", sub("`4af2afa0", "`5af2afa0")))
     tests.append(("a D34 number that another cited file holds", "d34_numbers", "14.3612",
                   sub("-4.1567 and -5.3701, all single negative spheres. Scope: inside r_safe; not a catalytic claim; no arrangement of more "
                       "than one sphere that the optimiser placed is quotable. [src: D34R, D34T]",
@@ -1224,6 +1359,19 @@ def selftest(doc, figdir, ctx):
                              "No arrangement with no positive charge relocates. Scope: one frame; r_safe is one axis from one site.")))
     tests.append(("the post hoc label", "posthoc", "without the words post hoc",
                   in_section("11. Hypotheses", "*Against, and limiting; this paragraph too is post hoc.*", "*Against, and limiting.*")))
+    # ---- the four checks added on 15 November 2026, and the widening of check 8
+    tests.append(("the benchmark's derived value", "benchmark", "DV220", tsv("derived.tsv", "DV220\t23.8603\t", "DV220\t23.8703\t")))
+    tests.append(("the denial beside the experimental number", "experiment", "different quantities",
+                  in_section("6. What", "a different quantity, and D36 says “ITS CLOSENESS TO 24.5 IS NOT AGREEMENT.”", "and the two are close.")))
+    tests.append(("the experimental number without its kind", "experiment", "does not say it is a free energy",
+                  in_section("6. What", "the record's 24.5 kcal/mol is a free energy in water", "the record's 24.5 kcal/mol is measured in water")))
+    tests.append(("the label of run A1", "d38_a1", "without the words NOT INTERPRETABLE",
+                  in_section("3. Levels", "Run A1 is “NOT INTERPRETABLE” under a rule", "Run A1 is set aside under a rule")))
+    tests.append(("the post hoc label of a distance", "posthoc_lvl", "post hoc distance",
+                  in_section("6. What", "Set against the benchmark they are post hoc, by D36's own label:", "Set against the benchmark:")))
+    tests.append(("the data-only label of an orbital energy", "posthoc_lvl", "orbital energy of a charged design",
+                  in_section("11. Hypotheses", "and, as data only and post hoc, orbital energies of", "and orbital energies of")))
+    tests.append(("a method run under another spelling", "not_tested", "M06-2X", sub("`PBE0`,", "`PBE0`, `M06-2X`,")))
     fired = 0
     lines = []
 
