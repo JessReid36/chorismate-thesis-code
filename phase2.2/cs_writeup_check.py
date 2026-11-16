@@ -45,9 +45,9 @@ THE TEN CHECKS (the numbering is the brief's)
 
 SIX CHECKS ADDED ON 11 NOVEMBER 2026, when the write-up was revised for DIAGNOSTIC 34
 
- 11 exp_heads    The write-up was rebuilt from results 21d631b and code 512eead (the revision of the evening of 15
-                 November 2026 for DIAGNOSTICS 40 and 41 and DIAGNOSTIC 37's Amendment 1; before that 4af2afa and
-                 1e47614, and before that f461bd1 and 23c2500).  The document states both, and each
+ 11 exp_heads    The write-up was rebuilt from results 6c09d9c and code 9f66ee3 (the revision of 16 November 2026 for
+                 DIAGNOSTIC 42; before that 21d631b and 512eead, on the evening of 15 November 2026; before that
+                 4af2afa and 1e47614, and before that f461bd1 and 23c2500).  The document states both, and each
                  repository's HEAD is that commit (or, once the write-up is committed, a descendant of it with nothing
                  but the write-up's own files changed since).
  12 d34_numbers  A block that cites DIAGNOSTIC 34 (a [src:] tag naming its result, its erratum, d34.tsv, or the tables
@@ -119,6 +119,25 @@ Check 20: the def2-SVPD distance of revDSD-PBEP86-D4 from DIAGNOSTIC 41's benchm
 barriers from the def2-TZVPD benchmark, are this write-up's own comparisons, and a block that quotes one of those
 used here carries the words "post hoc".
 
+TWO CHECKS ADDED ON 16 NOVEMBER 2026, when the write-up was revised for DIAGNOSTIC 42
+
+ 25 bound_d42    Every detachment energy of DIAGNOSTIC 42 is recomputed here from the raw outputs: the monoanion of
+                 d42/<run> minus the committed dianion run of DIAGNOSTIC 31 that d42.tsv names as its source, each
+                 read by code in this file.  Each must equal d42.tsv and the row of figures/T14 that holds it, and the
+                 word must be the one DIAGNOSTIC 42's rule gives: METASTABLE at or below zero; BOUND above zero if the
+                 monoanion's last stability verdict is stable.  The ddE of each condition is recomputed from DIAGNOSTIC
+                 31's committed dianion outputs and its two charge-free controls and must equal figures/T14 and
+                 d42.tsv; the reading of Probe 2's sentence in figures/T14 must be the one the two words give; the
+                 number of conditions BOUND at both states must be its [dv:] row; and the verdict on H9 that the
+                 document quotes must be the one those words give.
+ 26 not_quotable DIAGNOSTIC 42 computed a ddE for each of its thirteen conditions and says "no ddE listed here is made
+                 quotable by D42".  Every block of the document that quotes one of the thirteen, as recomputed by
+                 check 25, carries the words NOT QUOTABLE, and a block that quotes one whose condition has a METASTABLE
+                 state carries the word METASTABLE as well.  And the comparisons of DIAGNOSTIC 42's numbers that are
+                 this write-up's own (how thin the margins are beside the spread between functionals; the change per
+                 unit of charge) are in [dv:] rows marked POST HOC, and a block that quotes one of those values carries
+                 the words "post hoc".
+
 THE SCOPED REPORT (added 11 November 2026).  With --scoped <report> --scoped-dir <its directory> the script validates
 the second report, WRITEUP_SCOPED_<date>.md, and leaves the checks above alone.  Its eight checks:
 
@@ -145,7 +164,10 @@ denial beside the experimental number, the label of run A1, the post hoc label o
 of an orbital energy and a method listed as not tested under another spelling, and, for the four checks of that
 evening, the derived value of the def2-SVPD benchmark, a detachment energy of a table, the word METASTABLE beside a
 reached lowering, a number of DIAGNOSTIC 39 quoted under its citation and the post hoc label of a distance at
-def2-SVPD, one at a time, on a copy, and requires the right check to fail for the right reason.
+def2-SVPD, and, for the two checks of 16 November 2026, a detachment energy of DIAGNOSTIC 42 in its table, the count of
+conditions bound at both states, the words NOT QUOTABLE beside one of its ddE, the word METASTABLE beside one that
+Probe 2's sentence reaches and the post hoc label of a comparison, one at a time, on a copy, and requires the right
+check to fail for the right reason.
 """
 import argparse
 import hashlib
@@ -194,7 +216,7 @@ SELF_LABELS = [
 ]
 
 # ---- the revision of 11 November 2026 (DIAGNOSTIC 34): checks 11 to 16
-EXPECTED_HEADS = {"chorismate-thesis-results": "21d631b", "chorismate-thesis-code": "512eead"}   # 4af2afa, 1e47614 on the morning of 15 November; f461bd1, 23c2500 on 11 November
+EXPECTED_HEADS = {"chorismate-thesis-results": "6c09d9c", "chorismate-thesis-code": "9f66ee3"}   # 21d631b, 512eead on the evening of 15 November; 4af2afa, 1e47614 that morning; f461bd1, 23c2500 on 11 November
 D34_RECORD = ("D34R", "D34T")                           # the committed result and its table: where a D34 number must stand
 D34_TAGS = ("D34R", "D34T", "D34E1", "T3D", "T4W")      # a block tagged with any of these is a block about D34
 D34_REF = "26.8248"                                     # the corrected reference barrier, kcal/mol
@@ -247,6 +269,11 @@ REACHED = r"(?<![\d.])-(?:3\.3985|4\.1567|5\.3701|14\.3612|13\.0007)(?!\d)"
 # its outputs and its table may not be sources at all
 D39_DOCS = r"cs_stage6/STAGE6_DIAGNOSTIC39_(?:RESULT|AMENDMENT)"
 D39_DATA = r"cs_stage6/(?:d39/|d39\.tsv$)"
+
+# ---- the revision of 16 November 2026 (DIAGNOSTIC 42): checks 25 and 26
+# check 26: the [dv:] rows that hold this write-up's own comparisons of DIAGNOSTIC 42's numbers; each is marked POST HOC there
+D42_POSTHOC_DV = ("DV406", "DV407", "DV412", "DV413", "DV414", "DV415", "DV416", "DV417", "DV418", "DV419")
+D42_NOTSTABLE = "ABOVE ZERO, MONOANION NOT STABLE"
 
 NUM = re.compile(r"^[+-]?\d+(?:\.\d+)?(?:e[+-]?\d+)?$", re.I)
 RANGE = re.compile(r"^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)$")
@@ -800,11 +827,12 @@ def run_checks(doc, figdir, ctx, docpath=None, mode="pre"):
     F = {k: [] for k in ("numbers", "quotes", "citations", "withdrawn", "selflabels", "controls", "counts", "not_tested",
                          "regeneration", "heads", "exp_heads", "d34_numbers", "d34_controls", "arm1_legs", "claims", "posthoc",
                          "benchmark", "experiment", "d38_a1", "posthoc_lvl",
-                         "benchmark_sv", "detachment", "metastable", "d39_held")}
+                         "benchmark_sv", "detachment", "metastable", "d39_held", "bound_d42", "not_quotable")}
     stats = dict(sourced=0, derived=0, estimated=0, exempt=0, quotes=0, files=0, controls=0, worst="", counts=0, names=0, tsv=0,
                  d34_blocks=0, d34_rec=0, d34_dv=0, d34_ctl="", legs=0, claim_dvs=0, c3_blocks=0,
                  bench="", exp_blocks=0, a1_blocks=0, ph_blocks=0, t9_blocks=0,
-                 bench_sv="", vde=0, vde_neg=0, reached_blocks=0, d39_blocks=0)
+                 bench_sv="", vde=0, vde_neg=0, reached_blocks=0, d39_blocks=0,
+                 vde42=0, vde42_neg=0, both42=0, cond42=0, nq_blocks=0, ph42_blocks=0)
     doc = doc.replace("−", "-")
     src = parse_sources(doc)
 
@@ -1424,6 +1452,114 @@ def run_checks(doc, figdir, ctx, docpath=None, mode="pre"):
                 if c not in dvals and not any(occurs(c, x) for x in others):
                     F["d39_held"].append("section '%s': %s stands in a block that cites DIAGNOSTIC 39's result or amendment and is in none of the "
                                          "block's other sources; a number of D39 may not be quoted while it is NOT ENTERED" % (sec, c))
+
+    # ================================================================ the two checks of 16 November 2026
+    # ---------------------------------------------------------------- 25 every detachment energy and ddE of DIAGNOSTIC 42, recomputed here
+    t14 = table("T14_d42_conditions.tsv", "run")
+    t42 = ctx.res / S6 / "d42.tsv"
+    rows42 = []
+    if t42.is_file():
+        ls = t42.read_text().splitlines()
+        rows42 = [dict(zip(ls[0].split("\t"), l.split("\t"))) for l in ls[1:] if l.strip()]
+    if not rows42:
+        F["bound_d42"].append("d42.tsv is missing or empty")
+    ctl42 = {st: e_last(ctx.res / S6 / "d31" / ("ctl_%s" % st) / "job.out", False) for st in ("R", "TS")}
+    if None in ctl42.values():
+        F["bound_d42"].append("a charge-free control of DIAGNOSTIC 31 is not a readable, normally terminated run")
+    words42, edi42, class42, dde42 = {}, {}, {}, {}
+    for r in rows42:
+        rn = r["run"]
+        q_m = ctx.res / S6 / "d42" / rn / "job.out"
+        if r["source"] != "d31/B/" + rn:
+            F["bound_d42"].append("%s: d42.tsv names %s as its source, not the run of DIAGNOSTIC 31 of the same name" % (rn, r["source"]))
+            continue
+        em, ed = e_last(q_m, False), e_last(ctx.res / S6 / r["source"] / "job.out", False)
+        if em is None or ed is None:
+            F["bound_d42"].append("%s or its source %s is not a readable, normally terminated run" % (rn, r["source"]))
+            continue
+        vde = (em - ed) * EV
+        stats["vde42"] += 1
+        stats["vde42_neg"] += vde <= 0
+        if abs(vde - float(r["VDE_eV"])) > 6e-5:
+            F["bound_d42"].append("%s: d42.tsv records %s eV; recomputed here from the raw outputs: %+.4f" % (rn, r["VDE_eV"], vde))
+        verd = re.findall(r"stability analysis[^\n]*?wave ?function is (stable|unstable)", q_m.read_text(errors="replace"), re.I)
+        word = "METASTABLE" if vde <= 0 else ("BOUND" if verd and verd[-1].lower() == "stable" else D42_NOTSTABLE)
+        words42[(r["condition"], r["state"])] = word
+        edi42[(r["condition"], r["state"])] = ed
+        class42[r["condition"]] = r["class"]
+        tr = t14.get(rn)
+        if tr is None:
+            F["bound_d42"].append("%s is not in figures/T14" % rn)
+            continue
+        if tr["VDE_eV"] != "%+.4f" % vde:
+            F["bound_d42"].append("%s: figures/T14 says %s eV; recomputed here from the raw outputs: %+.4f" % (rn, tr["VDE_eV"], vde))
+        if tr.get("word") != word or r.get("word") != word:
+            F["bound_d42"].append("%s: DIAGNOSTIC 42's rule gives %s; figures/T14 says %s and d42.tsv says %s" % (rn, word, tr.get("word"), r.get("word")))
+    if rows42 and len(t14) != len(rows42):
+        F["bound_d42"].append("figures/T14 holds %d runs and d42.tsv %d" % (len(t14), len(rows42)))
+    both42 = set()
+    for c in sorted(class42):
+        if (c, "R") not in edi42 or (c, "TS") not in edi42 or None in ctl42.values():
+            F["bound_d42"].append("%s: the two states and the two controls are not all readable, so its ddE is not recomputed" % c)
+            continue
+        dde = ((edi42[(c, "TS")] - ctl42["TS"]) - (edi42[(c, "R")] - ctl42["R"])) * H2K
+        dde42[c] = dde
+        w = (words42[(c, "R")], words42[(c, "TS")])
+        if w == ("BOUND", "BOUND"):
+            both42.add(c)
+        want = "APPLIES" if "METASTABLE" in w else ("does not reach" if w == ("BOUND", "BOUND") else "neither")
+        for st in ("R", "TS"):
+            rn = "%s_%s" % (c, st)
+            rr = next(x for x in rows42 if x["run"] == rn)
+            if abs(float(rr["ddE_kcal"]) - dde) > 6e-5:
+                F["bound_d42"].append("%s: d42.tsv records a ddE of %s kcal/mol; recomputed here from DIAGNOSTIC 31's outputs: %+.4f" % (rn, rr["ddE_kcal"], dde))
+            tr = t14.get(rn)
+            if tr is not None and tr["ddE_kcal"] != "%+.4f" % dde:
+                F["bound_d42"].append("%s: figures/T14 says a ddE of %s kcal/mol; recomputed here from DIAGNOSTIC 31's outputs: %+.4f" % (rn, tr["ddE_kcal"], dde))
+            if tr is not None and tr["probe2"] != want:
+                F["bound_d42"].append("%s: figures/T14 reads Probe 2's sentence as '%s'; the two words give '%s'" % (rn, tr["probe2"], want))
+    stats["cond42"], stats["both42"] = len(class42), len(both42)
+    if rows42 and ("DV386" not in dv or dv["DV386"][1] != str(len(both42))):
+        F["bound_d42"].append("DV386 (conditions BOUND at both states) is %s in figures/derived.tsv; recomputed here from the raw outputs: %d"
+                              % (dv["DV386"][1] if "DV386" in dv else "absent", len(both42)))
+    h42 = [c for c in class42 if class42[c] == "H"]
+    if h42:
+        fals = any("METASTABLE" in (words42.get((c, "R")), words42.get((c, "TS"))) for c in h42)
+        if fals and "H9 IS NOT FALSIFIED" in doc:
+            F["bound_d42"].append("the document quotes H9 IS NOT FALSIFIED, and a condition whose charges sum to zero or more is METASTABLE here")
+        if not fals and "H9 IS FALSIFIED" in doc:
+            F["bound_d42"].append("the document quotes H9 IS FALSIFIED, and no condition whose charges sum to zero or more is METASTABLE here")
+        if not fals and all(c in both42 for c in h42) and ("H9 IS NOT FALSIFIED BY THESE %d CONDITIONS." % len(h42)) not in doc:
+            F["bound_d42"].append("the document does not quote DIAGNOSTIC 42's verdict, H9 IS NOT FALSIFIED BY THESE %d CONDITIONS." % len(h42))
+
+    # ---------------------------------------------------------------- 26 the thirteen ddE of DIAGNOSTIC 42 are NOT QUOTABLE
+    nq42 = dict((c, "%.4f" % v) for c, v in dde42.items())
+    reached42 = set(c for c in dde42 if "METASTABLE" in (words42.get((c, "R")), words42.get((c, "TS"))))
+    ph42 = [dv[k][1] for k in D42_POSTHOC_DV if k in dv]
+    if rows42 and len(ph42) != len(D42_POSTHOC_DV):
+        F["not_quotable"].append("figures/derived.tsv does not hold all of %s" % ", ".join(D42_POSTHOC_DV))
+    for k in D42_POSTHOC_DV:
+        if k in dv and "POST HOC" not in dv[k][2]:
+            F["not_quotable"].append("%s is a comparison of this write-up's own and its row in figures/derived.tsv is not marked POST HOC" % k)
+    for sec, b in blocks_of(doc):
+        if b.startswith("#") or "| key | repo | path |" in b:
+            continue
+        hit = sorted(c for c, s in nq42.items() if re.search(r"(?<![\d.])" + re.escape(s) + r"(?!\d)", b))
+        if hit:
+            stats["nq_blocks"] += 1
+            if "NOT QUOTABLE" not in b:
+                F["not_quotable"].append("section '%s': a block quotes a ddE of DIAGNOSTIC 42 (%s, %s) without the words NOT QUOTABLE: %s..."
+                                         % (sec, hit[0], nq42[hit[0]], norm(b)[:90]))
+            r_ = [c for c in hit if c in reached42]
+            if r_ and "METASTABLE" not in b:
+                F["not_quotable"].append("section '%s': a block quotes a ddE that Probe 2's sentence reaches (%s, %s) without the word METASTABLE: %s..."
+                                         % (sec, r_[0], nq42[r_[0]], norm(b)[:90]))
+        hitp = [s for s in ph42 if re.search(r"(?<![\d.+-])" + re.escape(s) + r"(?!\d)", b)]
+        if hitp and not b.lstrip().startswith("|"):
+            stats["ph42_blocks"] += 1
+            if not re.search(r"post hoc", b, re.I):
+                F["not_quotable"].append("section '%s': a block quotes a comparison of DIAGNOSTIC 42's numbers that is this write-up's own (%s) without "
+                                         "the words post hoc: %s..." % (sec, hitp[0], norm(b)[:90]))
     return F, stats
 
 
@@ -1431,7 +1567,7 @@ def report(F, stats, out=sys.stdout):
     order = ["numbers", "quotes", "citations", "withdrawn", "selflabels", "controls", "counts", "not_tested", "regeneration", "heads",
              "exp_heads", "d34_numbers", "d34_controls", "arm1_legs", "claims", "posthoc",
              "benchmark", "experiment", "d38_a1", "posthoc_lvl",
-             "benchmark_sv", "detachment", "metastable", "d39_held"]
+             "benchmark_sv", "detachment", "metastable", "d39_held", "bound_d42", "not_quotable"]
     notes = {
         "numbers": "%d sourced in a named committed file, %d derived (figures/derived.tsv), %d estimated; %d items not treated as numerals"
                    % (stats["sourced"], stats["derived"], stats["estimated"], stats["exempt"]),
@@ -1453,7 +1589,10 @@ def report(F, stats, out=sys.stdout):
         "benchmark_sv": ("DLPNO-CCSD(T)/def2-SVPD barrier %s recomputed from d38/N and d41/T" % stats["bench_sv"]) if stats["bench_sv"] else "not recomputed",
         "detachment": "%d detachment energies recomputed from d40/ and their committed dianion runs; %d at or below zero" % (stats["vde"], stats["vde_neg"]),
         "metastable": "%d blocks quote a lowering that DIAGNOSTIC 40 reaches" % stats["reached_blocks"],
-        "d39_held": "%d blocks cite DIAGNOSTIC 39's result or amendment; none quotes a number of it" % stats["d39_blocks"]}
+        "d39_held": "%d blocks cite DIAGNOSTIC 39's result or amendment; none quotes a number of it" % stats["d39_blocks"],
+        "bound_d42": "%d detachment energies recomputed from d42/ and DIAGNOSTIC 31's dianion runs; %d at or below zero; %d of %d conditions "
+                     "BOUND at both states" % (stats["vde42"], stats["vde42_neg"], stats["both42"], stats["cond42"]),
+        "not_quotable": "%d blocks quote a ddE of DIAGNOSTIC 42; %d a post hoc comparison of its numbers" % (stats["nq_blocks"], stats["ph42_blocks"])}
     bad = 0
     for i, k in enumerate(order, 1):
         if i == 11:
@@ -1462,11 +1601,13 @@ def report(F, stats, out=sys.stdout):
             print("   -- added 15 November 2026 for DIAGNOSTICS 35 to 38", file=out)
         if i == 21:
             print("   -- added on the evening of 15 November 2026 for DIAGNOSTICS 40 and 41 and DIAGNOSTIC 37's Amendment 1", file=out)
+        if i == 25:
+            print("   -- added 16 November 2026 for DIAGNOSTIC 42", file=out)
         print("%2d %-12s %s   (%s)" % (i, k, "PASS" if not F[k] else "FAIL  %d" % len(F[k]), notes[k]), file=out)
         for msg in F[k][:40]:
             print("      - " + msg, file=out)
         bad += len(F[k])
-    print("RESULT: %s" % ("ALL TWENTY-FOUR CHECKS PASS" if not bad else "%d FAILURE(S)" % bad), file=out)
+    print("RESULT: %s" % ("ALL TWENTY-SIX CHECKS PASS" if not bad else "%d FAILURE(S)" % bad), file=out)
     return bad
 
 
@@ -1511,7 +1652,7 @@ def selftest(doc, figdir, ctx):
                   in_section("6. What", "Each item states", "A budget of 0.58 applies. Each item states")))
     tests.append(("a self-label", "selflabels", "PARTIAL", in_section("4. The approaches", "PARTIAL", "mixed")))
     tests.append(("a figure's tsv", "regeneration", "F5_distance_ladder.tsv", tsv("F5_distance_ladder.tsv", "+0.3994", "+0.3894")))
-    tests.append(("a HEAD hash", "heads", "records", sub("`512eead9", "`612eead9")))
+    tests.append(("a HEAD hash", "heads", "records", sub("`9f66ee33", "`af66ee33")))
     tests.append(("the not-tested list", "not_tested", "CAM-B3LYP", sub("`PBE0`,", "`PBE0`, `CAM-B3LYP`,")))
 
     # ---- the six checks added on 11 November 2026
@@ -1534,7 +1675,7 @@ def selftest(doc, figdir, ctx):
         ctx.d34root = alt
         return d, fd
 
-    tests.append(("the commit the revision was built from", "exp_heads", "does not state", sub("`21d631b0", "`31d631b0")))
+    tests.append(("the commit the revision was built from", "exp_heads", "does not state", sub("`6c09d9c3d", "`7c09d9c3d")))
     tests.append(("a D34 number that another cited file holds", "d34_numbers", "14.3612",
                   sub("-4.1567 and -5.3701, all single negative spheres. Scope: inside r_safe; not a catalytic claim; no arrangement of more "
                       "than one sphere that the optimiser placed is quotable. [src: D34R, D34T]",
@@ -1564,7 +1705,8 @@ def selftest(doc, figdir, ctx):
     tests.append(("the post hoc label of a distance", "posthoc_lvl", "post hoc distance",
                   in_section("6. What", "Set against the benchmark they are post hoc, by D36's own label:", "Set against the benchmark:")))
     tests.append(("the data-only label of an orbital energy", "posthoc_lvl", "orbital energy of a charged design",
-                  in_section("11. Hypotheses", "and, as data only and post hoc, orbital energies of", "and orbital energies of")))
+                  in_section("6. What", "from -0.1563 to -1.6998 eV. The sign is the reading; the size is not.",
+                             "from -0.1563 to -1.6998 eV, the orbital lying at +0.7782 eV. The sign is the reading; the size is not.")))
     tests.append(("a method run under another spelling", "not_tested", "M06-2X", sub("`PBE0`,", "`PBE0`, `M06-2X`,")))
     # ---- the four checks added on the evening of 15 November 2026, and the widening of check 20
     tests.append(("the def2-SVPD benchmark's derived value", "benchmark_sv", "DV300", tsv("derived.tsv", "DV300\t22.8968\t", "DV300\t22.9068\t")))
@@ -1579,6 +1721,18 @@ def selftest(doc, figdir, ctx):
     tests.append(("the post hoc label of a distance at def2-SVPD", "posthoc_lvl", "post hoc distance",
                   in_section("2. The reference barrier", "is post hoc, as are these counts: D41 named eight functionals and it is not one of them, and",
                              "was not named by D41, and")))
+    # ---- the two checks added on 16 November 2026
+    tests.append(("a detachment energy of D42 in its table", "bound_d42", "n10_q0.25_R",
+                  tsv("T14_d42_conditions.tsv", "\t+0.1591\tBOUND\t", "\t-0.1591\tMETASTABLE\t")))
+    tests.append(("the count of conditions bound at both states", "bound_d42", "DV386", tsv("derived.tsv", "DV386\t10\t", "DV386\t11\t")))
+    tests.append(("the words NOT QUOTABLE beside a ddE of D42", "not_quotable", "without the words NOT QUOTABLE",
+                  in_section("10. Conclusions", "-16.3574 kcal/mol, and those are NOT QUOTABLE: they are test conditions",
+                             "-16.3574 kcal/mol: they are test conditions")))
+    tests.append(("the word METASTABLE beside a reached ddE of D42", "not_quotable", "without the word METASTABLE",
+                  in_section("5. The reliability criterion", "For the 3 conditions with a METASTABLE state Probe 2's sentence applies",
+                             "For the 3 conditions with a state at or below zero Probe 2's sentence applies")))
+    tests.append(("the post hoc label of a comparison of D42's numbers", "not_quotable", "without the words post hoc",
+                  in_section("5. The reliability criterion", "which is how H9 was worded. Post hoc.", "which is how H9 was worded.")))
     fired = 0
     lines = []
 
