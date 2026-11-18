@@ -45,9 +45,10 @@ THE TEN CHECKS (the numbering is the brief's)
 
 SIX CHECKS ADDED ON 11 NOVEMBER 2026, when the write-up was revised for DIAGNOSTIC 34
 
- 11 exp_heads    The write-up was rebuilt from results 6c09d9c and code 9f66ee3 (the revision of 16 November 2026 for
-                 DIAGNOSTIC 42; before that 21d631b and 512eead, on the evening of 15 November 2026; before that
-                 4af2afa and 1e47614, and before that f461bd1 and 23c2500).  The document states both, and each
+ 11 exp_heads    The write-up was rebuilt from results 0ede870 and code ee28301 (the revision of 18 November 2026 for
+                 DIAGNOSTIC 43, AMENDMENTS 6 and 7 and the pre-registration of DIAGNOSTIC 44; before that 6c09d9c and
+                 9f66ee3, on 16 November 2026; before that 21d631b and 512eead, on the evening of 15 November 2026;
+                 before that 4af2afa and 1e47614, and before that f461bd1 and 23c2500).  The document states both, and each
                  repository's HEAD is that commit (or, once the write-up is committed, a descendant of it with nothing
                  but the write-up's own files changed since).
  12 d34_numbers  A block that cites DIAGNOSTIC 34 (a [src:] tag naming its result, its erratum, d34.tsv, or the tables
@@ -138,6 +139,26 @@ TWO CHECKS ADDED ON 16 NOVEMBER 2026, when the write-up was revised for DIAGNOST
                  unit of charge) are in [dv:] rows marked POST HOC, and a block that quotes one of those values carries
                  the words "post hoc".
 
+TWO CHECKS ADDED ON 18 NOVEMBER 2026, when the write-up was revised for DIAGNOSTIC 43 and AMENDMENTS 6 and 7
+
+ 27 survivors_d43 DIAGNOSTIC 43 is recomputed here from the raw outputs of d43/ and the two charge-free controls of
+                 DIAGNOSTIC 31.  For each of its 36 condition-states: the detachment energy, the monoanion run minus the
+                 dianion run that d43.tsv names, with the word AMENDMENT 6 gives (METASTABLE at or below zero; BOUND
+                 above zero if the monoanion's last stability verdict is stable); and the four legs of the dianion
+                 through the committed readers (cs6_audit.read, cs6_d33b.stability and SHIFT) at the committed
+                 thresholds.  For each condition: the four-leg verdict, whether the fifth leg is passed, and ddE.  Each
+                 must equal d43.tsv and the row of figures/T15 that holds it.  The survivors, the designs of part B that
+                 are RELIABLE and BOUND at both states, must be the ones figures/T15 and d43.tsv mark, and their number
+                 must be its [dv:] row.  The verdicts on H3, H2 and H9 that the document quotes must be the ones those
+                 readings give.  And the document's statement that DIAGNOSTIC 44 has no output must be true of the
+                 repository: the number of job.out files under d44/ must be the [dv:] row that says so, and if any
+                 exists the document may not say that none does.
+ 28 working_level AMENDMENT 7: "No ddE of a survivor is quoted as more than a working-level number until it has been
+                 through A7.3."  Every block of the document that quotes the ddE of a condition of DIAGNOSTIC 43 that is
+                 RELIABLE and BOUND at both states, as recomputed by check 27, carries the words "working-level number".
+                 A block that quotes the ddE of a condition with a METASTABLE state carries the words "Probe 2" or the
+                 word METASTABLE, because Probe 2's sentence applies to it.
+
 THE SCOPED REPORT (added 11 November 2026).  With --scoped <report> --scoped-dir <its directory> the script validates
 the second report, WRITEUP_SCOPED_<date>.md, and leaves the checks above alone.  Its eight checks:
 
@@ -166,8 +187,10 @@ evening, the derived value of the def2-SVPD benchmark, a detachment energy of a 
 reached lowering, a number of DIAGNOSTIC 39 quoted under its citation and the post hoc label of a distance at
 def2-SVPD, and, for the two checks of 16 November 2026, a detachment energy of DIAGNOSTIC 42 in its table, the count of
 conditions bound at both states, the words NOT QUOTABLE beside one of its ddE, the word METASTABLE beside one that
-Probe 2's sentence reaches and the post hoc label of a comparison, one at a time, on a copy, and requires the right
-check to fail for the right reason.
+Probe 2's sentence reaches and the post hoc label of a comparison, and, for the two checks of 18 November 2026, a
+detachment energy of DIAGNOSTIC 43 in its table, the count of survivors, the count of outputs of DIAGNOSTIC 44, the
+words working-level number beside a survivor's ddE and the mention of Probe 2 beside a ddE its sentence reaches, one at
+a time, on a copy, and requires the right check to fail for the right reason.
 """
 import argparse
 import hashlib
@@ -216,7 +239,7 @@ SELF_LABELS = [
 ]
 
 # ---- the revision of 11 November 2026 (DIAGNOSTIC 34): checks 11 to 16
-EXPECTED_HEADS = {"chorismate-thesis-results": "6c09d9c", "chorismate-thesis-code": "9f66ee3"}   # 21d631b, 512eead on the evening of 15 November; 4af2afa, 1e47614 that morning; f461bd1, 23c2500 on 11 November
+EXPECTED_HEADS = {"chorismate-thesis-results": "0ede870", "chorismate-thesis-code": "ee28301"}   # 6c09d9c, 9f66ee3 on 16 November; 21d631b, 512eead on the evening of 15 November; 4af2afa, 1e47614 that morning; f461bd1, 23c2500 on 11 November
 D34_RECORD = ("D34R", "D34T")                           # the committed result and its table: where a D34 number must stand
 D34_TAGS = ("D34R", "D34T", "D34E1", "T3D", "T4W")      # a block tagged with any of these is a block about D34
 D34_REF = "26.8248"                                     # the corrected reference barrier, kcal/mol
@@ -827,12 +850,13 @@ def run_checks(doc, figdir, ctx, docpath=None, mode="pre"):
     F = {k: [] for k in ("numbers", "quotes", "citations", "withdrawn", "selflabels", "controls", "counts", "not_tested",
                          "regeneration", "heads", "exp_heads", "d34_numbers", "d34_controls", "arm1_legs", "claims", "posthoc",
                          "benchmark", "experiment", "d38_a1", "posthoc_lvl",
-                         "benchmark_sv", "detachment", "metastable", "d39_held", "bound_d42", "not_quotable")}
+                         "benchmark_sv", "detachment", "metastable", "d39_held", "bound_d42", "not_quotable", "survivors_d43", "working_level")}
     stats = dict(sourced=0, derived=0, estimated=0, exempt=0, quotes=0, files=0, controls=0, worst="", counts=0, names=0, tsv=0,
                  d34_blocks=0, d34_rec=0, d34_dv=0, d34_ctl="", legs=0, claim_dvs=0, c3_blocks=0,
                  bench="", exp_blocks=0, a1_blocks=0, ph_blocks=0, t9_blocks=0,
                  bench_sv="", vde=0, vde_neg=0, reached_blocks=0, d39_blocks=0,
-                 vde42=0, vde42_neg=0, both42=0, cond42=0, nq_blocks=0, ph42_blocks=0)
+                 vde42=0, vde42_neg=0, both42=0, cond42=0, nq_blocks=0, ph42_blocks=0,
+                 vde43=0, vde43_neg=0, cond43=0, rel43=0, both43=0, surv43=0, out44=0, wl_blocks=0, p2_blocks=0)
     doc = doc.replace("−", "-")
     src = parse_sources(doc)
 
@@ -1560,6 +1584,153 @@ def run_checks(doc, figdir, ctx, docpath=None, mode="pre"):
             if not re.search(r"post hoc", b, re.I):
                 F["not_quotable"].append("section '%s': a block quotes a comparison of DIAGNOSTIC 42's numbers that is this write-up's own (%s) without "
                                          "the words post hoc: %s..." % (sec, hitp[0], norm(b)[:90]))
+
+    # ================================================================ the two checks of 18 November 2026
+    # ---------------------------------------------------------------- 27 DIAGNOSTIC 43, recomputed here from the raw outputs
+    P43 = ctx.code / "phase2.2"
+    audit43, d33b43 = load(P43 / "cs6_audit.py", "cswu43_audit"), load(P43 / "cs6_d33b.py", "cswu43_d33b")
+    t43 = ctx.res / S6 / "d43.tsv"
+    rows43 = []
+    if t43.is_file():
+        ls = t43.read_text().splitlines()
+        rows43 = [dict(zip(ls[0].split("\t"), l.split("\t"))) for l in ls[1:] if l.strip()]
+    if not rows43:
+        F["survivors_d43"].append("d43.tsv is missing or empty")
+    t15 = {}
+    q15 = Path(figdir) / "T15_d43_conditions.tsv"
+    if q15.is_file():
+        cols15 = None
+        for l in q15.read_text().splitlines():
+            if l.startswith("#") or not l.strip():
+                continue
+            f = l.split("\t")
+            if cols15 is None:
+                cols15 = f
+                continue
+            r_ = dict(zip(cols15, f))
+            t15[(r_["condition"], r_["state"])] = r_
+    if rows43 and len(t15) != len(rows43):
+        F["survivors_d43"].append("figures/T15 holds %d condition-states and d43.tsv %d" % (len(t15), len(rows43)))
+
+    def read43(q):
+        """One dianion run of DIAGNOSTIC 43 or one control of DIAGNOSTIC 31, through the committed readers."""
+        if not q.is_file():
+            return None
+        x = q.read_text(errors="replace")
+        c = audit43.read(x)
+        if c is None or not c["norm"] or c["notconv"]:
+            return None
+        c["shifted"] = any(re.search(s_, x) for s_ in d33b43.SHIFT)
+        c["stab"] = d33b43.stability(x)
+        return c
+    c43 = {st: read43(ctx.res / S6 / "d31" / ("ctl_%s" % st) / "job.out") for st in ("R", "TS")}
+    if None in c43.values():
+        F["survivors_d43"].append("a charge-free control of DIAGNOSTIC 31 is not a readable, normally terminated run")
+    st43, part43 = {}, {}
+    for r in rows43:
+        k = (r["condition"], r["state"])
+        part43[r["condition"]] = (r["part"], float(r["sum_q_e"]))
+        di = read43(ctx.res / S6 / "d43" / r["di_run"] / "job.out")
+        q_m = ctx.res / S6 / "d43" / r["mo_run"] / "job.out"
+        em = e_last(q_m, False)
+        if di is None or em is None or c43[r["state"]] is None:
+            F["survivors_d43"].append("%s %s: the dianion run, the monoanion run or the control is not a readable, normally terminated run" % k)
+            continue
+        ctl = c43[r["state"]]
+        vde = (em - di["E"]) * EV
+        stats["vde43"] += 1
+        stats["vde43_neg"] += vde <= 0
+        verd = re.findall(r"stability analysis[^\n]*?wave ?function is (stable|unstable)", q_m.read_text(errors="replace"), re.I)
+        word = "METASTABLE" if vde <= 0 else ("BOUND" if verd and verd[-1].lower() == "stable" else D42_NOTSTABLE)
+        rise, dip = di["maxlw"] - ctl["maxlw"], di["dip"] / ctl["dip"]
+        flag = rise >= audit43.D_LW or dip >= audit43.R_DIP or (di["stab"]["ran"] and di["stab"]["last"] == "UNSTABLE")
+        held = di["shifted"] or di["gap"] is None or ctl["gap"] is None or not di["stab"]["ran"]
+        if not held and di["gap"] < audit43.GAP_ABS and di["gap"] < audit43.R_GAP * ctl["gap"]:
+            flag = True
+        st43[k] = dict(E=di["E"], vde=vde, word=word, flag=flag, held=held, rise=rise)
+        tr = t15.get(k)
+        for what, rec in (("d43.tsv", r), ("figures/T15", tr)):
+            if rec is None:
+                F["survivors_d43"].append("%s %s is not in %s" % (k[0], k[1], what))
+                continue
+            if abs(float(rec["VDE_eV"]) - vde) > 6e-5:
+                F["survivors_d43"].append("%s %s: %s says %s eV; recomputed here from the raw outputs: %+.4f" % (k[0], k[1], what, rec["VDE_eV"], vde))
+            if rec.get("word") != word:
+                F["survivors_d43"].append("%s %s: AMENDMENT 6's rule gives %s; %s says %s" % (k[0], k[1], word, what, rec.get("word")))
+            if abs(float(rec["lowdin_rise_e"]) - rise) > 6e-5:
+                F["survivors_d43"].append("%s %s: %s says a Loewdin rise of %s e; recomputed here: %+.4f" % (k[0], k[1], what, rec["lowdin_rise_e"], rise))
+    dde43, both43, rel43, surv43 = {}, set(), set(), set()
+    for c in sorted(part43):
+        if (c, "R") not in st43 or (c, "TS") not in st43 or None in c43.values():
+            F["survivors_d43"].append("%s: the two states and the two controls are not all readable, so it is not recomputed" % c)
+            continue
+        x = {st: st43[(c, st)] for st in ("R", "TS")}
+        dde = ((x["TS"]["E"] - c43["TS"]["E"]) - (x["R"]["E"] - c43["R"]["E"])) * H2K
+        dde43[c] = dde
+        four = "UNRELIABLE" if (x["R"]["flag"] or x["TS"]["flag"]) else ("INCONCLUSIVE" if (x["R"]["held"] or x["TS"]["held"]) else "RELIABLE")
+        w = (x["R"]["word"], x["TS"]["word"])
+        fifth = "PASSED" if w == ("BOUND", "BOUND") else ("NOT PASSED: METASTABLE" if "METASTABLE" in w else "NOT PASSED")
+        if four == "RELIABLE":
+            rel43.add(c)
+        if w == ("BOUND", "BOUND"):
+            both43.add(c)
+        s_ = part43[c][0] == "B" and four == "RELIABLE" and fifth == "PASSED"
+        if s_:
+            surv43.add(c)
+        for st in ("R", "TS"):
+            rr = next(y for y in rows43 if (y["condition"], y["state"]) == (c, st))
+            tr = t15.get((c, st))
+            for what, rec, ys in (("d43.tsv", rr, "yes"), ("figures/T15", tr, "SURVIVOR")):
+                if rec is None:
+                    continue
+                if abs(float(rec["ddE_kcal"]) - dde) > 6e-5:
+                    F["survivors_d43"].append("%s %s: %s says a ddE of %s kcal/mol; recomputed here from the raw outputs: %+.4f" % (c, st, what, rec["ddE_kcal"], dde))
+                if rec["four_legs"] != four or rec["fifth_leg"] != fifth:
+                    F["survivors_d43"].append("%s %s: read here %s on four legs and the fifth leg %s; %s says %s and %s" % (c, st, four, fifth, what, rec["four_legs"], rec["fifth_leg"]))
+                if (rec["survivor"] == ys) != s_:
+                    F["survivors_d43"].append("%s %s: %s marks it %s; by the readings formed here it %s a survivor" % (c, st, what, rec["survivor"], "is" if s_ else "is not"))
+    stats["cond43"], stats["rel43"], stats["both43"], stats["surv43"] = len(part43), len(rel43), len(both43), len(surv43)
+    if rows43 and ("DV436" not in dv or dv["DV436"][1] != str(len(surv43))):
+        F["survivors_d43"].append("DV436 (the survivors of the search) is %s in figures/derived.tsv; recomputed here from the raw outputs: %d"
+                                  % (dv["DV436"][1] if "DV436" in dv else "absent", len(surv43)))
+    if len(dde43) == len(part43) and part43:
+        pa = [c for c in part43 if part43[c][0] == "A"]
+        for name, cs in (("H3", pa), ("H2", [c for c in pa if part43[c][1] < 0]), ("H9", [c for c in part43 if part43[c][1] > -5e-7 and c in rel43])):
+            ok = all(c in rel43 for c in cs) if name != "H9" else all(c in both43 for c in cs)
+            said = "%s IS NOT FALSIFIED BY THESE %d CONDITIONS." % (name, len(cs))
+            if ok and said not in doc:
+                F["survivors_d43"].append("the document does not quote DIAGNOSTIC 43's verdict, %s" % said)
+            if not ok and re.search(name + r" IS NOT FALSIFIED BY THESE \d+ CONDITIONS", doc) and name != "H9":
+                F["survivors_d43"].append("the document quotes %s IS NOT FALSIFIED, and a condition of its test is not RELIABLE here" % name)
+            if not ok and name == "H9" and ("H9 IS NOT FALSIFIED BY THESE %d CONDITIONS." % len(cs)) in doc:
+                F["survivors_d43"].append("the document quotes H9 IS NOT FALSIFIED for DIAGNOSTIC 43, and a RELIABLE condition whose charges sum to zero or more is not BOUND at both states here")
+    d44 = ctx.res / S6 / "d44"
+    n44 = len(list(d44.rglob("job.out"))) if d44.is_dir() else 0
+    stats["out44"] = n44
+    if "DV470" not in dv or dv["DV470"][1] != str(n44):
+        F["survivors_d43"].append("DV470 (the outputs of DIAGNOSTIC 44 in the record) is %s in figures/derived.tsv; counted here: %d"
+                                  % (dv["DV470"][1] if "DV470" in dv else "absent", n44))
+    if n44 and re.search(r"D44[^.]*?(?:has no output|holds no output)", doc):
+        F["survivors_d43"].append("the document says DIAGNOSTIC 44 has no output in the record, and d44/ holds %d job.out files" % n44)
+
+    # ---------------------------------------------------------------- 28 a ddE of DIAGNOSTIC 43 is a working-level number, or is reached by Probe 2's sentence
+    wl43 = dict((c, "%.4f" % v) for c, v in dde43.items() if c in rel43 and c in both43)
+    p243 = dict((c, "%.4f" % v) for c, v in dde43.items() if "METASTABLE" in (st43[(c, "R")]["word"], st43[(c, "TS")]["word"]))
+    for sec, b in blocks_of(doc):
+        if b.startswith("#") or "| key | repo | path |" in b:
+            continue
+        hit = sorted(c for c, s in wl43.items() if re.search(r"(?<![\d.])" + re.escape(s) + r"(?!\d)", b))
+        if hit:
+            stats["wl_blocks"] += 1
+            if "working-level number" not in b:
+                F["working_level"].append("section '%s': a block quotes a ddE of DIAGNOSTIC 43 (%s, %s) without the words working-level number: %s..."
+                                          % (sec, hit[0], wl43[hit[0]], norm(b)[:90]))
+        hit = sorted(c for c, s in p243.items() if re.search(r"(?<![\d.])" + re.escape(s) + r"(?!\d)", b))
+        if hit:
+            stats["p2_blocks"] += 1
+            if "Probe 2" not in b and "METASTABLE" not in b:
+                F["working_level"].append("section '%s': a block quotes a ddE that Probe 2's sentence reaches (%s, %s) without naming Probe 2 or the word "
+                                          "METASTABLE: %s..." % (sec, hit[0], p243[hit[0]], norm(b)[:90]))
     return F, stats
 
 
@@ -1567,7 +1738,7 @@ def report(F, stats, out=sys.stdout):
     order = ["numbers", "quotes", "citations", "withdrawn", "selflabels", "controls", "counts", "not_tested", "regeneration", "heads",
              "exp_heads", "d34_numbers", "d34_controls", "arm1_legs", "claims", "posthoc",
              "benchmark", "experiment", "d38_a1", "posthoc_lvl",
-             "benchmark_sv", "detachment", "metastable", "d39_held", "bound_d42", "not_quotable"]
+             "benchmark_sv", "detachment", "metastable", "d39_held", "bound_d42", "not_quotable", "survivors_d43", "working_level"]
     notes = {
         "numbers": "%d sourced in a named committed file, %d derived (figures/derived.tsv), %d estimated; %d items not treated as numerals"
                    % (stats["sourced"], stats["derived"], stats["estimated"], stats["exempt"]),
@@ -1592,7 +1763,12 @@ def report(F, stats, out=sys.stdout):
         "d39_held": "%d blocks cite DIAGNOSTIC 39's result or amendment; none quotes a number of it" % stats["d39_blocks"],
         "bound_d42": "%d detachment energies recomputed from d42/ and DIAGNOSTIC 31's dianion runs; %d at or below zero; %d of %d conditions "
                      "BOUND at both states" % (stats["vde42"], stats["vde42_neg"], stats["both42"], stats["cond42"]),
-        "not_quotable": "%d blocks quote a ddE of DIAGNOSTIC 42; %d a post hoc comparison of its numbers" % (stats["nq_blocks"], stats["ph42_blocks"])}
+        "not_quotable": "%d blocks quote a ddE of DIAGNOSTIC 42; %d a post hoc comparison of its numbers" % (stats["nq_blocks"], stats["ph42_blocks"]),
+        "survivors_d43": "%d detachment energies recomputed from d43/; %d at or below zero; of %d conditions %d RELIABLE on four legs and %d BOUND at "
+                         "both states; %d survivors; %d outputs of DIAGNOSTIC 44 in the record"
+                         % (stats["vde43"], stats["vde43_neg"], stats["cond43"], stats["rel43"], stats["both43"], stats["surv43"], stats["out44"]),
+        "working_level": "%d blocks quote a ddE of DIAGNOSTIC 43 that is a working-level number; %d one that Probe 2's sentence reaches"
+                         % (stats["wl_blocks"], stats["p2_blocks"])}
     bad = 0
     for i, k in enumerate(order, 1):
         if i == 11:
@@ -1603,11 +1779,13 @@ def report(F, stats, out=sys.stdout):
             print("   -- added on the evening of 15 November 2026 for DIAGNOSTICS 40 and 41 and DIAGNOSTIC 37's Amendment 1", file=out)
         if i == 25:
             print("   -- added 16 November 2026 for DIAGNOSTIC 42", file=out)
+        if i == 27:
+            print("   -- added 18 November 2026 for DIAGNOSTIC 43 and AMENDMENTS 6 and 7", file=out)
         print("%2d %-12s %s   (%s)" % (i, k, "PASS" if not F[k] else "FAIL  %d" % len(F[k]), notes[k]), file=out)
         for msg in F[k][:40]:
             print("      - " + msg, file=out)
         bad += len(F[k])
-    print("RESULT: %s" % ("ALL TWENTY-SIX CHECKS PASS" if not bad else "%d FAILURE(S)" % bad), file=out)
+    print("RESULT: %s" % ("ALL TWENTY-EIGHT CHECKS PASS" if not bad else "%d FAILURE(S)" % bad), file=out)
     return bad
 
 
@@ -1652,7 +1830,7 @@ def selftest(doc, figdir, ctx):
                   in_section("6. What", "Each item states", "A budget of 0.58 applies. Each item states")))
     tests.append(("a self-label", "selflabels", "PARTIAL", in_section("4. The approaches", "PARTIAL", "mixed")))
     tests.append(("a figure's tsv", "regeneration", "F5_distance_ladder.tsv", tsv("F5_distance_ladder.tsv", "+0.3994", "+0.3894")))
-    tests.append(("a HEAD hash", "heads", "records", sub("`9f66ee33", "`af66ee33")))
+    tests.append(("a HEAD hash", "heads", "records", sub("`ee283016", "`fe283016")))
     tests.append(("the not-tested list", "not_tested", "CAM-B3LYP", sub("`PBE0`,", "`PBE0`, `CAM-B3LYP`,")))
 
     # ---- the six checks added on 11 November 2026
@@ -1675,7 +1853,7 @@ def selftest(doc, figdir, ctx):
         ctx.d34root = alt
         return d, fd
 
-    tests.append(("the commit the revision was built from", "exp_heads", "does not state", sub("`6c09d9c3d", "`7c09d9c3d")))
+    tests.append(("the commit the revision was built from", "exp_heads", "does not state", sub("`0ede870f6", "`fede870f6")))
     tests.append(("a D34 number that another cited file holds", "d34_numbers", "14.3612",
                   sub("-4.1567 and -5.3701, all single negative spheres. Scope: inside r_safe; not a catalytic claim; no arrangement of more "
                       "than one sphere that the optimiser placed is quotable. [src: D34R, D34T]",
@@ -1733,6 +1911,17 @@ def selftest(doc, figdir, ctx):
                              "For the 3 conditions with a state at or below zero Probe 2's sentence applies")))
     tests.append(("the post hoc label of a comparison of D42's numbers", "not_quotable", "without the words post hoc",
                   in_section("5. The reliability criterion", "which is how H9 was worded. Post hoc.", "which is how H9 was worded.")))
+    # ---- the two checks added on 18 November 2026
+    tests.append(("a detachment energy of D43 in its table", "survivors_d43", "B_n02_q1.00 R",
+                  tsv("T15_d43_conditions.tsv", "\t+0.2272\tBOUND\t", "\t-0.2272\tMETASTABLE\t")))
+    tests.append(("the count of survivors", "survivors_d43", "DV436", tsv("derived.tsv", "DV436\t6\t", "DV436\t5\t")))
+    tests.append(("the count of outputs of D44", "survivors_d43", "DV470", tsv("derived.tsv", "DV470\t0\t", "DV470\t1\t")))
+    tests.append(("the words working-level number beside a survivor's ddE", "working_level", "without the words working-level number",
+                  in_section("6. What", "against a charge-free barrier of 26.8248, are working-level numbers: Amendment 7 allows",
+                             "against a charge-free barrier of 26.8248, are lowerings: Amendment 7 allows")))
+    tests.append(("the mention of Probe 2 beside a ddE of D43 that its sentence reaches", "working_level", "without naming Probe 2",
+                  in_section("7. What has been withdrawn", "What D43 adds to the numbers Probe 2's sentence reaches is the ddE",
+                             "What D43 adds to the record is the ddE")))
     fired = 0
     lines = []
 
